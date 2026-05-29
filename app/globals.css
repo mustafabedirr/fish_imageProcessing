@@ -1223,6 +1223,10 @@ body:has(.auth-stage) {
   gap: 6px;
 }
 
+.auth-field:first-child {
+  margin-top: 12px;
+}
+
 .auth-label {
   display: inline-flex;
   align-items: center;
@@ -1239,7 +1243,7 @@ body:has(.auth-stage) {
   display: grid;
   grid-template-columns: 18px minmax(0, 1fr) auto;
   align-items: center;
-  height: 31px;
+  height: 40px;
   padding: 0 12px;
   border: 1px solid rgba(77, 112, 171, 0.42);
   border-radius: 11px;
@@ -1606,7 +1610,7 @@ body:has(.auth-stage) {
   }
 
   .auth-input-wrap {
-    height: 42px;
+    height: 48px;
     padding: 0 12px;
     border-radius: 11px;
   }
