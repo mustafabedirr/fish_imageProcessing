@@ -9,11 +9,16 @@ import {
   BrainCircuit,
   Camera,
   CirclePlay,
+  Fish,
+  Instagram,
+  Linkedin,
   MapPin,
   MessageSquareText,
   Search,
   ShieldCheck,
+  Twitter,
   Users,
+  Youtube,
 } from "lucide-react";
 
 const featureCards = [
@@ -86,7 +91,7 @@ const modules = [
 
 const stats = [
   { value: 10000, label: "Aktif Kullanıcı", icon: BrainCircuit, suffix: "+", compact: "k", duration: 1800 },
-  { value: 350, label: "Balık Türü", icon: FishGlyph, suffix: "+", duration: 1500 },
+  { value: 350, label: "Balık Türü", icon: Fish, suffix: "+", duration: 1500 },
   { value: 500, label: "Analiz Kategorisi", icon: Users, suffix: "+", duration: 1650 },
   { value: 50, label: "Ülke", icon: ShieldCheck, suffix: "+", duration: 1300 },
 ] as const;
@@ -345,10 +350,10 @@ export default function LandingPage() {
               AquaScope, yapay zeka ile sualtı dünyasını keşfetmenizi sağlayan modern bir analiz platformudur.
             </p>
             <div className="landing-footer-socials">
-              <span>in</span>
-              <span>ig</span>
-              <span>yt</span>
-              <span>x</span>
+              <span aria-label="LinkedIn"><Linkedin size={16} /></span>
+              <span aria-label="Instagram"><Instagram size={16} /></span>
+              <span aria-label="YouTube"><Youtube size={16} /></span>
+              <span aria-label="X"><Twitter size={16} /></span>
             </div>
           </div>
 
@@ -442,18 +447,4 @@ function AnimatedStatValue({
   }
 
   return <>{value}{suffix}</>;
-}
-
-function FishGlyph() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 32 32" fill="none" aria-hidden>
-      <path
-        d="M4 16c3.6-5.1 8.1-7.6 13.5-7.6 4.7 0 8.6 1.9 11.7 5.7L28.2 16l1 1.9c-3.1 3.8-7 5.7-11.7 5.7C12.1 23.6 7.6 21.1 4 16Z"
-        fill="currentColor"
-      />
-      <circle cx="21.4" cy="14.1" r="1.5" fill="#07162C" />
-      <path d="M3.7 12.5 1 9.8l2.3-.7L6 10.7" fill="currentColor" />
-      <path d="m3.7 19.5-2.7 2.7 2.3.7L6 21.3" fill="currentColor" />
-    </svg>
-  );
 }

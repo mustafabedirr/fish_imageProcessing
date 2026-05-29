@@ -6,9 +6,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Fish,
+  Globe2,
   Search,
   SlidersHorizontal,
   Star,
+  Tags,
   TrendingDown,
   TrendingUp,
   Waves,
@@ -70,9 +72,9 @@ const trendingSpecies = [
 const popularTags = ["Freshwater", "Saltwater", "Bass", "Perch", "Tropical", "Deepwater", "Coastal"];
 
 const overviewStats = [
-  { label: "Total Species", value: "128", icon: "Species" },
-  { label: "Regions", value: "45", icon: "Region" },
-  { label: "Types", value: "8", icon: "Type" },
+  { label: "Total Species", value: "128", icon: Fish },
+  { label: "Regions", value: "45", icon: Globe2 },
+  { label: "Types", value: "8", icon: Tags },
 ];
 
 export default function SpeciesLibraryWorkspace() {
@@ -181,11 +183,11 @@ export default function SpeciesLibraryWorkspace() {
               </div>
 
               <div className="species-catalog-overview">
-                {overviewStats.map((item) => (
-                  <article key={item.label}>
-                    <span>{item.icon}</span>
-                    <strong>{item.value}</strong>
-                    <small>{item.label}</small>
+                {overviewStats.map(({ icon: Icon, label, value }) => (
+                  <article key={label}>
+                    <span><Icon size={18} /></span>
+                    <strong>{value}</strong>
+                    <small>{label}</small>
                   </article>
                 ))}
               </div>
