@@ -5055,8 +5055,14 @@ body.profile-dark-theme .profile-following img {
 }
 
 body:has(.landing-page) {
+  scroll-behavior: smooth;
   overflow-x: hidden;
   overflow-y: auto;
+}
+
+.landing-page section,
+.landing-footer {
+  scroll-margin-top: 24px;
 }
 
 .landing-navbar,

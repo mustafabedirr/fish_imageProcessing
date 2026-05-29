@@ -140,8 +140,6 @@ export default function LandingPage() {
             <a href="#features">Özellikler</a>
             <a href="#modules">Modüller</a>
             <a href="#how-it-works">Nasıl Çalışır?</a>
-            <a href="#technologies">Teknolojiler</a>
-            <a href="#about">Hakkımızda</a>
           </nav>
 
           <Link href="/login" className="landing-primary-button">
