@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   BarChart3,
@@ -84,15 +85,45 @@ const modules = [
 ];
 
 const stats = [
-  ["10K+", "Aktif Kullanıcı", BrainCircuit],
-  ["350+", "Balık Türü", FishGlyph],
-  ["500+", "Analiz Kategorisi", Users],
-  ["50+", "Ülke", ShieldCheck],
+  { value: 10000, label: "Aktif Kullanıcı", icon: BrainCircuit, suffix: "+", compact: "k", duration: 1800 },
+  { value: 350, label: "Balık Türü", icon: FishGlyph, suffix: "+", duration: 1500 },
+  { value: 500, label: "Analiz Kategorisi", icon: Users, suffix: "+", duration: 1650 },
+  { value: 50, label: "Ülke", icon: ShieldCheck, suffix: "+", duration: 1300 },
 ] as const;
 
 const technologies = ["Next.js", "FastAPI", "TensorFlow / Keras", "Leaflet", "TypeScript"];
 
 export default function LandingPage() {
+  const statsRef = useRef<HTMLElement | null>(null);
+  const [animateStats, setAnimateStats] = useState(false);
+
+  useEffect(() => {
+    const statsNode = statsRef.current;
+
+    if (!statsNode || animateStats) {
+      return;
+    }
+
+    if (!("IntersectionObserver" in window)) {
+      setAnimateStats(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setAnimateStats(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.35 }
+    );
+
+    observer.observe(statsNode);
+
+    return () => observer.disconnect();
+  }, [animateStats]);
+
   return (
     <main className="landing-page">
       <section className="landing-hero" id="top">
@@ -220,12 +251,20 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="landing-stats-band" id="about">
+      <section className="landing-stats-band" id="about" ref={statsRef}>
         <div className="landing-stats-inner">
-          {stats.map(([value, label, Icon]) => (
+          {stats.map(({ value, label, icon: Icon, suffix, compact, duration }) => (
             <article key={label}>
               <span><Icon size={18} /></span>
-              <strong>{value}</strong>
+              <strong>
+                <AnimatedStatValue
+                  compact={compact}
+                  duration={duration}
+                  start={animateStats}
+                  suffix={suffix}
+                  target={value}
+                />
+              </strong>
               <p>{label}</p>
             </article>
           ))}
@@ -354,6 +393,57 @@ export default function LandingPage() {
       </footer>
     </main>
   );
+}
+
+function AnimatedStatValue({
+  compact,
+  duration,
+  start,
+  suffix,
+  target,
+}: {
+  compact?: "k";
+  duration: number;
+  start: boolean;
+  suffix: string;
+  target: number;
+}) {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    if (!start) {
+      setValue(0);
+      return;
+    }
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setValue(target);
+      return;
+    }
+
+    let frameId = 0;
+    const startedAt = performance.now();
+    const easeOutCubic = (progress: number) => 1 - Math.pow(1 - progress, 3);
+
+    const tick = (now: number) => {
+      const progress = Math.min((now - startedAt) / duration, 1);
+      setValue(Math.round(target * easeOutCubic(progress)));
+
+      if (progress < 1) {
+        frameId = requestAnimationFrame(tick);
+      }
+    };
+
+    frameId = requestAnimationFrame(tick);
+
+    return () => cancelAnimationFrame(frameId);
+  }, [duration, start, target]);
+
+  if (compact === "k") {
+    return <>{Math.round(value / 1000)}K{suffix}</>;
+  }
+
+  return <>{value}{suffix}</>;
 }
 
 function FishGlyph() {
