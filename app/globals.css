@@ -3140,21 +3140,21 @@ body {
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
+  grid-template-columns: 304px minmax(0, 1fr);
   gap: 0;
   overflow: hidden;
   background: #020817;
 }
 
 body.sidebar-collapsed .app-shell {
-  grid-template-columns: 104px minmax(0, 1fr);
+  grid-template-columns: 86px minmax(0, 1fr);
 }
 
 body.sidebar-collapsed .sidebar.aqua-sidebar {
-  width: 104px;
-  min-width: 104px;
-  max-width: 104px;
-  padding: 12px;
+  width: 86px;
+  min-width: 86px;
+  max-width: 86px;
+  padding: 14px 8px;
   transition:
     width 280ms ease,
     min-width 280ms ease,
@@ -3237,14 +3237,14 @@ body.sidebar-collapsed .sidebar.aqua-sidebar {
   }
 
   body.sidebar-collapsed .app-shell {
-    grid-template-columns: 96px minmax(0, 1fr);
+    grid-template-columns: 84px minmax(0, 1fr);
   }
 
   body.sidebar-collapsed .sidebar.aqua-sidebar {
-    width: 96px;
-    min-width: 96px;
-    max-width: 96px;
-    padding: 10px;
+    width: 84px;
+    min-width: 84px;
+    max-width: 84px;
+    padding: 8px;
   }
 
   .sidebar {
@@ -8482,12 +8482,14 @@ body:has(.landing-page) {
 
 /* Aqua sidebar refresh */
 .sisyphus-sidebar.aqua-sidebar {
-  width: 330px;
-  min-width: 330px;
+  width: 304px;
+  min-width: 304px;
   height: 100dvh;
-  padding: 12px;
+  padding: 14px 12px;
   color: #f8fbff;
-  background: #020817;
+  background:
+    radial-gradient(420px 520px at 20% 0%, rgba(0, 212, 255, 0.08), transparent 62%),
+    #020817;
   border-right: 0;
   box-shadow: none;
 }
@@ -8496,11 +8498,16 @@ body:has(.landing-page) {
   display: flex;
   height: 100%;
   flex-direction: column;
-  border: 0;
-  border-radius: 28px;
-  background: linear-gradient(180deg, #06162b 0%, #031124 58%, #020817 100%);
-  padding: 24px 20px;
-  box-shadow: 0 0 35px rgba(14, 165, 233, 0.15);
+  overflow: hidden;
+  border: 1px solid rgba(110, 154, 210, 0.22);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(7, 20, 38, 0.94) 0%, rgba(5, 18, 36, 0.98) 58%, rgba(3, 12, 26, 0.99) 100%);
+  padding: 28px 18px 20px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 18px 50px rgba(0, 8, 24, 0.34),
+    0 0 0 1px rgba(34, 211, 238, 0.04);
 }
 
 .aqua-sidebar__header {
@@ -8508,7 +8515,7 @@ body:has(.landing-page) {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 30px;
+  margin-bottom: 28px;
 }
 
 .aqua-sidebar__brand-wrap {
@@ -8528,18 +8535,18 @@ body:has(.landing-page) {
 
 .aqua-sidebar__logo-box {
   display: flex;
-  width: 64px;
-  height: 48px;
+  width: 58px;
+  height: 38px;
   align-items: center;
   justify-content: center;
   border-radius: 12px;
 }
 
 .aqua-sidebar__logo-image {
-  width: 48px;
-  height: 48px;
+  width: 58px;
+  height: 38px;
   object-fit: contain;
-  filter: drop-shadow(0 0 14px rgba(34, 211, 238, 0.9));
+  filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.62));
 }
 
 .aqua-sidebar__brand-copy {
@@ -8548,10 +8555,10 @@ body:has(.landing-page) {
 
 .aqua-sidebar__brand-copy h1 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0.34em;
-  color: #67e8f9;
+  font-size: 20px;
+  font-weight: 760;
+  letter-spacing: -0.02em;
+  color: #ffffff;
 }
 
 .aqua-sidebar__brand-copy p {
@@ -8563,14 +8570,14 @@ body:has(.landing-page) {
 
 .aqua-sidebar__theme {
   display: inline-flex;
-  width: 48px;
-  height: 48px;
+  width: 28px;
+  height: 28px;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  border-radius: 18px;
-  background: rgba(56, 189, 248, 0.1);
-  color: #7dd3fc;
+  border: 1px solid rgba(108, 147, 194, 0.24);
+  border-radius: 8px;
+  background: rgba(31, 64, 103, 0.62);
+  color: #a8c7ee;
   transition: background 180ms ease, box-shadow 180ms ease, color 180ms ease;
 }
 
@@ -8581,13 +8588,13 @@ body:has(.landing-page) {
 }
 
 .aqua-sidebar--collapsed {
-  width: 104px;
+  width: 86px;
 }
 
 .aqua-sidebar--collapsed .aqua-sidebar__panel {
   width: 100%;
   align-items: center;
-  padding: 20px 10px;
+  padding: 26px 10px 18px;
   transition:
     padding 280ms ease,
     border-radius 280ms ease,
@@ -8616,6 +8623,7 @@ body:has(.landing-page) {
 .aqua-sidebar--collapsed .aqua-sidebar__item-plus,
 .aqua-sidebar--collapsed .aqua-sidebar__collapsed,
 .aqua-sidebar--collapsed .aqua-sidebar__logout span,
+.aqua-sidebar--collapsed .aqua-sidebar__insight-card,
 .aqua-sidebar--collapsed .aqua-sidebar__user-text,
 .aqua-sidebar--collapsed .aqua-sidebar__settings {
   display: none;
@@ -8679,31 +8687,31 @@ body:has(.landing-page) {
 
 .aqua-sidebar__menu {
   display: grid;
-  gap: 12px;
+  gap: 8px;
 }
 
 .aqua-sidebar__menu--top {
-  padding-bottom: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(110, 154, 210, 0.12);
 }
 
 .aqua-sidebar__section {
-  margin-top: 28px;
+  margin-top: 20px;
 }
 
 .aqua-sidebar__section-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 8px;
+  padding: 0 12px 8px;
 }
 
 .aqua-sidebar__section-title h2 {
   margin: 0;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.28em;
-  color: #94a3b8;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  color: rgba(190, 205, 231, 0.72);
 }
 
 .aqua-sidebar__section-title svg {
@@ -8711,21 +8719,22 @@ body:has(.landing-page) {
 }
 
 .aqua-sidebar__menu--org {
-  margin-top: 16px;
+  margin-top: 4px;
 }
 
 .aqua-sidebar__item {
   position: relative;
   display: flex;
   width: 100%;
-  min-height: 56px;
+  min-height: 42px;
   align-items: center;
-  gap: 20px;
-  padding: 0 16px;
-  border-radius: 12px;
+  gap: 14px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
   text-decoration: none;
   text-align: left;
-  color: #cbd5e1;
+  color: rgba(218, 230, 250, 0.86);
   transition:
     background 220ms ease,
     color 220ms ease,
@@ -8734,20 +8743,24 @@ body:has(.landing-page) {
 }
 
 .aqua-sidebar__item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(30, 144, 255, 0.22);
+  background: rgba(12, 37, 74, 0.6);
   color: #ffffff;
 }
 
 .aqua-sidebar__item--active {
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(30, 144, 255, 0.68);
+  background:
+    linear-gradient(90deg, rgba(30, 144, 255, 0.24), rgba(30, 144, 255, 0.08));
   color: #ffffff;
-  box-shadow: inset 3px 0 0 #22d3ee, 0 0 24px rgba(34, 211, 238, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 8px 24px rgba(30, 144, 255, 0.16);
 }
 
 .aqua-sidebar__item-icon {
   flex: 0 0 auto;
-  color: rgba(125, 211, 252, 0.8);
+  color: rgba(188, 204, 232, 0.88);
   transition: color 220ms ease, filter 220ms ease;
 }
 
@@ -8757,12 +8770,12 @@ body:has(.landing-page) {
 }
 
 .aqua-sidebar__item-icon--active {
-  filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.9));
+  filter: drop-shadow(0 0 8px rgba(30, 144, 255, 0.8));
 }
 
 .aqua-sidebar__item-label {
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 560;
 }
 
 .aqua-sidebar__item-dot {
@@ -8795,6 +8808,71 @@ body:has(.landing-page) {
 
 .aqua-sidebar__spacer {
   flex: 1;
+}
+
+.aqua-sidebar__insight-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 24px;
+  gap: 12px;
+  align-items: center;
+  min-height: 96px;
+  margin-bottom: 18px;
+  padding: 16px;
+  border: 1px solid rgba(30, 144, 255, 0.48);
+  border-radius: 10px;
+  color: #ffffff;
+  text-decoration: none;
+  background:
+    radial-gradient(circle at 86% 24%, rgba(0, 212, 255, 0.18), transparent 34%),
+    linear-gradient(180deg, rgba(13, 46, 88, 0.82), rgba(7, 28, 57, 0.92));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.aqua-sidebar__insight-card strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 760;
+}
+
+.aqua-sidebar__insight-card p {
+  margin: 8px 0 0;
+  color: rgba(204, 222, 247, 0.78);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.aqua-sidebar__insight-card svg {
+  color: #1e90ff;
+  filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.5));
+}
+
+.aqua-sidebar__notification {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  margin: 0 0 16px 10px;
+  border: 0;
+  border-radius: 12px;
+  color: #c6d7f3;
+  background: transparent;
+}
+
+.aqua-sidebar__notification span {
+  position: absolute;
+  top: 4px;
+  right: 3px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: #1e90ff;
+  font-size: 11px;
+  font-weight: 760;
+  box-shadow: 0 0 0 2px #061428;
 }
 
 .aqua-sidebar__footer {
@@ -8837,9 +8915,9 @@ body:has(.landing-page) {
 
 .aqua-sidebar__user {
   display: grid;
-  grid-template-columns: 56px minmax(0, 1fr) 48px;
+  grid-template-columns: 40px minmax(0, 1fr) 24px;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   padding: 0;
   border-radius: 16px;
   text-decoration: none;
@@ -8854,25 +8932,25 @@ body:has(.landing-page) {
 
 .aqua-sidebar__avatar-wrap {
   position: relative;
-  width: 56px;
-  height: 56px;
+  width: 40px;
+  height: 40px;
 }
 
 .aqua-sidebar__avatar-wrap img {
-  width: 56px;
-  height: 56px;
+  width: 40px;
+  height: 40px;
   border-radius: 999px;
   object-fit: cover;
-  border: 2px solid #22d3ee;
-  box-shadow: 0 0 20px rgba(34, 211, 238, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 0 16px rgba(0, 212, 255, 0.24);
 }
 
 .aqua-sidebar__status {
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 16px;
-  height: 16px;
+  width: 10px;
+  height: 10px;
   border-radius: 999px;
   background: #4ade80;
   border: 1px solid #020617;
@@ -8891,27 +8969,27 @@ body:has(.landing-page) {
 }
 
 .aqua-sidebar__user-text strong {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 720;
   color: #ffffff;
 }
 
 .aqua-sidebar__user-text span {
   margin-top: 4px;
-  font-size: 14px;
-  color: #94a3b8;
+  font-size: 11px;
+  color: rgba(183, 202, 231, 0.74);
 }
 
 .aqua-sidebar__settings {
   display: inline-flex;
-  width: 48px;
-  height: 48px;
+  width: 24px;
+  height: 24px;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(56, 189, 248, 0.25);
-  border-radius: 18px;
-  background: rgba(56, 189, 248, 0.05);
-  color: #7dd3fc;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #91acd0;
   transition: background 220ms ease, color 220ms ease;
 }
 
@@ -8938,6 +9016,7 @@ body:has(.landing-page) {
   .aqua-sidebar__item-dot,
   .aqua-sidebar__item-plus,
   .aqua-sidebar__logout span,
+  .aqua-sidebar__insight-card,
   .aqua-sidebar__user-text,
   .aqua-sidebar__settings,
   .aqua-sidebar__collapsed {
@@ -8961,9 +9040,9 @@ body:has(.landing-page) {
   }
 
   .aqua-sidebar__item--active {
-    border: 1px solid rgba(56, 189, 248, 0.3);
-    background: rgba(34, 211, 238, 0.16);
-    box-shadow: 0 0 15px rgba(34, 211, 238, 0.18);
+    border: 1px solid rgba(30, 144, 255, 0.5);
+    background: rgba(30, 144, 255, 0.18);
+    box-shadow: 0 0 15px rgba(30, 144, 255, 0.18);
   }
 
   .aqua-sidebar__logout {
@@ -8975,6 +9054,11 @@ body:has(.landing-page) {
     grid-template-columns: 1fr;
     justify-items: center;
     padding: 0;
+  }
+
+  .aqua-sidebar__notification {
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .aqua-sidebar--collapsed {

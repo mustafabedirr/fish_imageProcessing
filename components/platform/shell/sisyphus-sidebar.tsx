@@ -5,36 +5,37 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import {
+  BarChart3,
+  Bell,
+  BookOpen,
   ChevronDown,
   ChevronsLeft,
+  Database,
   FileText,
-  Flag,
-  Globe2,
-  Home,
+  Fish,
+  LayoutDashboard,
   LogOut,
+  MapPin,
   Settings,
-  Shield,
+  Sparkles,
+  User,
   Users,
 } from "lucide-react";
 
 const primaryItems = [
-  { href: "/platform/dashboard", label: "Home", icon: Home, matches: ["/platform", "/platform/dashboard"] },
-  { href: "/platform/social", label: "Reports", icon: FileText },
-];
-
-const analyseItems = [
-  { href: "/platform/library", label: "Species Library" },
-  { href: "/platform/map", label: "Map" },
-  { href: "/platform/profile", label: "Risk Profile" },
-  { href: "/platform/social", label: "Remediation" },
+  { href: "/platform/dashboard", label: "Dashboard", icon: LayoutDashboard, matches: ["/platform", "/platform/dashboard"] },
+  { href: "/platform/analyze", label: "Analiz", icon: BarChart3 },
+  { href: "/platform/map", label: "Harita", icon: MapPin },
+  { href: "/platform/library", label: "Tür Kütüphanesi", icon: Fish },
+  { href: "/platform/social", label: "Sosyal Alan", icon: Users },
+  { href: "/platform/profile", label: "Profil", icon: User },
 ];
 
 const lowerItems = [
-  { href: "/platform/library", label: "Domains", icon: Globe2 },
-  { href: "/platform/social", label: "Vulnerabilities", icon: Users },
-  { href: "/platform/profile", label: "Identity breaches", icon: Shield },
-  { href: "/platform/analyze", label: "Data leaks", icon: Flag },
-  { href: "/platform/profile", label: "Security profile", icon: Shield },
+  { href: "/platform/social", label: "Raporlar", icon: FileText },
+  { href: "/platform/messages", label: "Veri Setleri", icon: Database },
+  { href: "/platform/dashboard", label: "İstatistikler", icon: BookOpen },
+  { href: "/platform/settings", label: "Ayarlar", icon: Settings },
 ];
 
 export default function SisyphusSidebar() {
@@ -60,13 +61,6 @@ export default function SisyphusSidebar() {
     });
   }
 
-  const analyseActive =
-    pathname === "/platform/analyze" ||
-    pathname === "/platform/library" ||
-    pathname === "/platform/map" ||
-    pathname === "/platform/profile" ||
-    pathname === "/platform/social";
-
   return (
     <aside className={collapsed ? "sidebar sisyphus-sidebar aqua-sidebar aqua-sidebar--collapsed" : "sidebar sisyphus-sidebar aqua-sidebar"}>
       <div className="aqua-sidebar__panel">
@@ -77,8 +71,7 @@ export default function SisyphusSidebar() {
             </div>
 
             <div className="aqua-sidebar__brand-copy">
-              <h1>AQUASCOPE</h1>
-              <p>Sisyphus</p>
+              <h1>AquaScope</h1>
             </div>
           </div>
 
@@ -94,6 +87,7 @@ export default function SisyphusSidebar() {
         </div>
 
         <nav className="aqua-sidebar__menu aqua-sidebar__menu--top" aria-label="Primary navigation">
+          <SectionTitle title="ANA MENÜ" />
           {primaryItems.map((item) => {
             const active = item.matches
               ? item.matches.some((match) => pathname === match || pathname.startsWith(`${match}/`))
@@ -103,33 +97,7 @@ export default function SisyphusSidebar() {
         </nav>
 
         <div className="aqua-sidebar__section">
-          <SectionTitle title="ORGANISATION" />
-
-          <Link
-            href="/platform/analyze"
-            className={analyseActive ? "aqua-sidebar__item aqua-sidebar__item--active aqua-sidebar__item--branch" : "aqua-sidebar__item aqua-sidebar__item--branch"}
-          >
-            <Shield
-              size={22}
-              className={analyseActive ? "aqua-sidebar__item-icon aqua-sidebar__item-icon--active" : "aqua-sidebar__item-icon"}
-            />
-            <span className="aqua-sidebar__item-label">Analyse</span>
-            <span className="aqua-sidebar__item-chevron">
-              <ChevronDown size={16} />
-            </span>
-          </Link>
-
-          <div className="aqua-sidebar__subtree">
-            {analyseItems.map((item) => {
-              const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-              return (
-                <Link key={item.label} href={item.href} className={active ? "aqua-sidebar__subitem aqua-sidebar__subitem--active" : "aqua-sidebar__subitem"}>
-                  <span className="aqua-sidebar__subitem-dot" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </div>
+          <SectionTitle title="ARAÇLAR" />
 
           <div className="aqua-sidebar__menu aqua-sidebar__menu--org">
             {lowerItems.map((item) => {
@@ -139,34 +107,37 @@ export default function SisyphusSidebar() {
           </div>
         </div>
 
-        <div className="aqua-sidebar__collapsed">
-          <SectionTitle title="VENDORS" />
-          <SectionTitle title="MANAGED SERVICE" />
-        </div>
-
         <div className="aqua-sidebar__spacer" />
 
-        <button className="aqua-sidebar__logout" type="button" onClick={() => setShowLogoutModal(true)}>
-          <LogOut size={20} className="aqua-sidebar__logout-icon" />
-          <span>Log out</span>
+        <Link href="/platform/analyze" className="aqua-sidebar__insight-card">
+          <div>
+            <strong>AI Destekli Analiz</strong>
+            <p>Akıllı analiz ile içgörüleri keşfedin.</p>
+          </div>
+          <Sparkles size={17} />
+        </Link>
+
+        <button className="aqua-sidebar__notification" type="button" aria-label="Bildirimler">
+          <Bell size={21} />
+          <span>3</span>
         </button>
 
         <Link href="/platform/profile" className="aqua-sidebar__user">
           <div className="aqua-sidebar__avatar-wrap">
             <img
               src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80"
-              alt="Alicia Vikander"
+              alt="Derya Yılmaz"
             />
             <span className="aqua-sidebar__status" aria-hidden />
           </div>
 
           <div className="aqua-sidebar__user-text">
-            <strong>Alicia Vikander</strong>
-            <span>alicia@sisyphus.com</span>
+            <strong>Derya Yılmaz</strong>
+            <span>derya@aquascope.io</span>
           </div>
 
           <span className="aqua-sidebar__settings" aria-hidden>
-            <Settings size={18} />
+            <ChevronDown size={18} />
           </span>
         </Link>
       </div>
