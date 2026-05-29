@@ -84,9 +84,9 @@ const modules = [
 ];
 
 const stats = [
-  ["10K+", "Analiz Gerçekleştirildi", BrainCircuit],
+  ["10K+", "Aktif Kullanıcı", BrainCircuit],
   ["350+", "Balık Türü", FishGlyph],
-  ["500+", "Aktif Kullanıcı", Users],
+  ["500+", "Analiz Kategorisi", Users],
   ["50+", "Ülke", ShieldCheck],
 ] as const;
 
@@ -196,7 +196,7 @@ export default function LandingPage() {
 
       <section className="landing-modules-section" id="modules">
         <div className="landing-section-heading">
-          <strong>MODÜLLER</strong>
+          <strong>TÜM ARAÇLAR</strong>
           <h2>AquaScope ile Her Şey Elinizin Altında</h2>
           <p>İhtiyacınız olan tüm araçlar, tek bir platformda.</p>
         </div>
@@ -236,7 +236,7 @@ export default function LandingPage() {
         <div className="landing-section-heading">
           <strong>NASIL ÇALIŞIR?</strong>
           <h2>3 Adımda Tür Analizi</h2>
-          <p>Görsel yükleyin, analiz edelim, sonucu keşfedin.</p>
+          <p>Görsel yükleyin, analizi bekleyin, sonucu keşfedin.</p>
         </div>
 
         <div className="landing-steps">
