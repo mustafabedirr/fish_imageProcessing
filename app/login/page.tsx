@@ -1,4 +1,7 @@
-import { BarChart3, BrainCircuit, ChevronDown, Globe2, Share2 } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { BarChart3, BrainCircuit, Check, ChevronDown, Globe2, Share2 } from "lucide-react";
 import Link from "next/link";
 import LoginCard from "../../components/auth/login-card";
 import { ShiningBorder } from "../../components/ui/shine-border";
@@ -21,7 +24,12 @@ const featureList = [
   },
 ];
 
+const localeOptions = ["Türkçe", "English", "Deutsch"];
+
 export default function LoginPage() {
+  const [selectedLocale, setSelectedLocale] = useState(localeOptions[0]);
+  const [localeOpen, setLocaleOpen] = useState(false);
+
   return (
     <main className="auth-stage">
       <ShiningBorder
@@ -95,10 +103,38 @@ export default function LoginPage() {
         </div>
 
         <div className="login-right-panel">
-          <div className="login-locale-pill">
-            <Globe2 size={16} />
-            <span>Türkçe</span>
-            <ChevronDown size={16} />
+          <div className="login-locale-menu">
+            <button
+              aria-expanded={localeOpen}
+              aria-haspopup="listbox"
+              className="login-locale-pill"
+              type="button"
+              onClick={() => setLocaleOpen((current) => !current)}
+            >
+              <Globe2 size={16} />
+              <span>{selectedLocale}</span>
+              <ChevronDown size={16} className={localeOpen ? "login-locale-chevron login-locale-chevron-open" : "login-locale-chevron"} />
+            </button>
+
+            {localeOpen ? (
+              <div className="login-locale-dropdown" role="listbox">
+                {localeOptions.map((locale) => (
+                  <button
+                    aria-selected={selectedLocale === locale}
+                    key={locale}
+                    role="option"
+                    type="button"
+                    onClick={() => {
+                      setSelectedLocale(locale);
+                      setLocaleOpen(false);
+                    }}
+                  >
+                    <span>{locale}</span>
+                    {selectedLocale === locale ? <Check size={14} /> : null}
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
 
           <div className="login-right-copy">

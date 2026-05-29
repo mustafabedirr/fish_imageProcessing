@@ -1182,7 +1182,6 @@ body:has(.auth-stage) {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  align-self: flex-end;
   height: 32px;
   padding: 0 12px;
   border: 1px solid rgba(131, 163, 219, 0.24);
@@ -1191,6 +1190,59 @@ body:has(.auth-stage) {
   background: rgba(9, 21, 46, 0.6);
   font-size: 11px;
   font-weight: 620;
+  cursor: pointer;
+}
+
+.login-locale-menu {
+  position: relative;
+  align-self: flex-end;
+}
+
+.login-locale-chevron {
+  transition: transform 180ms ease;
+}
+
+.login-locale-chevron-open {
+  transform: rotate(180deg);
+}
+
+.login-locale-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 5;
+  display: grid;
+  min-width: 142px;
+  padding: 6px;
+  border: 1px solid rgba(92, 159, 255, 0.28);
+  border-radius: 14px;
+  background: rgba(5, 17, 40, 0.96);
+  box-shadow:
+    0 18px 42px rgba(0, 6, 18, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(14px);
+}
+
+.login-locale-dropdown button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 10px;
+  color: rgba(230, 241, 255, 0.86);
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.login-locale-dropdown button:hover,
+.login-locale-dropdown button[aria-selected="true"] {
+  color: #ffffff;
+  background: rgba(47, 146, 255, 0.18);
 }
 
 .login-right-copy {
@@ -1299,6 +1351,23 @@ body:has(.auth-stage) {
 
 .auth-input:focus {
   box-shadow: none;
+}
+
+.auth-password-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 8px;
+  color: #90a8cb;
+  background: transparent;
+  cursor: pointer;
+}
+
+.auth-password-toggle:hover {
+  color: #d3e7ff;
+  background: rgba(47, 146, 255, 0.16);
 }
 
 .forgot-link {
@@ -1601,8 +1670,17 @@ body:has(.auth-stage) {
   }
 
   .login-locale-pill {
-    align-self: stretch;
     justify-content: center;
+    width: 100%;
+  }
+
+  .login-locale-menu {
+    align-self: stretch;
+  }
+
+  .login-locale-dropdown {
+    left: 0;
+    right: 0;
   }
 
   .auth-label {

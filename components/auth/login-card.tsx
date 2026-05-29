@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Apple, AppWindow, ArrowRight, Chrome, Eye, Lock, Mail } from "lucide-react";
+import { Apple, AppWindow, ArrowRight, Chrome, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { demoCredentials } from "../../lib/auth";
 
 export default function LoginCard() {
@@ -13,6 +13,7 @@ export default function LoginCard() {
   const [loading, setLoading] = useState(false);
   const [showLaunchOverlay, setShowLaunchOverlay] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -76,12 +77,19 @@ export default function LoginCard() {
               <input
                 className="auth-input"
                 placeholder="••••••••"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
               />
-              <Eye size={15} />
+              <button
+                aria-label={showPassword ? "Şifreyi gizle" : "Şifreyi göster"}
+                className="auth-password-toggle"
+                type="button"
+                onClick={() => setShowPassword((current) => !current)}
+              >
+                {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
             </span>
           </label>
         </div>
