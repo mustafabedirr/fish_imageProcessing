@@ -41,6 +41,32 @@ img {
   max-width: 100%;
 }
 
+:where(button, a, input, select, textarea) {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(button, a[class*="button"], .button, .nav-link, select) {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    color 180ms ease,
+    opacity 180ms ease,
+    filter 180ms ease;
+}
+
+:where(button, a[class*="button"], .button, .nav-link):active {
+  transform: translateY(1px) scale(0.985);
+}
+
+:where(button, a[class*="button"], .button, input, select, textarea):focus-visible {
+  outline: 0;
+  box-shadow:
+    0 0 0 3px rgba(34, 211, 238, 0.22),
+    0 0 0 1px rgba(34, 211, 238, 0.56);
+}
+
 .app-shell {
   min-height: 100vh;
   display: grid;
@@ -115,6 +141,18 @@ img {
   border-radius: 8px;
   box-shadow: var(--shadow);
   backdrop-filter: blur(10px);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.surface:hover {
+  border-color: rgba(18, 184, 198, 0.24);
+  box-shadow:
+    var(--shadow),
+    0 0 0 1px rgba(18, 184, 198, 0.08);
 }
 
 .section {
@@ -169,6 +207,18 @@ img {
   background: rgba(7, 35, 56, 0.06);
   color: var(--text);
   border: 1px solid var(--border);
+}
+
+.button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(18, 184, 198, 0.26);
+  filter: saturate(1.08);
+}
+
+.button-secondary:hover {
+  border-color: rgba(18, 184, 198, 0.34);
+  background: rgba(18, 184, 198, 0.1);
+  box-shadow: 0 10px 24px rgba(7, 35, 56, 0.1);
 }
 
 .landing-hero {
@@ -484,6 +534,12 @@ img {
   transform: translateY(-1px);
 }
 
+.auth-submit:active:not(:disabled),
+.auth-help:active,
+.auth-topbar-cta:active {
+  transform: translateY(1px) scale(0.99);
+}
+
 .auth-decor {
   position: absolute;
   inset: auto;
@@ -624,6 +680,40 @@ body,
   background: #dcebf1;
 }
 
+.sisyphus-toggle,
+.aqua-sidebar__logout,
+.logout-stay-button,
+.logout-confirm-button,
+.platform-utility-icon,
+.platform-utility-profile,
+.sidebar-search {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.sisyphus-toggle:hover,
+.platform-utility-icon:hover,
+.platform-utility-profile:hover,
+.sidebar-search:hover {
+  transform: translateY(-1px);
+  border-color: rgba(34, 211, 238, 0.28);
+  box-shadow: 0 12px 26px rgba(5, 17, 41, 0.16);
+}
+
+.sisyphus-toggle:active,
+.aqua-sidebar__logout:active,
+.logout-stay-button:active,
+.logout-confirm-button:active,
+.platform-utility-icon:active,
+.platform-utility-profile:active,
+.sidebar-search:active {
+  transform: translateY(1px) scale(0.98);
+}
+
 .sisyphus-link {
   color: #40506a;
 }
@@ -729,6 +819,85 @@ body,
   background: linear-gradient(180deg, var(--aqua-primary), var(--aqua-primary-strong));
   color: #ffffff;
   box-shadow: 0 12px 26px rgba(67, 173, 208, 0.24);
+}
+
+.upload-button,
+.new-photo-button,
+.species-pill,
+.analysis-upload-inner button,
+.analysis-location-actions button,
+.analysis-ghost-button,
+.dark-map-toolbar button,
+.dark-filter-button,
+.species-catalog-filter,
+.species-catalog-pagination button,
+.species-catalog-tags button,
+.fish-map-mode button,
+.map-actions button,
+.feed-button,
+.home-kpi-card button,
+.panel-head button,
+.community-list button,
+.social-composer button,
+.friend-request-list button,
+.profile-stats-row button,
+.profile-tabs button {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    color 180ms ease,
+    filter 180ms ease;
+}
+
+.upload-button:hover,
+.new-photo-button:hover:not(:disabled),
+.species-pill:hover,
+.analysis-upload-inner button:hover,
+.analysis-location-actions button:hover,
+.analysis-ghost-button:hover,
+.dark-filter-button:hover,
+.species-catalog-filter:hover,
+.species-catalog-pagination button:hover,
+.species-catalog-tags button:hover,
+.fish-map-mode button:hover,
+.map-actions button:hover,
+.feed-button:hover,
+.home-kpi-card button:hover,
+.panel-head button:hover,
+.community-list button:hover,
+.social-composer button:hover,
+.friend-request-list button:hover,
+.profile-stats-row button:hover,
+.profile-tabs button:hover {
+  transform: translateY(-1px);
+  filter: saturate(1.08);
+  box-shadow: 0 14px 30px rgba(34, 125, 255, 0.18);
+}
+
+.upload-button:active,
+.new-photo-button:active:not(:disabled),
+.species-pill:active,
+.analysis-upload-inner button:active,
+.analysis-location-actions button:active,
+.analysis-ghost-button:active,
+.dark-map-toolbar button:active,
+.dark-filter-button:active,
+.species-catalog-filter:active,
+.species-catalog-pagination button:active,
+.species-catalog-tags button:active,
+.fish-map-mode button:active,
+.map-actions button:active,
+.feed-button:active,
+.home-kpi-card button:active,
+.panel-head button:active,
+.community-list button:active,
+.social-composer button:active,
+.friend-request-list button:active,
+.profile-stats-row button:active,
+.profile-tabs button:active {
+  transform: translateY(1px) scale(0.985);
 }
 
 .result-image-wrap span {
@@ -5001,10 +5170,25 @@ body:has(.landing-page) {
   box-shadow: 0 14px 32px rgba(34, 125, 255, 0.26);
 }
 
+.landing-primary-button:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #3aa4ff, #1f75ff);
+  box-shadow:
+    0 18px 42px rgba(34, 125, 255, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
 .landing-secondary-button {
   border: 1px solid rgba(173, 203, 255, 0.28);
   color: #edf6ff;
   background: rgba(9, 21, 44, 0.38);
+}
+
+.landing-secondary-button:hover {
+  transform: translateY(-2px);
+  border-color: rgba(120, 190, 255, 0.46);
+  background: rgba(18, 48, 91, 0.68);
+  box-shadow: 0 16px 34px rgba(2, 10, 26, 0.24);
 }
 
 .landing-hero-inner {
@@ -5153,6 +5337,12 @@ body:has(.landing-page) {
     0 18px 44px rgba(1, 10, 28, 0.32);
 }
 
+.landing-feature-card:active,
+.landing-module-card:active,
+.landing-steps article:active {
+  transform: translateY(0) scale(0.992);
+}
+
 .landing-feature-card-inner {
   position: relative;
   display: flex;
@@ -5286,6 +5476,36 @@ body:has(.landing-page) {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
     0 18px 44px rgba(0, 7, 20, 0.18);
+  transition:
+    transform 190ms ease,
+    border-color 190ms ease,
+    box-shadow 190ms ease,
+    background 190ms ease;
+}
+
+.landing-module-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(76, 160, 255, 0.42);
+  background:
+    radial-gradient(circle at 28px 28px, rgba(44, 139, 255, 0.26), transparent 32%),
+    linear-gradient(180deg, rgba(22, 50, 88, 0.94), rgba(9, 27, 56, 0.98));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 24px 58px rgba(0, 8, 24, 0.32),
+    0 0 0 1px rgba(59, 130, 246, 0.12);
+}
+
+.landing-module-card:hover img {
+  filter: saturate(1.16) contrast(1.08) brightness(1.04);
+  transform: scale(1.025);
+}
+
+.landing-module-card:hover > span,
+.landing-feature-card:hover .landing-feature-icon,
+.landing-steps article:hover > span {
+  box-shadow:
+    0 12px 28px rgba(31, 118, 255, 0.3),
+    0 0 0 1px rgba(116, 190, 255, 0.18);
 }
 
 .landing-module-card h3 {
@@ -5312,6 +5532,7 @@ body:has(.landing-page) {
   border-radius: 8px;
   object-fit: cover;
   filter: saturate(1.05) contrast(1.04);
+  transition: transform 240ms ease, filter 240ms ease;
 }
 
 .landing-module-card p {
@@ -5331,6 +5552,12 @@ body:has(.landing-page) {
   font-size: 13px;
   font-weight: 680;
   text-decoration: none;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.landing-module-card a:hover {
+  color: #75d5ff;
+  transform: translateX(2px);
 }
 
 .landing-stats-band {
@@ -5417,6 +5644,22 @@ body:has(.landing-page) {
     radial-gradient(circle at 12% 0%, rgba(57, 142, 255, 0.2), transparent 28%),
     linear-gradient(180deg, rgba(18, 39, 71, 0.86), rgba(8, 23, 47, 0.96));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition:
+    transform 190ms ease,
+    border-color 190ms ease,
+    box-shadow 190ms ease,
+    background 190ms ease;
+}
+
+.landing-steps article:hover {
+  transform: translateY(-4px);
+  border-color: rgba(80, 164, 255, 0.4);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(57, 142, 255, 0.28), transparent 30%),
+    linear-gradient(180deg, rgba(22, 49, 88, 0.92), rgba(8, 26, 54, 0.98));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 18px 44px rgba(0, 8, 24, 0.24);
 }
 
 .landing-steps article:not(:last-child)::after {
@@ -5676,6 +5919,13 @@ body:has(.landing-page) {
   border-radius: 8px;
   color: #ffffff;
   background: linear-gradient(135deg, #2f89ff, #1d6df2);
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.landing-newsletter button:hover {
+  transform: translateX(-1px) scale(1.03);
+  background: linear-gradient(135deg, #39a3ff, #1e75ff);
+  box-shadow: 0 10px 24px rgba(30, 117, 255, 0.32);
 }
 
 .landing-footer-bottom {
@@ -8838,6 +9088,52 @@ body:has(.landing-page) {
   cursor: pointer;
 }
 
+.dark-filter-select,
+.species-catalog-filter,
+.species-catalog-search,
+.fish-filter-select,
+.analyze-dashboard-filter,
+.platform-utility-search,
+.home-search,
+.social-composer,
+.landing-newsletter,
+.auth-input-wrap {
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.dark-filter-select:hover,
+.species-catalog-filter:hover,
+.species-catalog-search:hover,
+.fish-filter-select:hover,
+.analyze-dashboard-filter:hover,
+.platform-utility-search:hover,
+.home-search:hover,
+.social-composer:hover,
+.landing-newsletter:hover {
+  transform: translateY(-1px);
+  border-color: rgba(34, 211, 238, 0.36);
+  box-shadow: 0 14px 32px rgba(2, 10, 26, 0.18);
+}
+
+.dark-filter-select:focus-within,
+.species-catalog-search:focus-within,
+.fish-filter-select:focus-within,
+.analyze-dashboard-filter:focus-within,
+.platform-utility-search:focus-within,
+.home-search:focus-within,
+.social-composer:focus-within,
+.landing-newsletter:focus-within {
+  transform: translateY(-1px);
+  border-color: rgba(34, 211, 238, 0.52);
+  box-shadow:
+    0 16px 36px rgba(2, 10, 26, 0.2),
+    0 0 0 3px rgba(34, 211, 238, 0.14);
+}
+
 .dark-filter-label {
   display: inline-flex;
   align-items: center;
@@ -9771,6 +10067,75 @@ body:has(.landing-page) {
 body.sidebar-collapsed .aqua-sidebar__subtree,
 body.sidebar-collapsed .aqua-sidebar__item-chevron {
   display: none;
+}
+
+.home-kpi-card,
+.logged-card,
+.best-card,
+.chart-card,
+.analyse-upload-card,
+.recent-analyses-card,
+.analysis-result-card-new,
+.analysis-upload-card,
+.analysis-recent-card,
+.analysis-result-hero,
+.analysis-detail-card,
+.analysis-summary-card,
+.dark-map-canvas-card,
+.dark-side-panel,
+.dark-map-stat-card,
+.species-catalog-card,
+.species-catalog-panel,
+.map-summary-card,
+.world-map-card,
+.fish-map-card,
+.species-library-card,
+.social-post-card,
+.profile-post-card,
+.profile-side-card {
+  transition:
+    transform 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    background 200ms ease,
+    filter 200ms ease;
+}
+
+.home-kpi-card:hover,
+.logged-card:hover,
+.best-card:hover,
+.chart-card:hover,
+.recent-analyses-card article:hover,
+.analysis-upload-card:hover,
+.analysis-recent-card:hover,
+.analysis-detail-card:hover,
+.analysis-summary-card:hover,
+.dark-map-stat-card:hover,
+.dark-side-panel:hover,
+.species-catalog-card:hover,
+.species-catalog-panel:hover,
+.map-summary-card:hover,
+.world-map-card:hover,
+.fish-map-card:hover,
+.species-library-card:hover,
+.social-post-card:hover,
+.profile-post-card:hover,
+.profile-side-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(34, 211, 238, 0.34);
+  box-shadow:
+    0 20px 48px rgba(2, 10, 26, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.species-catalog-card:hover img,
+.species-library-card:hover img,
+.social-post-card:hover img,
+.profile-post-card:hover img,
+.recent-analyses-card article:hover img,
+.logged-card article:hover img,
+.best-card article:hover img {
+  filter: saturate(1.08) brightness(1.05);
 }
 
 @media (max-width: 1380px) {
