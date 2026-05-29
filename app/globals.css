@@ -4905,8 +4905,11 @@ body:has(.landing-page) {
 
 .landing-hero {
   position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: 100svh;
   overflow: hidden;
-  padding: 22px 0 24px;
+  padding: clamp(14px, 2.2svh, 22px) 0 clamp(16px, 2.4svh, 24px);
   background:
     linear-gradient(180deg, rgba(5, 18, 40, 0.18), rgba(3, 12, 28, 0.62)),
     radial-gradient(circle at 68% 18%, rgba(98, 180, 255, 0.24), transparent 28%),
@@ -4936,6 +4939,7 @@ body:has(.landing-page) {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+  min-height: clamp(52px, 8svh, 64px);
 }
 
 .landing-brand {
@@ -4951,8 +4955,8 @@ body:has(.landing-page) {
 .landing-brand-badge {
   display: grid;
   place-items: center;
-  width: 84px;
-  height: 56px;
+  width: clamp(64px, 8vw, 84px);
+  height: clamp(42px, 5.4vw, 56px);
 }
 
 .landing-brand-badge img {
@@ -4983,10 +4987,10 @@ body:has(.landing-page) {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  height: 50px;
-  padding: 0 24px;
+  min-height: clamp(44px, 6svh, 50px);
+  padding: 0 clamp(18px, 2vw, 24px);
   border-radius: 8px;
-  font-size: 15px;
+  font-size: clamp(14px, 1.6vw, 15px);
   font-weight: 680;
   text-decoration: none;
 }
@@ -5004,14 +5008,16 @@ body:has(.landing-page) {
 }
 
 .landing-hero-inner {
-  display: block;
-  padding: 64px 0 38px;
+  display: grid;
+  align-items: center;
+  min-height: 0;
+  padding: clamp(34px, 7svh, 64px) 0 clamp(24px, 4.8svh, 38px);
 }
 
 .landing-hero-copy h1 {
   margin: 0;
   color: #ffffff;
-  font-size: clamp(44px, 5vw, 74px);
+  font-size: clamp(34px, min(5vw, 8.6svh), 74px);
   line-height: 0.98;
   font-weight: 820;
 }
@@ -5022,9 +5028,9 @@ body:has(.landing-page) {
 
 .landing-hero-copy p {
   max-width: 540px;
-  margin: 26px 0 0;
+  margin: clamp(16px, 3svh, 26px) 0 0;
   color: rgba(228, 238, 255, 0.88);
-  font-size: 22px;
+  font-size: clamp(16px, min(2vw, 2.7svh), 22px);
   line-height: 1.55;
 }
 
@@ -5036,14 +5042,14 @@ body:has(.landing-page) {
   display: flex;
   gap: 14px;
   flex-wrap: wrap;
-  margin-top: 32px;
+  margin-top: clamp(20px, 3.8svh, 32px);
 }
 
 .landing-social-proof {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-top: 28px;
+  margin-top: clamp(18px, 3.2svh, 28px);
 }
 
 .landing-social-proof p {
@@ -5108,16 +5114,16 @@ body:has(.landing-page) {
   z-index: 1;
   width: min(1240px, calc(100vw - 64px));
   margin: 0 auto;
-  padding: 24px 0 8px;
+  padding: clamp(10px, 1.9svh, 18px) 0 clamp(4px, 0.8svh, 8px);
 }
 
 .landing-feature-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-  padding: 26px;
+  gap: clamp(12px, 1.5vw, 18px);
+  padding: clamp(16px, 2vw, 26px);
   border: 1px solid rgba(94, 137, 209, 0.22);
-  border-radius: 32px;
+  border-radius: clamp(22px, 2.4vw, 32px);
   background: linear-gradient(180deg, rgba(10, 24, 49, 0.74), rgba(6, 18, 39, 0.9));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.04),
@@ -5128,9 +5134,9 @@ body:has(.landing-page) {
 .landing-feature-card {
   position: relative;
   overflow: hidden;
-  min-height: 286px;
+  min-height: clamp(148px, 22svh, 210px);
   border: 1px solid rgba(95, 132, 188, 0.16);
-  border-radius: 28px;
+  border-radius: clamp(18px, 2.1vw, 28px);
   background:
     radial-gradient(circle at top, rgba(84, 163, 255, 0.14), transparent 32%),
     linear-gradient(180deg, rgba(10, 25, 51, 0.96), rgba(5, 16, 35, 0.98));
@@ -5152,15 +5158,15 @@ body:has(.landing-page) {
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  padding: 22px 22px 20px;
+  padding: clamp(12px, 1.5vw, 18px);
 }
 
 .landing-feature-icon {
   display: grid;
   place-items: center;
-  width: 74px;
-  height: 74px;
-  margin-bottom: 18px;
+  width: clamp(42px, 6.4svh, 58px);
+  height: clamp(42px, 6.4svh, 58px);
+  margin-bottom: clamp(8px, 1.4svh, 14px);
   border: 1px solid rgba(67, 137, 255, 0.3);
   border-radius: 20px;
   color: #75b7ff;
@@ -5174,7 +5180,7 @@ body:has(.landing-page) {
   max-width: none;
   margin: 0;
   color: #ffffff;
-  font-size: 20px;
+  font-size: clamp(15px, min(1.55vw, 2.1svh), 18px);
   line-height: 1.14;
   font-weight: 760;
   letter-spacing: -0.02em;
@@ -5183,7 +5189,7 @@ body:has(.landing-page) {
 .landing-feature-accent {
   width: 42px;
   height: 4px;
-  margin: 14px 0 16px;
+  margin: clamp(7px, 1.1svh, 11px) 0 clamp(8px, 1.2svh, 12px);
   border-radius: 999px;
   background: #3b8fff;
   transition: width 180ms ease;
@@ -5197,14 +5203,14 @@ body:has(.landing-page) {
   max-width: none;
   margin: 0;
   color: rgba(217, 229, 248, 0.8);
-  font-size: 14px;
-  line-height: 1.62;
+  font-size: clamp(11px, min(1.05vw, 1.55svh), 13px);
+  line-height: 1.45;
 }
 
 .landing-feature-footer {
   position: relative;
   margin-top: auto;
-  padding-top: 14px;
+  padding-top: clamp(8px, 1.2svh, 12px);
 }
 
 .landing-feature-footer::before {
@@ -5215,8 +5221,8 @@ body:has(.landing-page) {
   position: relative;
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
+  width: clamp(32px, 4.8svh, 40px);
+  height: clamp(32px, 4.8svh, 40px);
   margin-top: 0;
   border-radius: 999px;
   color: #e3f0ff;
@@ -5656,7 +5662,7 @@ body:has(.landing-page) {
   }
 
   .landing-hero-inner {
-    padding: 42px 0 28px;
+    padding: clamp(30px, 6svh, 42px) 0 clamp(22px, 4svh, 28px);
   }
 
   .landing-hero-copy p,
@@ -5667,7 +5673,6 @@ body:has(.landing-page) {
   }
 
   .landing-feature-strip,
-  .landing-feature-grid,
   .landing-module-grid,
   .landing-stats-inner,
   .landing-steps,
@@ -5676,27 +5681,28 @@ body:has(.landing-page) {
   }
 
   .landing-feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     padding: 16px;
   }
 
   .landing-feature-card {
-    min-height: 250px;
+    min-height: clamp(132px, 18svh, 152px);
   }
 
   .landing-feature-icon {
-    width: 66px;
-    height: 66px;
-    border-radius: 18px;
+    width: clamp(38px, 5.6svh, 46px);
+    height: clamp(38px, 5.6svh, 46px);
+    border-radius: 14px;
   }
 
   .landing-feature-title {
     max-width: none;
-    font-size: 19px;
+    font-size: clamp(13px, 3.5vw, 16px);
   }
 
   .landing-feature-description {
     max-width: none;
-    font-size: 14px;
+    font-size: clamp(10px, 2.8vw, 12px);
   }
 
   .landing-stats-inner article {
