@@ -41,6 +41,857 @@ img {
   max-width: 100%;
 }
 
+/* AquaScope dashboard reference build */
+.aqua-dashboard-page {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  color: #f8fbff;
+  background:
+    radial-gradient(760px 520px at 72% -10%, rgba(0, 138, 255, 0.16), transparent 62%),
+    radial-gradient(640px 480px at 30% 105%, rgba(0, 212, 255, 0.1), transparent 62%),
+    #020817;
+}
+
+.aqua-dashboard-topbar {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.95fr) minmax(300px, 520px) minmax(420px, auto);
+  align-items: center;
+  gap: 28px;
+  height: 88px;
+  padding: 0 28px;
+  border-bottom: 1px solid rgba(105, 145, 190, 0.16);
+  background: rgba(3, 12, 26, 0.72);
+  backdrop-filter: blur(18px);
+}
+
+.aqua-dashboard-title {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  min-width: 0;
+}
+
+.aqua-dashboard-title h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 31px;
+  font-weight: 680;
+  line-height: 1;
+}
+
+.aqua-dashboard-title span {
+  color: #8ea7c8;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.aqua-dashboard-search {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: center;
+  height: 44px;
+  gap: 12px;
+  padding: 0 14px;
+  border: 1px solid rgba(85, 130, 186, 0.22);
+  border-radius: 10px;
+  color: #87a4c8;
+  background: rgba(5, 18, 36, 0.84);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.aqua-dashboard-search input {
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #dbeafe;
+  font-size: 14px;
+}
+
+.aqua-dashboard-search input::placeholder {
+  color: #7892b4;
+}
+
+.aqua-dashboard-search kbd {
+  display: inline-grid;
+  place-items: center;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 6px;
+  color: #8fa8ca;
+  background: rgba(17, 35, 62, 0.94);
+  font-size: 11px;
+  font-family: inherit;
+}
+
+.aqua-dashboard-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px;
+  min-width: 0;
+}
+
+.aqua-dashboard-actions button,
+.aqua-panel-head button,
+.aqua-rail-filters button,
+.aqua-map-controls button,
+.aqua-map-expand,
+.aqua-radar-card button {
+  border: 1px solid rgba(65, 124, 194, 0.35);
+  color: #d8e8ff;
+  background: rgba(8, 26, 51, 0.78);
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.aqua-dashboard-actions button:hover,
+.aqua-panel-head button:hover,
+.aqua-rail-filters button:hover,
+.aqua-map-controls button:hover,
+.aqua-map-expand:hover,
+.aqua-radar-card button:hover {
+  border-color: rgba(30, 144, 255, 0.72);
+  background: rgba(20, 68, 126, 0.68);
+  color: #ffffff;
+  box-shadow: 0 0 24px rgba(30, 144, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.aqua-dashboard-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 22px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.aqua-dashboard-bell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-color: transparent !important;
+  background: transparent !important;
+}
+
+.aqua-dashboard-bell span {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #126bff;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.aqua-dashboard-user {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 12px;
+  min-width: 196px;
+  height: 52px;
+  padding: 0 12px;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.aqua-dashboard-user img {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.aqua-dashboard-user strong,
+.aqua-dashboard-user small {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.aqua-dashboard-user strong {
+  font-size: 13px;
+}
+
+.aqua-dashboard-user small {
+  margin-top: 3px;
+  color: #86a4c8;
+  font-size: 11px;
+}
+
+.aqua-dashboard-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 390px;
+  gap: 18px;
+  height: calc(100% - 88px);
+  min-height: 0;
+  padding: 28px;
+  overflow: hidden;
+}
+
+.aqua-dashboard-center,
+.aqua-dashboard-rail {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.aqua-dashboard-center {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) minmax(240px, 0.66fr);
+  gap: 18px;
+}
+
+.aqua-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.aqua-panel,
+.aqua-stat-card {
+  border: 1px solid rgba(105, 145, 190, 0.22);
+  border-radius: 10px;
+  background:
+    radial-gradient(300px 180px at 10% 0%, rgba(30, 144, 255, 0.1), transparent 68%),
+    linear-gradient(180deg, rgba(8, 27, 52, 0.9), rgba(5, 19, 39, 0.96));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 18px 44px rgba(0, 8, 24, 0.28);
+}
+
+.aqua-stat-card {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  min-height: 126px;
+  padding: 20px;
+}
+
+.aqua-stat-icon,
+.aqua-source-icon {
+  display: inline-grid;
+  place-items: center;
+  border-radius: 14px;
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.aqua-stat-icon {
+  width: 58px;
+  height: 58px;
+}
+
+.aqua-stat-icon--blue,
+.aqua-source-icon--blue {
+  background: linear-gradient(135deg, rgba(30, 144, 255, 0.92), rgba(29, 78, 216, 0.72));
+}
+
+.aqua-stat-icon--green {
+  background: linear-gradient(135deg, rgba(0, 201, 150, 0.86), rgba(6, 95, 70, 0.72));
+}
+
+.aqua-stat-icon--purple,
+.aqua-source-icon--purple {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.92), rgba(67, 56, 202, 0.74));
+}
+
+.aqua-source-icon--cyan {
+  background: rgba(0, 201, 198, 0.18);
+  color: #21e6e0;
+}
+
+.aqua-source-icon--amber {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+}
+
+.aqua-source-icon--red {
+  background: rgba(239, 68, 68, 0.16);
+  color: #fb7185;
+}
+
+.aqua-stat-card p,
+.aqua-stat-card em {
+  margin: 0;
+  color: #8da8ca;
+  font-size: 12px;
+  font-style: normal;
+}
+
+.aqua-stat-card strong {
+  display: inline-block;
+  margin-top: 8px;
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 680;
+  line-height: 1;
+}
+
+.aqua-stat-card small {
+  display: inline-block;
+  margin-left: 10px;
+  color: #00d48f;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.aqua-stat-card em {
+  display: block;
+  margin-top: 8px;
+}
+
+.aqua-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(430px, 1.34fr) minmax(300px, 0.88fr);
+  grid-template-rows: minmax(250px, 1.15fr) minmax(180px, 0.76fr);
+  gap: 18px;
+  min-height: 0;
+}
+
+.aqua-map-panel {
+  grid-row: span 2;
+}
+
+.aqua-panel {
+  min-width: 0;
+  min-height: 0;
+  padding: 18px;
+  overflow: hidden;
+}
+
+.aqua-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 28px;
+  margin-bottom: 14px;
+}
+
+.aqua-panel-head h2,
+.aqua-sources-panel h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 720;
+}
+
+.aqua-panel-head button,
+.aqua-rail-filters button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-width: 0;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.aqua-map-shell {
+  position: relative;
+  height: calc(100% - 42px);
+  min-height: 320px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #061426;
+}
+
+.aqua-map-shell .maplibregl-map {
+  font-family: inherit;
+}
+
+.aqua-map-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(30, 144, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 144, 255, 0.06) 1px, transparent 1px),
+    radial-gradient(circle at 70% 16%, rgba(0, 212, 255, 0.24), transparent 18%),
+    radial-gradient(circle at 20% 40%, rgba(30, 144, 255, 0.18), transparent 20%);
+  background-size: 54px 54px, 54px 54px, 100% 100%, 100% 100%;
+  mix-blend-mode: screen;
+}
+
+.aqua-map-controls {
+  position: absolute;
+  left: 14px;
+  bottom: 132px;
+  display: grid;
+  overflow: hidden;
+  border: 1px solid rgba(72, 119, 178, 0.3);
+  border-radius: 8px;
+}
+
+.aqua-map-controls button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-width: 0 0 1px;
+  border-radius: 0;
+  font-size: 18px;
+}
+
+.aqua-map-controls button:last-child {
+  border-bottom: 0;
+}
+
+.aqua-map-expand {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+}
+
+.aqua-map-scale {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 16px;
+  display: grid;
+  grid-template-columns: auto 160px auto;
+  align-items: center;
+  gap: 8px;
+  color: #9fb7d5;
+  font-size: 12px;
+}
+
+.aqua-map-scale span {
+  grid-column: 1 / -1;
+  color: #c6d9f3;
+}
+
+.aqua-map-scale div {
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #0c2444, #1e90ff);
+}
+
+.aqua-donut-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: calc(100% - 42px);
+}
+
+.aqua-donut-center {
+  position: absolute;
+  left: 28%;
+  top: 50%;
+  display: grid;
+  justify-items: center;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.aqua-donut-center strong {
+  color: #ffffff;
+  font-size: 24px;
+}
+
+.aqua-donut-center span {
+  margin-top: 4px;
+  color: #9eb6d6;
+  font-size: 12px;
+}
+
+.aqua-chart-legend {
+  display: grid;
+  gap: 14px;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.aqua-chart-legend li {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  color: #d9e8ff;
+  font-size: 13px;
+}
+
+.aqua-chart-legend i {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+}
+
+.aqua-chart-legend strong {
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.aqua-dashboard-bottom {
+  display: grid;
+  grid-template-columns: minmax(430px, 1.05fr) minmax(330px, 0.9fr);
+  gap: 18px;
+  min-height: 0;
+}
+
+.aqua-condition-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.aqua-condition-metric {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+}
+
+.aqua-source-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+}
+
+.aqua-condition-metric small,
+.aqua-condition-metric em {
+  display: block;
+  color: #8ea8c9;
+  font-size: 11px;
+  font-style: normal;
+}
+
+.aqua-condition-metric strong {
+  display: block;
+  margin-top: 3px;
+  color: #ffffff;
+  font-size: 15px;
+}
+
+.aqua-condition-metric em {
+  margin-top: 4px;
+  color: #00d48f;
+}
+
+.aqua-dashboard-rail {
+  display: grid;
+  grid-template-rows: auto minmax(320px, 1fr) minmax(180px, 0.62fr) minmax(200px, 0.72fr);
+  gap: 18px;
+}
+
+.aqua-rail-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+}
+
+.aqua-recent-list {
+  display: grid;
+  gap: 10px;
+  height: calc(100% - 42px);
+  overflow: hidden;
+}
+
+.aqua-recent-row {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) auto 18px;
+  align-items: center;
+  gap: 12px;
+  min-height: 70px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(105, 145, 190, 0.13);
+}
+
+.aqua-recent-row:last-child {
+  border-bottom: 0;
+}
+
+.aqua-recent-row img {
+  width: 76px;
+  height: 54px;
+  border: 1px solid rgba(105, 145, 190, 0.22);
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.aqua-recent-row strong,
+.aqua-recent-row small,
+.aqua-recent-row em {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.aqua-recent-row strong {
+  color: #ffffff;
+  font-size: 13px;
+}
+
+.aqua-recent-row small,
+.aqua-recent-row em {
+  margin-top: 4px;
+  color: #8fa9ca;
+  font-size: 11px;
+  font-style: normal;
+}
+
+.aqua-recent-row b {
+  display: inline-grid;
+  place-items: center;
+  min-width: 58px;
+  height: 32px;
+  border-radius: 999px;
+  color: #20e0a2;
+  background: rgba(0, 201, 150, 0.13);
+  font-size: 12px;
+}
+
+.aqua-recent-row > svg {
+  color: #9db7d8;
+}
+
+.aqua-radar-card {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+}
+
+.aqua-radar {
+  width: 108px;
+  height: 108px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, rgba(0, 212, 255, 0.9) 0 4px, transparent 5px),
+    repeating-radial-gradient(circle, rgba(30, 144, 255, 0.28) 0 1px, transparent 1px 18px),
+    conic-gradient(from 0deg, rgba(30, 144, 255, 0.08), rgba(30, 144, 255, 0.7), rgba(0, 212, 255, 0.04));
+  box-shadow: 0 0 40px rgba(30, 144, 255, 0.25);
+}
+
+.aqua-radar-card p {
+  margin: 0;
+  color: #d9e8ff;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.aqua-radar-card p strong {
+  color: #ffffff;
+}
+
+.aqua-radar-card span {
+  display: block;
+  margin-top: 10px;
+  color: #8ea8c9;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.aqua-radar-card button {
+  height: 34px;
+  margin-top: 12px;
+  padding: 0 13px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.aqua-ai-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.aqua-ai-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(124, 160, 204, 0.28);
+}
+
+.aqua-ai-dots span:nth-child(2) {
+  background: #1e90ff;
+}
+
+.aqua-sources-panel {
+  padding: 18px 18px 14px;
+}
+
+.aqua-source-list {
+  display: grid;
+  gap: 20px;
+  margin-top: 18px;
+}
+
+.aqua-source-row {
+  display: grid;
+  grid-template-columns: 42px 132px minmax(130px, 1fr) 88px 38px;
+  align-items: center;
+  gap: 12px;
+}
+
+.aqua-source-row strong {
+  color: #dcecff;
+  font-size: 13px;
+  font-weight: 580;
+}
+
+.aqua-source-meter {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(49, 78, 116, 0.8);
+}
+
+.aqua-source-meter i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #1e90ff, #4e7cff);
+}
+
+.aqua-source-row small,
+.aqua-source-row em {
+  color: #9fb5d2;
+  font-size: 12px;
+  font-style: normal;
+  text-align: right;
+}
+
+.recharts-wrapper,
+.recharts-surface {
+  outline: none;
+}
+
+@media (max-width: 1500px) {
+  .aqua-dashboard-topbar {
+    grid-template-columns: minmax(220px, 0.8fr) minmax(260px, 420px) auto;
+    gap: 18px;
+  }
+
+  .aqua-dashboard-main {
+    grid-template-columns: minmax(0, 1fr) 350px;
+    padding: 20px;
+  }
+
+  .aqua-source-row {
+    grid-template-columns: 42px minmax(90px, 1fr) minmax(100px, 1fr) 70px 34px;
+  }
+}
+
+@media (max-width: 1240px) {
+  .aqua-dashboard-page {
+    overflow: auto;
+  }
+
+  .aqua-dashboard-topbar,
+  .aqua-dashboard-main,
+  .aqua-dashboard-center,
+  .aqua-dashboard-grid,
+  .aqua-dashboard-bottom,
+  .aqua-dashboard-rail {
+    height: auto;
+    overflow: visible;
+  }
+
+  .aqua-dashboard-topbar {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    padding: 18px;
+  }
+
+  .aqua-dashboard-main {
+    grid-template-columns: 1fr;
+  }
+
+  .aqua-stat-grid,
+  .aqua-dashboard-grid,
+  .aqua-dashboard-bottom {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .aqua-map-panel {
+    grid-row: auto;
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .aqua-dashboard-title,
+  .aqua-dashboard-actions,
+  .aqua-rail-filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .aqua-dashboard-title,
+  .aqua-dashboard-actions {
+    display: grid;
+  }
+
+  .aqua-stat-grid,
+  .aqua-dashboard-grid,
+  .aqua-dashboard-bottom,
+  .aqua-condition-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .aqua-dashboard-user,
+  .aqua-dashboard-upload {
+    width: 100%;
+  }
+
+  .aqua-map-shell {
+    min-height: 280px;
+  }
+
+  .aqua-donut-wrap,
+  .aqua-radar-card,
+  .aqua-source-row {
+    grid-template-columns: 1fr;
+  }
+
+  .aqua-donut-wrap {
+    display: grid;
+    justify-items: center;
+    height: auto;
+  }
+
+  .aqua-donut-center {
+    left: 50%;
+    top: 116px;
+  }
+
+  .aqua-chart-legend {
+    width: 100%;
+  }
+}
+
 :where(button, a, input, select, textarea) {
   -webkit-tap-highlight-color: transparent;
 }
