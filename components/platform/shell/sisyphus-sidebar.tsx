@@ -65,25 +65,30 @@ export default function SisyphusSidebar() {
     <aside className={collapsed ? "sidebar sisyphus-sidebar aqua-sidebar aqua-sidebar--collapsed" : "sidebar sisyphus-sidebar aqua-sidebar"}>
       <div className="aqua-sidebar__panel">
         <div className="aqua-sidebar__header">
-          <div className="aqua-sidebar__brand-wrap">
-            <div className="aqua-sidebar__logo-box">
-              <img src="/aquascope-logo.svg" alt="" className="aqua-sidebar__logo-image" />
-            </div>
+          {collapsed ? (
+            <button
+              className="aqua-sidebar__brand-wrap aqua-sidebar__brand-trigger"
+              type="button"
+              aria-label="Expand sidebar"
+              onClick={toggleSidebar}
+            >
+              <LogoMark />
+            </button>
+          ) : (
+            <>
+              <div className="aqua-sidebar__brand-wrap">
+                <LogoMark />
 
-            <div className="aqua-sidebar__brand-copy">
-              <h1>AquaScope</h1>
-            </div>
-          </div>
+                <div className="aqua-sidebar__brand-copy">
+                  <h1>AquaScope</h1>
+                </div>
+              </div>
 
-          <button
-            className={collapsed ? "aqua-sidebar__theme aqua-sidebar__theme--active" : "aqua-sidebar__theme"}
-            type="button"
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            aria-pressed={collapsed}
-            onClick={toggleSidebar}
-          >
-            <ChevronsLeft size={20} />
-          </button>
+              <button className="aqua-sidebar__theme" type="button" aria-label="Collapse sidebar" aria-pressed={collapsed} onClick={toggleSidebar}>
+                <ChevronsLeft size={20} />
+              </button>
+            </>
+          )}
         </div>
 
         <nav className="aqua-sidebar__menu aqua-sidebar__menu--top" aria-label="Primary navigation">
@@ -165,6 +170,14 @@ export default function SisyphusSidebar() {
           )
         : null}
     </aside>
+  );
+}
+
+function LogoMark() {
+  return (
+    <div className="aqua-sidebar__logo-box">
+      <img src="/aquascope-logo.svg" alt="" className="aqua-sidebar__logo-image" />
+    </div>
   );
 }
 

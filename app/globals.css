@@ -8544,9 +8544,33 @@ body:has(.landing-page) {
   align-items: center;
   gap: 16px;
   min-width: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
   transition:
     gap 420ms cubic-bezier(0.22, 1, 0.36, 1),
     justify-content 420ms ease;
+}
+
+.aqua-sidebar__brand-trigger {
+  cursor: pointer;
+  border-radius: 14px;
+  padding: 0;
+  transition:
+    background 220ms ease,
+    box-shadow 220ms ease,
+    transform 220ms ease;
+}
+
+.aqua-sidebar__brand-trigger:hover {
+  background: rgba(34, 211, 238, 0.08);
+  box-shadow: 0 0 22px rgba(34, 211, 238, 0.18);
+  transform: translateY(-1px);
+}
+
+.aqua-sidebar__brand-trigger:focus-visible {
+  outline: 2px solid rgba(103, 232, 249, 0.72);
+  outline-offset: 4px;
 }
 
 .aqua-sidebar__brand {
