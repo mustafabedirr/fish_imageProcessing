@@ -307,40 +307,44 @@ export default function DashboardWorkspace() {
 
             <article className="aqua-panel aqua-trend-panel">
               <PanelHeader title="Analiz Trendi" action="Gunluk" />
-              <ResponsiveContainer width="100%" height={188}>
-                <AreaChart data={trendData} margin={{ left: -22, right: 8, top: 8, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#1e90ff" stopOpacity={0.58} />
-                      <stop offset="100%" stopColor="#1e90ff" stopOpacity={0.04} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid stroke="rgba(124,160,204,.12)" vertical={false} />
-                  <XAxis dataKey="day" tick={{ fill: "#8aa5c7", fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: "#8aa5c7", fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  <Area type="monotone" dataKey="value" stroke="#1e90ff" strokeWidth={3} fill="url(#trendFill)" />
-                </AreaChart>
-              </ResponsiveContainer>
+              <div className="aqua-chart-frame aqua-chart-frame--trend">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={trendData} margin={{ left: -22, right: 8, top: 8, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#1e90ff" stopOpacity={0.58} />
+                        <stop offset="100%" stopColor="#1e90ff" stopOpacity={0.04} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid stroke="rgba(124,160,204,.12)" vertical={false} />
+                    <XAxis dataKey="day" tick={{ fill: "#8aa5c7", fontSize: 11 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fill: "#8aa5c7", fontSize: 11 }} axisLine={false} tickLine={false} />
+                    <Tooltip contentStyle={tooltipStyle} />
+                    <Area type="monotone" dataKey="value" stroke="#1e90ff" strokeWidth={3} fill="url(#trendFill)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
             </article>
           </section>
 
           <section className="aqua-dashboard-bottom">
             <article className="aqua-panel aqua-bar-panel">
               <PanelHeader title="Turlere Gore Analiz Dagilimi" action="Tumunu Gor" />
-              <ResponsiveContainer width="100%" height={236}>
-                <BarChart data={barData} margin={{ left: -22, right: 8, top: 8, bottom: 0 }}>
-                  <CartesianGrid stroke="rgba(124,160,204,.12)" vertical={false} />
-                  <XAxis dataKey="name" tick={{ fill: "#91a9c8", fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: "#91a9c8", fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  <Bar dataKey="value" radius={[5, 5, 0, 0]} fill="#1e90ff">
-                    {barData.map((item, index) => (
-                      <Cell key={item.name} fill={index === barData.length - 1 ? "#64748b" : "#1e90ff"} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+              <div className="aqua-chart-frame aqua-chart-frame--bar">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={barData} margin={{ left: -22, right: 8, top: 8, bottom: 0 }}>
+                    <CartesianGrid stroke="rgba(124,160,204,.12)" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fill: "#91a9c8", fontSize: 11 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fill: "#91a9c8", fontSize: 11 }} axisLine={false} tickLine={false} />
+                    <Tooltip contentStyle={tooltipStyle} />
+                    <Bar dataKey="value" radius={[5, 5, 0, 0]} fill="#1e90ff">
+                      {barData.map((item, index) => (
+                        <Cell key={item.name} fill={index === barData.length - 1 ? "#64748b" : "#1e90ff"} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </article>
 
             <article className="aqua-panel aqua-condition-panel">
@@ -350,17 +354,19 @@ export default function DashboardWorkspace() {
                 <Metric icon={Waves} label="Tuzluluk" value="36.2 PSU" delta="0.4" tone="cyan" />
                 <Metric icon={Thermometer} label="pH Degeri" value="8.1" delta="0.2" tone="red" />
               </div>
-              <ResponsiveContainer width="100%" height={146}>
-                <LineChart data={conditionData} margin={{ left: -22, right: 8, top: 12, bottom: 0 }}>
-                  <CartesianGrid stroke="rgba(124,160,204,.12)" vertical={false} />
-                  <XAxis dataKey="day" tick={{ fill: "#91a9c8", fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <YAxis yAxisId="left" tick={{ fill: "#91a9c8", fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <YAxis yAxisId="right" orientation="right" tick={{ fill: "#91a9c8", fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  <Line yAxisId="left" type="monotone" dataKey="temp" stroke="#1e90ff" strokeWidth={2.5} dot={false} />
-                  <Line yAxisId="right" type="monotone" dataKey="salt" stroke="#00c996" strokeWidth={2.5} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
+              <div className="aqua-chart-frame aqua-chart-frame--condition">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={conditionData} margin={{ left: -22, right: 8, top: 12, bottom: 0 }}>
+                    <CartesianGrid stroke="rgba(124,160,204,.12)" vertical={false} />
+                    <XAxis dataKey="day" tick={{ fill: "#91a9c8", fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <YAxis yAxisId="left" tick={{ fill: "#91a9c8", fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <YAxis yAxisId="right" orientation="right" tick={{ fill: "#91a9c8", fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <Tooltip contentStyle={tooltipStyle} />
+                    <Line yAxisId="left" type="monotone" dataKey="temp" stroke="#1e90ff" strokeWidth={2.5} dot={false} />
+                    <Line yAxisId="right" type="monotone" dataKey="salt" stroke="#00c996" strokeWidth={2.5} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </article>
           </section>
         </main>
