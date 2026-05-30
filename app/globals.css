@@ -3144,6 +3144,7 @@ body {
   gap: 0;
   overflow: hidden;
   background: #020817;
+  transition: grid-template-columns 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 body.sidebar-collapsed .app-shell {
@@ -3156,10 +3157,10 @@ body.sidebar-collapsed .sidebar.aqua-sidebar {
   max-width: 86px;
   padding: 14px 8px;
   transition:
-    width 280ms ease,
-    min-width 280ms ease,
-    max-width 280ms ease,
-    padding 280ms ease;
+    width 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    min-width 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    max-width 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .sidebar {
@@ -3175,6 +3176,11 @@ body.sidebar-collapsed .sidebar.aqua-sidebar {
   border-right: 0;
   background: #020817;
   box-shadow: none;
+  transition:
+    width 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    min-width 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    max-width 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .platform-main {
@@ -8484,6 +8490,7 @@ body:has(.landing-page) {
 .sisyphus-sidebar.aqua-sidebar {
   width: 304px;
   min-width: 304px;
+  max-width: 304px;
   height: 100dvh;
   padding: 14px 12px;
   color: #f8fbff;
@@ -8492,6 +8499,12 @@ body:has(.landing-page) {
     #020817;
   border-right: 0;
   box-shadow: none;
+  transition:
+    width 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    min-width 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    max-width 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 420ms ease;
 }
 
 .aqua-sidebar__panel {
@@ -8508,6 +8521,11 @@ body:has(.landing-page) {
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
     0 18px 50px rgba(0, 8, 24, 0.34),
     0 0 0 1px rgba(34, 211, 238, 0.04);
+  transition:
+    padding 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 420ms ease,
+    align-items 420ms ease;
 }
 
 .aqua-sidebar__header {
@@ -8516,6 +8534,9 @@ body:has(.landing-page) {
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 28px;
+  transition:
+    gap 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    margin-bottom 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .aqua-sidebar__brand-wrap {
@@ -8523,6 +8544,9 @@ body:has(.landing-page) {
   align-items: center;
   gap: 16px;
   min-width: 0;
+  transition:
+    gap 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    justify-content 420ms ease;
 }
 
 .aqua-sidebar__brand {
@@ -8551,6 +8575,15 @@ body:has(.landing-page) {
 
 .aqua-sidebar__brand-copy {
   min-width: 0;
+  max-width: 152px;
+  overflow: hidden;
+  opacity: 1;
+  transform: translateX(0);
+  white-space: nowrap;
+  transition:
+    max-width 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease,
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .aqua-sidebar__brand-copy h1 {
@@ -8578,7 +8611,12 @@ body:has(.landing-page) {
   border-radius: 8px;
   background: rgba(31, 64, 103, 0.62);
   color: #a8c7ee;
-  transition: background 180ms ease, box-shadow 180ms ease, color 180ms ease;
+  transition:
+    background 220ms ease,
+    box-shadow 220ms ease,
+    color 220ms ease,
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .aqua-sidebar__theme--active {
@@ -8589,16 +8627,14 @@ body:has(.landing-page) {
 
 .aqua-sidebar--collapsed {
   width: 86px;
+  min-width: 86px;
+  max-width: 86px;
 }
 
 .aqua-sidebar--collapsed .aqua-sidebar__panel {
   width: 100%;
   align-items: center;
   padding: 26px 10px 18px;
-  transition:
-    padding 280ms ease,
-    border-radius 280ms ease,
-    box-shadow 280ms ease;
 }
 
 .aqua-sidebar--collapsed .aqua-sidebar__header {
@@ -8607,12 +8643,11 @@ body:has(.landing-page) {
   justify-content: center;
   gap: 12px;
   margin-bottom: 24px;
-  transition: gap 280ms ease, margin-bottom 280ms ease;
 }
 
 .aqua-sidebar--collapsed .aqua-sidebar__brand-wrap {
   justify-content: center;
-  transition: gap 280ms ease;
+  gap: 0;
 }
 
 .aqua-sidebar--collapsed .aqua-sidebar__brand-copy,
@@ -8626,13 +8661,35 @@ body:has(.landing-page) {
 .aqua-sidebar--collapsed .aqua-sidebar__insight-card,
 .aqua-sidebar--collapsed .aqua-sidebar__user-text,
 .aqua-sidebar--collapsed .aqua-sidebar__settings {
-  display: none;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-8px);
+}
+
+.aqua-sidebar--collapsed .aqua-sidebar__brand-copy,
+.aqua-sidebar--collapsed .aqua-sidebar__section-title h2,
+.aqua-sidebar--collapsed .aqua-sidebar__item-label,
+.aqua-sidebar--collapsed .aqua-sidebar__user-text {
+  max-width: 0;
+}
+
+.aqua-sidebar--collapsed .aqua-sidebar__insight-card {
+  max-height: 0;
+  min-height: 0;
+  margin-bottom: 0;
+  padding: 0;
+  border-width: 0;
+}
+
+.aqua-sidebar--collapsed .aqua-sidebar__settings {
+  width: 0;
+  height: 0;
+  overflow: hidden;
 }
 
 .aqua-sidebar--collapsed .aqua-sidebar__theme {
   transform: rotate(180deg);
   border-radius: 16px;
-  transition: transform 280ms ease, border-radius 280ms ease;
 }
 
 .aqua-sidebar--collapsed .aqua-sidebar__menu,
@@ -8654,7 +8711,6 @@ body:has(.landing-page) {
 
 .aqua-sidebar--collapsed .aqua-sidebar__menu {
   gap: 10px;
-  transition: gap 280ms ease;
 }
 
 .aqua-sidebar--collapsed .aqua-sidebar__item {
@@ -8663,10 +8719,10 @@ body:has(.landing-page) {
   min-height: 52px;
   padding: 0;
   transition:
-    padding 280ms ease,
-    min-height 280ms ease,
-    gap 280ms ease,
-    border-radius 280ms ease;
+    padding 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    min-height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    gap 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .aqua-sidebar--collapsed .aqua-sidebar__item--active {
@@ -8682,12 +8738,14 @@ body:has(.landing-page) {
 
 .aqua-sidebar--collapsed .aqua-sidebar__user {
   grid-template-columns: 1fr;
+  gap: 0;
   justify-items: center;
 }
 
 .aqua-sidebar__menu {
   display: grid;
   gap: 8px;
+  transition: gap 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .aqua-sidebar__menu--top {
@@ -8697,6 +8755,9 @@ body:has(.landing-page) {
 
 .aqua-sidebar__section {
   margin-top: 20px;
+  transition:
+    margin-top 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .aqua-sidebar__section-title {
@@ -8704,18 +8765,32 @@ body:has(.landing-page) {
   align-items: center;
   justify-content: space-between;
   padding: 0 12px 8px;
+  transition:
+    min-height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    justify-content 420ms ease;
 }
 
 .aqua-sidebar__section-title h2 {
   margin: 0;
+  max-width: 160px;
+  overflow: hidden;
   font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.14em;
+  white-space: nowrap;
   color: rgba(190, 205, 231, 0.72);
+  transition:
+    max-width 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease,
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .aqua-sidebar__section-title svg {
   color: #94a3b8;
+  transition:
+    opacity 220ms ease,
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .aqua-sidebar__menu--org {
@@ -8738,8 +8813,13 @@ body:has(.landing-page) {
   transition:
     background 220ms ease,
     color 220ms ease,
+    border-color 220ms ease,
     box-shadow 220ms ease,
-    transform 220ms ease;
+    transform 220ms ease,
+    padding 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    min-height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    gap 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .aqua-sidebar__item:hover {
@@ -8774,8 +8854,15 @@ body:has(.landing-page) {
 }
 
 .aqua-sidebar__item-label {
+  max-width: 180px;
+  overflow: hidden;
   font-size: 15px;
   font-weight: 560;
+  white-space: nowrap;
+  transition:
+    max-width 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease,
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .aqua-sidebar__item-dot {
@@ -8785,6 +8872,9 @@ body:has(.landing-page) {
   border-radius: 999px;
   background: #3b82f6;
   box-shadow: 0 0 10px rgba(59, 130, 246, 0.9);
+  transition:
+    opacity 220ms ease,
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .aqua-sidebar__item-plus {
@@ -8792,6 +8882,10 @@ body:has(.landing-page) {
   font-size: 28px;
   font-weight: 300;
   color: #94a3b8;
+  transition:
+    color 220ms ease,
+    opacity 220ms ease,
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .aqua-sidebar__item:hover .aqua-sidebar__item-plus {
@@ -8826,6 +8920,16 @@ body:has(.landing-page) {
     radial-gradient(circle at 86% 24%, rgba(0, 212, 255, 0.18), transparent 34%),
     linear-gradient(180deg, rgba(13, 46, 88, 0.82), rgba(7, 28, 57, 0.92));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  max-height: 120px;
+  transition:
+    max-height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    margin-bottom 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 220ms ease,
+    opacity 220ms ease,
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms ease;
 }
 
 .aqua-sidebar__insight-card strong {
@@ -8923,7 +9027,10 @@ body:has(.landing-page) {
   text-decoration: none;
   color: #ffffff;
   background: transparent;
-  transition: transform 220ms ease;
+  transition:
+    grid-template-columns 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    gap 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 220ms ease;
 }
 
 .aqua-sidebar__user:hover {
@@ -8958,6 +9065,13 @@ body:has(.landing-page) {
 
 .aqua-sidebar__user-text {
   min-width: 0;
+  max-width: 170px;
+  opacity: 1;
+  transform: translateX(0);
+  transition:
+    max-width 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease,
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .aqua-sidebar__user-text strong,
@@ -8990,7 +9104,13 @@ body:has(.landing-page) {
   border-radius: 8px;
   background: transparent;
   color: #91acd0;
-  transition: background 220ms ease, color 220ms ease;
+  transition:
+    width 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 220ms ease,
+    color 220ms ease,
+    opacity 220ms ease,
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .aqua-sidebar__user:hover .aqua-sidebar__settings {
@@ -10243,6 +10363,42 @@ body:has(.landing-page) {
 body.sidebar-collapsed .aqua-sidebar__subtree,
 body.sidebar-collapsed .aqua-sidebar__item-chevron {
   display: none;
+}
+
+body.sidebar-collapsed .sisyphus-sidebar.aqua-sidebar {
+  width: 86px;
+  min-width: 86px;
+  max-width: 86px;
+  padding: 14px 8px;
+}
+
+body.sidebar-collapsed .aqua-sidebar__brand-copy,
+body.sidebar-collapsed .aqua-sidebar__section-title h2,
+body.sidebar-collapsed .aqua-sidebar__item-label,
+body.sidebar-collapsed .aqua-sidebar__user-text {
+  max-width: 0;
+  opacity: 0;
+  transform: translateX(-8px);
+}
+
+body.sidebar-collapsed .aqua-sidebar__section-title svg,
+body.sidebar-collapsed .aqua-sidebar__item-dot,
+body.sidebar-collapsed .aqua-sidebar__item-plus,
+body.sidebar-collapsed .aqua-sidebar__settings {
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-8px);
+}
+
+body.sidebar-collapsed .aqua-sidebar__insight-card {
+  max-height: 0;
+  min-height: 0;
+  margin-bottom: 0;
+  padding: 0;
+  border-width: 0;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-8px);
 }
 
 .home-kpi-card,
