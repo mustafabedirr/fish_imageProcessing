@@ -131,7 +131,7 @@ export default function LoginCard() {
       {showLaunchOverlay && portalReady ? createPortal(
         <div className="launch-overlay" role="status" aria-live="polite">
           <div className="launch-loader">
-            <img src="/aqualens-marine-loader.gif" alt="" />
+            <img src="/aquascope-loading-transparent.gif" alt="" />
             <strong>AquaScope hazırlanıyor</strong>
             <span>Deniz verileri senkronize ediliyor</span>
             <div className="launch-dots" aria-hidden>
