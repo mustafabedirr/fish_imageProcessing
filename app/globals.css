@@ -2439,7 +2439,7 @@ body:has(.auth-stage) {
   z-index: 1;
   display: grid;
   justify-items: center;
-  gap: 10px;
+  gap: 4px;
   color: #d8f6ff;
   text-align: center;
   animation: launch-rise 520ms ease both;
@@ -2448,13 +2448,13 @@ body:has(.auth-stage) {
 .launch-loader img {
   width: min(260px, 42vw);
   height: auto;
-  margin-bottom: 4px;
+  margin-bottom: 0;
   image-rendering: auto;
   filter: none;
 }
 
 .launch-loader strong {
-  margin-top: 2px;
+  margin-top: 0;
   font-size: 21px;
   font-weight: 740;
   letter-spacing: 0;
