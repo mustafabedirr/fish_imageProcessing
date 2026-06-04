@@ -2414,12 +2414,24 @@ body:has(.auth-stage) {
   z-index: 1000;
   display: grid;
   place-items: center;
-  background: #eaf7fa;
+  background:
+    radial-gradient(620px 420px at 50% 38%, rgba(0, 212, 255, 0.2), transparent 64%),
+    radial-gradient(780px 560px at 18% 12%, rgba(30, 144, 255, 0.18), transparent 58%),
+    linear-gradient(180deg, #081526 0%, #001b2a 48%, #020817 100%);
   animation: launch-fade-in 240ms ease both;
 }
 
 .launch-overlay::before {
-  display: none;
+  content: "";
+  position: absolute;
+  inset: 0;
+  display: block;
+  background:
+    linear-gradient(rgba(0, 212, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(circle at center, #000 0 48%, transparent 78%);
+  pointer-events: none;
 }
 
 .launch-loader {
@@ -2428,7 +2440,7 @@ body:has(.auth-stage) {
   display: grid;
   justify-items: center;
   gap: 10px;
-  color: #256f7c;
+  color: #d8f6ff;
   text-align: center;
   animation: launch-rise 520ms ease both;
 }
