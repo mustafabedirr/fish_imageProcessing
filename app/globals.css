@@ -6223,8 +6223,41 @@ body:has(.landing-page) {
   font-weight: 820;
 }
 
-.landing-hero-copy h1 span {
+.landing-hero-copy h1 > span {
+  color: inherit;
+}
+
+.landing-hero-copy h1 .landing-typewriter-line--accent {
   color: #4599ff;
+}
+
+.landing-typewriter-line {
+  display: block;
+  min-height: 0.98em;
+  white-space: nowrap;
+}
+
+.landing-typewriter-line i {
+  display: inline-block;
+  width: 0.08em;
+  height: 0.82em;
+  margin-left: 0.08em;
+  border-radius: 999px;
+  background: currentColor;
+  transform: translateY(0.08em);
+  animation: landingTypewriterCursor 880ms steps(2, end) infinite;
+}
+
+@keyframes landingTypewriterCursor {
+  0%,
+  45% {
+    opacity: 1;
+  }
+
+  46%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .landing-hero-copy p {

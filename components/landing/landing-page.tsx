@@ -96,11 +96,14 @@ const stats = [
   { value: 50, label: "Ülke", icon: ShieldCheck, suffix: "+", duration: 1300 },
 ] as const;
 
+const heroTitleLines = ["Balık Türlerini", "Keşfet, Analiz Et,", "Dünyayla Paylaş!"] as const;
+
 const technologies = ["Next.js", "FastAPI", "TensorFlow / Keras", "Leaflet", "TypeScript"];
 
 export default function LandingPage() {
   const statsRef = useRef<HTMLElement | null>(null);
   const [animateStats, setAnimateStats] = useState(false);
+  const [typedTitle, setTypedTitle] = useState<string[]>(() => heroTitleLines.map(() => ""));
 
   useEffect(() => {
     const statsNode = statsRef.current;
@@ -129,6 +132,47 @@ export default function LandingPage() {
     return () => observer.disconnect();
   }, [animateStats]);
 
+  useEffect(() => {
+    let lineIndex = 0;
+    let charIndex = 0;
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    function typeNextCharacter() {
+      setTypedTitle(
+        heroTitleLines.map((line, index) => {
+          if (index < lineIndex) {
+            return line;
+          }
+
+          if (index === lineIndex) {
+            return line.slice(0, charIndex);
+          }
+
+          return "";
+        })
+      );
+
+      if (lineIndex >= heroTitleLines.length) {
+        return;
+      }
+
+      const currentLine = heroTitleLines[lineIndex];
+      if (charIndex <= currentLine.length) {
+        charIndex += 1;
+        timeoutId = setTimeout(typeNextCharacter, charIndex === 1 ? 220 : 58);
+        return;
+      }
+
+      lineIndex += 1;
+      charIndex = 0;
+      timeoutId = setTimeout(typeNextCharacter, 260);
+    }
+
+    timeoutId = setTimeout(typeNextCharacter, 280);
+
+    return () => clearTimeout(timeoutId);
+  }, []);
+
   return (
     <main className="landing-page">
       <section className="landing-hero" id="top">
@@ -155,12 +199,23 @@ export default function LandingPage() {
 
         <div className="landing-hero-inner">
           <div className="landing-hero-copy">
-            <h1>
-              Balık Türlerini
-              <br />
-              <span>Keşfet, Analiz Et,</span>
-              <br />
-              Dünyayla Paylaş!
+            <h1 aria-label={heroTitleLines.join(" ")}>
+              {heroTitleLines.map((line, index) => {
+                const activeLineIndex = typedTitle.findIndex((value, activeIndex) => value.length < heroTitleLines[activeIndex].length);
+                const isComplete = typedTitle.every((value, doneIndex) => value === heroTitleLines[doneIndex]);
+                const showCursor = index === activeLineIndex || (isComplete && index === heroTitleLines.length - 1);
+
+                return (
+                  <span
+                    aria-hidden="true"
+                    className={index === 1 ? "landing-typewriter-line landing-typewriter-line--accent" : "landing-typewriter-line"}
+                    key={line}
+                  >
+                    {typedTitle[index]}
+                    {showCursor ? <i aria-hidden="true" /> : null}
+                  </span>
+                );
+              })}
             </h1>
             <p>
               AquaScope, yapay zeka destekli analiz teknolojisi ile balık türlerini tanır,
