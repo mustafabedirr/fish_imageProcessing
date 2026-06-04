@@ -6392,15 +6392,46 @@ body:has(.landing-page) {
 
 .landing-avatars {
   display: flex;
+  width: 132px;
+  overflow: hidden;
+  padding: 2px 0;
+  mask-image: linear-gradient(90deg, transparent 0, #000 10px, #000 calc(100% - 10px), transparent 100%);
 }
 
-.landing-avatars img {
+.landing-avatar-track {
+  display: flex;
+  width: max-content;
+  animation: landingAvatarSlide 5s linear infinite;
+}
+
+.landing-avatar-set {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.landing-avatar-set img {
   width: 42px;
   height: 42px;
   margin-right: -10px;
   border: 2px solid rgba(7, 18, 37, 0.86);
   border-radius: 999px;
   object-fit: cover;
+}
+
+@keyframes landingAvatarSlide {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-avatar-track {
+    animation: none;
+  }
 }
 
 .landing-feature-strip {

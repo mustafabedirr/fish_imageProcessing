@@ -138,6 +138,16 @@ export default function LandingPage() {
     let timeoutId: ReturnType<typeof setTimeout>;
 
     function typeNextCharacter() {
+      if (lineIndex >= heroTitleLines.length) {
+        timeoutId = setTimeout(() => {
+          lineIndex = 0;
+          charIndex = 0;
+          setTypedTitle(heroTitleLines.map(() => ""));
+          timeoutId = setTimeout(typeNextCharacter, 280);
+        }, 5000);
+        return;
+      }
+
       setTypedTitle(
         heroTitleLines.map((line, index) => {
           if (index < lineIndex) {
@@ -151,10 +161,6 @@ export default function LandingPage() {
           return "";
         })
       );
-
-      if (lineIndex >= heroTitleLines.length) {
-        return;
-      }
 
       const currentLine = heroTitleLines[lineIndex];
       if (charIndex <= currentLine.length) {
@@ -235,10 +241,16 @@ export default function LandingPage() {
 
             <div className="landing-social-proof">
               <div className="landing-avatars">
-                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80" alt="User 1" />
-                <img src="https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=96&q=80" alt="User 2" />
-                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=96&q=80" alt="User 3" />
-                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80" alt="User 4" />
+                <div className="landing-avatar-track">
+                  {[0, 1].map((group) => (
+                    <span className="landing-avatar-set" aria-hidden={group === 1} key={group}>
+                      <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80" alt={group === 0 ? "User 1" : ""} />
+                      <img src="https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=96&q=80" alt={group === 0 ? "User 2" : ""} />
+                      <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=96&q=80" alt={group === 0 ? "User 3" : ""} />
+                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80" alt={group === 0 ? "User 4" : ""} />
+                    </span>
+                  ))}
+                </div>
               </div>
               <p><strong>500+</strong> kullanıcı AquaScope'u keşfetmeye başladı.</p>
             </div>
