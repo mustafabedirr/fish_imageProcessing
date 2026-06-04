@@ -188,7 +188,10 @@ export default function LandingPage() {
             <span className="landing-brand-badge">
               <img src="/aquascope-logo.svg" alt="AquaScope logo" />
             </span>
-            <span>AquaScope</span>
+            <span className="landing-brand-word" aria-label="AquaScope">
+              <span>Aqua</span>
+              <span className="landing-brand-word-accent">Scope</span>
+            </span>
           </Link>
 
           <nav className="landing-nav-links" aria-label="Landing navigation">

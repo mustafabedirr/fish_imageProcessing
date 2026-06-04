@@ -6149,13 +6149,18 @@ body:has(.landing-page) {
     transform 180ms ease;
 }
 
-.landing-brand > span:not(.landing-brand-badge) {
+.landing-brand-word {
+  display: inline-flex;
+  color: #ffffff;
+  filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.12));
+}
+
+.landing-brand-word-accent {
   background:
-    linear-gradient(180deg, #ffffff 0%, #e6f2ff 44%, #50ddff 45%, #3ba5ff 100%);
+    linear-gradient(180deg, #bff5ff 0%, #62dcff 42%, #35b8ff 72%, #268bff 100%);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.18));
 }
 
 .landing-brand:hover {
