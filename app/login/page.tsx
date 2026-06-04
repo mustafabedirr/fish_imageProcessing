@@ -52,7 +52,10 @@ export default function LoginPage() {
               <span className="login-brandmark-icon" aria-hidden>
                 <img src="/aquascope-logo.svg" alt="" />
               </span>
-              <span>AquaScope</span>
+              <span className="login-brandmark-word" aria-label="AquaScope">
+                <span>Aqua</span>
+                <span className="login-brandmark-word-accent">Scope</span>
+              </span>
             </Link>
 
             <div className="login-left-copy">

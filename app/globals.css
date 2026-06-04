@@ -1954,8 +1954,28 @@ body:has(.auth-stage) {
   align-items: center;
   gap: 14px;
   color: #f7fbff;
-  font-size: 22px;
-  font-weight: 760;
+  font-family: "Exo 2", Inter, "SF Pro Display", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: clamp(28px, 2.15vw, 38px);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  text-decoration: none;
+  text-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.08),
+    0 0 24px rgba(0, 212, 255, 0.24);
+}
+
+.login-brandmark-word {
+  display: inline-flex;
+  color: #ffffff;
+  filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.12));
+}
+
+.login-brandmark-word-accent {
+  background:
+    linear-gradient(180deg, #bff5ff 0%, #62dcff 42%, #35b8ff 72%, #268bff 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
 .login-brandmark-icon {
