@@ -13986,6 +13986,16 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   object-fit: cover;
 }
 
+.fish-species-main--loading img {
+  opacity: 0.62;
+  filter: saturate(0.75) blur(0.4px);
+}
+
+.fish-species-main--loading em {
+  color: #7bd8ff;
+  background: rgba(34, 191, 255, 0.12);
+}
+
 .fish-species-main strong,
 .fish-species-main small,
 .fish-species-main em {

@@ -30,6 +30,8 @@ import {
 type AnalyzeResponse = {
   species: string;
   confidence: number;
+  name_tr?: string;
+  display_name?: string;
   edible: boolean;
   ideal_size: string;
   recommended_baits: string[];
@@ -38,6 +40,7 @@ type AnalyzeResponse = {
 };
 
 type SpeciesProfile = {
+  commonName: string;
   latin: string;
   description: string;
   location: string;
@@ -70,6 +73,7 @@ const reportItems = [
 
 const speciesProfiles: Record<string, SpeciesProfile> = {
   levrek: {
+    commonName: "Levrek",
     latin: "Dicentrarchus labrax",
     description: "Akdeniz, Ege ve Karadeniz kiyilarinda yaygin gorulen avci bir deniz balik turudur.",
     location: "Karadeniz, Sinop Aciklari",
@@ -86,6 +90,7 @@ const speciesProfiles: Record<string, SpeciesProfile> = {
     distribution: [12, 28, 52, 82, 61, 34, 18],
   },
   cupra: {
+    commonName: "Cupra",
     latin: "Sparus aurata",
     description: "Kiyisal kayalik, kumluk ve deniz cayi alanlarinda gozlenen degerli bir deniz balik turudur.",
     location: "Kuzey Ege Bolgesi",
@@ -102,6 +107,7 @@ const speciesProfiles: Record<string, SpeciesProfile> = {
     distribution: [8, 22, 48, 76, 66, 38, 20],
   },
   palamut: {
+    commonName: "Palamut",
     latin: "Sarda sarda",
     description: "Suruler halinde gezen, hizli hareket eden ve acik denizlerde izlenen pelajik bir turdur.",
     location: "Marmara Gecisi",
@@ -118,6 +124,7 @@ const speciesProfiles: Record<string, SpeciesProfile> = {
     distribution: [5, 15, 33, 58, 79, 64, 30],
   },
   kefal: {
+    commonName: "Kefal",
     latin: "Mugil cephalus",
     description: "Kiyiya yakin, lagun ve acisu gecislerinde sik gorulen dayanikli bir turdur.",
     location: "Izmir Korfezi",
@@ -152,6 +159,7 @@ export default function AnalyzeWorkspace() {
   const scoreLabel = confidence >= 85 ? "Cok Yuksek" : confidence >= 65 ? "Yuksek" : "Orta";
   const analysisDate = analysisCompletedAt ? analysisCompletedAt.toLocaleString("tr-TR") : "18 Mayis 2024 - 14:32";
   const speciesProfile = getSpeciesProfile(detectedSpecies);
+  const displaySpecies = result ? getDisplaySpecies(result, speciesProfile) : "Levrek";
   const scoreRows = getScoreRows(confidence, result, speciesProfile);
   const measurements = getMeasurementsFromResult(result);
   const alternatives = getAlternatives(detectedSpecies, confidence);
@@ -184,6 +192,7 @@ export default function AnalyzeWorkspace() {
       if (current.startsWith("blob:")) URL.revokeObjectURL(current);
       return URL.createObjectURL(selected);
     });
+    void analyzeImage(selected);
   }
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
@@ -191,8 +200,8 @@ export default function AnalyzeWorkspace() {
     event.target.value = "";
   }
 
-  async function analyzeImage() {
-    if (!file) {
+  async function analyzeImage(targetFile = file) {
+    if (!targetFile) {
       setError("Analiz icin once bir balik gorseli secin.");
       inputRef.current?.click();
       return;
@@ -204,7 +213,7 @@ export default function AnalyzeWorkspace() {
       const startedAt = performance.now();
 
       const formData = new FormData();
-      formData.append("image", file);
+      formData.append("image", targetFile);
 
       const response = await fetch("/api/analyze-fish", {
         method: "POST",
@@ -217,7 +226,7 @@ export default function AnalyzeWorkspace() {
         throw new Error(message);
       }
 
-      setResult(data as AnalyzeResponse);
+      setResult(normalizeAnalyzeResponse(data));
       setAnalysisCompletedAt(new Date());
       setAnalysisDuration(`${((performance.now() - startedAt) / 1000).toFixed(2)} saniye`);
     } catch (err) {
@@ -328,7 +337,7 @@ export default function AnalyzeWorkspace() {
                 <div className="fish-score-copy">
                   <p>
                     {result
-                      ? `${detectedSpecies} turu ${confidenceText} guven skoru ile tespit edildi.`
+                      ? `${displaySpecies} turu ${confidenceText} guven skoru ile tespit edildi.`
                       : "Bir balik gorseli secip analiz ettiginde model sonucu burada guncellenir."}
                   </p>
                   <div className="fish-score-list">
@@ -366,7 +375,7 @@ export default function AnalyzeWorkspace() {
           <section className="fish-detail-grid">
             <article className="fish-panel fish-measure-panel">
               <h2>Morfometrik Olcumler</h2>
-              <FishMorphometricViewer species={detectedSpecies} measurements={measurements} />
+              <FishMorphometricViewer species={displaySpecies} measurements={measurements} />
               <p className="fish-panel-note">Olcumler tahmini degerlerdir ve +- %3 hata payi icerebilir.</p>
             </article>
 
@@ -424,18 +433,20 @@ export default function AnalyzeWorkspace() {
           <article className="fish-panel fish-species-card">
             <div className="fish-rail-head">
               <h2>Tespit Edilen Tur</h2>
-              <span>Birincil Eslesme</span>
+              <span>{loading ? "Analiz Ediliyor" : result ? "Birincil Eslesme" : "Sonuc Bekleniyor"}</span>
             </div>
-            <div className="fish-species-main">
+            <div className={`fish-species-main ${loading ? "fish-species-main--loading" : ""}`}>
               <img src={previewUrl} alt="" />
               <div>
-                <strong>{detectedSpecies}</strong>
+                <strong>{loading ? "Model calisiyor" : displaySpecies}</strong>
                 <small>{speciesProfile.latin}</small>
-                <em>{confidenceText} Guven</em>
+                <em>{loading ? "Analiz suruyor" : `${confidenceText} Guven`}</em>
               </div>
             </div>
             <p>
-              {result
+              {loading
+                ? "Yuklenen gorsel model tarafindan isleniyor. Tespit sonucu tamamlandiginda bu kart otomatik guncellenecek."
+                : result
                 ? `${speciesProfile.description} Ideal boy: ${result.ideal_size}. Onerilen yem: ${result.recommended_baits.join(", ")}.`
                 : speciesProfile.description}
             </p>
@@ -478,6 +489,79 @@ function normalizeConfidence(value: number) {
   return Math.max(0, Math.min(100, normalized));
 }
 
+function normalizeAnalyzeResponse(data: unknown): AnalyzeResponse {
+  const payload = unwrapAnalyzePayload(data);
+  const species = readString(payload, "species") || readString(payload, "class_name") || readString(payload, "prediction") || "Bilinmeyen Tur";
+  const confidence = readNumber(payload, "confidence") ?? readNumber(payload, "score") ?? readNumber(payload, "probability") ?? 0;
+  const recommendedBaits = readStringArray(payload, "recommended_baits");
+  const recommendedGear = readStringArray(payload, "recommended_gear");
+  const regionNotes = readStringArray(payload, "region_notes");
+
+  return {
+    species,
+    confidence,
+    name_tr: readString(payload, "name_tr"),
+    display_name: readString(payload, "display_name"),
+    edible: readBoolean(payload, "edible") ?? false,
+    ideal_size: readString(payload, "ideal_size") || "Bilinmiyor",
+    recommended_baits: recommendedBaits.length ? recommendedBaits : ["Bilgi yok"],
+    recommended_gear: recommendedGear.length ? recommendedGear : ["Bilgi yok"],
+    region_notes: regionNotes.length ? regionNotes : ["Bolge bilgisi yok"],
+  };
+}
+
+function unwrapAnalyzePayload(data: unknown): Record<string, unknown> {
+  if (!isRecord(data)) return {};
+
+  for (const key of ["result", "analysis", "data", "prediction"]) {
+    const nested = data[key];
+    if (isRecord(nested)) return nested;
+  }
+
+  return data;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function readString(source: Record<string, unknown>, key: string) {
+  const value = source[key];
+  return typeof value === "string" ? value : "";
+}
+
+function readNumber(source: Record<string, unknown>, key: string) {
+  const value = source[key];
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string") {
+    const parsed = Number(value.replace(",", "."));
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
+function readBoolean(source: Record<string, unknown>, key: string) {
+  const value = source[key];
+  return typeof value === "boolean" ? value : null;
+}
+
+function readStringArray(source: Record<string, unknown>, key: string) {
+  const value = source[key];
+  if (Array.isArray(value)) return value.filter((item): item is string => typeof item === "string");
+  if (typeof value === "string" && value.trim()) return [value];
+  return [];
+}
+
+function getDisplaySpecies(result: AnalyzeResponse, profile: SpeciesProfile) {
+  return result.name_tr || result.display_name || profile.commonName || prettifySpeciesName(result.species);
+}
+
+function prettifySpeciesName(species: string) {
+  return species
+    .replace(/[_-]+/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toLocaleUpperCase("tr-TR"));
+}
+
 function normalizeSpeciesKey(species: string) {
   return species
     .toLocaleLowerCase("tr-TR")
@@ -493,6 +577,7 @@ function normalizeSpeciesKey(species: string) {
 function getSpeciesProfile(species: string): SpeciesProfile {
   const key = normalizeSpeciesKey(species);
   return speciesProfiles[key] ?? {
+    commonName: prettifySpeciesName(species),
     latin: "Model tahmini",
     description: `${species} icin model tarafindan olusturulan birincil eslesme sonucu gosteriliyor.`,
     location: "Turkiye Denizleri",
