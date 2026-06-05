@@ -12974,7 +12974,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 /* Fish analysis mockup */
 .fish-analyze-page {
   --fish-topbar: clamp(70px, 8vh, 86px);
-  --fish-flow: clamp(58px, 7vh, 78px);
+  --fish-flow: clamp(76px, 9vh, 96px);
   --fish-pad: clamp(14px, 1.6vw, 28px);
   --fish-gap: clamp(12px, 1vw, 18px);
   --fish-panel-pad: clamp(14px, 1vw, 20px);
@@ -13097,10 +13097,10 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: center;
-  gap: clamp(22px, 4vw, 56px);
+  gap: clamp(18px, 3vw, 44px);
   height: var(--fish-flow);
-  margin: 0 var(--fish-pad);
-  padding: 14px clamp(26px, 4vw, 70px);
+  margin: 0 var(--fish-pad) var(--fish-gap);
+  padding: 12px clamp(24px, 3.4vw, 54px);
   border: 1px solid rgba(48, 126, 230, 0.44);
   border-radius: 14px;
   background:
@@ -13116,34 +13116,53 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 .fish-flow-step {
   position: relative;
   display: grid;
-  grid-template-columns: clamp(50px, 4.5vw, 68px) minmax(0, 1fr);
+  grid-template-columns: clamp(42px, 3.4vw, 56px) minmax(0, 1fr);
   align-items: center;
   gap: clamp(14px, 1.6vw, 24px);
   min-width: 0;
   isolation: isolate;
 }
 
+.fish-flow-step:not(:last-child)::before,
 .fish-flow-step:not(:last-child)::after {
   content: "";
   position: absolute;
-  left: calc(100% - 22px);
-  right: calc(-1 * clamp(34px, 5vw, 76px));
+  left: calc(100% - clamp(16px, 2vw, 28px));
+  right: calc(-1 * clamp(36px, 4.5vw, 68px));
   top: 50%;
   height: 4px;
   border-radius: 999px;
+  transform: translateY(-50%);
+}
+
+.fish-flow-step:not(:last-child)::before {
+  background: rgba(44, 92, 155, 0.28);
+  box-shadow: inset 0 0 0 1px rgba(103, 145, 205, 0.08);
+}
+
+.fish-flow-step:not(:last-child)::after {
   background:
     linear-gradient(90deg, rgba(30, 144, 255, 0.95), rgba(30, 144, 255, 0.22)),
     rgba(91, 130, 185, 0.14);
   box-shadow: 0 0 18px rgba(30, 144, 255, 0.22);
-  opacity: 0.22;
-  transform: translateY(-50%);
-  transition: opacity 260ms ease, box-shadow 260ms ease, background 260ms ease;
+  opacity: 0;
+  transform: translateY(-50%) scaleX(0);
+  transform-origin: left center;
+  transition:
+    opacity 420ms ease,
+    transform 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 760ms ease,
+    background-color 760ms ease;
 }
 
 .fish-flow-step--completed:not(:last-child)::after,
 .fish-flow-step--active:not(:last-child)::after {
   opacity: 1;
-  box-shadow: 0 0 20px rgba(30, 144, 255, 0.46);
+  transform: translateY(-50%) scaleX(1);
+  background:
+    linear-gradient(90deg, #37a1ff, #1e90ff 54%, rgba(30, 144, 255, 0.28)),
+    rgba(91, 130, 185, 0.14);
+  box-shadow: 0 0 20px rgba(30, 144, 255, 0.48);
 }
 
 .fish-flow-step > span {
@@ -13151,14 +13170,14 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   z-index: 2;
   display: grid;
   place-items: center;
-  width: clamp(50px, 4.5vw, 68px);
-  height: clamp(50px, 4.5vw, 68px);
+  width: clamp(42px, 3.4vw, 56px);
+  height: clamp(42px, 3.4vw, 56px);
   border: 2px solid rgba(68, 124, 196, 0.58);
   border-radius: 999px;
   color: #eef6ff;
   background: rgba(5, 17, 35, 0.8);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
-  font-size: clamp(1.05rem, 1.6vw, 1.55rem);
+  font-size: clamp(1rem, 1.25vw, 1.3rem);
   font-weight: 800;
   transition:
     color 260ms ease,
@@ -13177,15 +13196,15 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 
 .fish-flow-step strong {
   color: #ffffff;
-  font-size: clamp(0.95rem, 1.1vw, 1.25rem);
+  font-size: clamp(0.88rem, 0.95vw, 1.05rem);
   font-weight: 760;
   transition: color 260ms ease, transform 260ms ease;
 }
 
 .fish-flow-step small {
-  margin-top: 7px;
+  margin-top: 4px;
   color: #8ea0ba;
-  font-size: clamp(0.82rem, 0.95vw, 1rem);
+  font-size: clamp(0.74rem, 0.82vw, 0.9rem);
   transition: color 260ms ease, transform 260ms ease;
 }
 
@@ -13211,8 +13230,8 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   color: #ffffff;
   background: linear-gradient(180deg, #3a8cff, #2657f4);
   box-shadow:
-    0 0 0 12px rgba(30, 144, 255, 0.13),
-    0 0 0 24px rgba(30, 144, 255, 0.05),
+    0 0 0 8px rgba(30, 144, 255, 0.12),
+    0 0 0 16px rgba(30, 144, 255, 0.05),
     0 0 34px rgba(30, 144, 255, 0.58);
   transform: scale(1.06);
   animation: fish-step-pulse 2.1s ease-in-out infinite;
@@ -13240,13 +13259,13 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   100% {
     box-shadow:
       0 0 0 10px rgba(30, 144, 255, 0.12),
-      0 0 0 22px rgba(30, 144, 255, 0.045),
+      0 0 0 18px rgba(30, 144, 255, 0.045),
       0 0 30px rgba(30, 144, 255, 0.5);
   }
   50% {
     box-shadow:
-      0 0 0 15px rgba(30, 144, 255, 0.18),
-      0 0 0 30px rgba(30, 144, 255, 0.075),
+      0 0 0 12px rgba(30, 144, 255, 0.18),
+      0 0 0 22px rgba(30, 144, 255, 0.075),
       0 0 42px rgba(30, 144, 255, 0.72);
   }
 }
@@ -13255,7 +13274,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 0.27fr);
   gap: var(--fish-gap);
-  height: calc(100% - var(--fish-topbar) - var(--fish-flow));
+  height: calc(100% - var(--fish-topbar) - var(--fish-flow) - var(--fish-gap));
   min-height: 0;
   padding: 0 var(--fish-pad) var(--fish-pad);
 }
@@ -14302,6 +14321,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
     width: 100%;
   }
 
+  .fish-flow-step::before,
   .fish-flow-step::after {
     display: none;
   }
