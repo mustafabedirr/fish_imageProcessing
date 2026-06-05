@@ -37,33 +37,28 @@ type AnalyzeResponse = {
   region_notes: string[];
 };
 
+type SpeciesProfile = {
+  latin: string;
+  description: string;
+  location: string;
+  coordinates: string;
+  environment: {
+    temperature: string;
+    salinity: string;
+    ph: string;
+    oxygen: string;
+    habitat: string;
+    habitatScore: number;
+  };
+  colors: string[];
+  distribution: number[];
+};
+
 const thumbnails = [
   "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=220&q=80",
   "https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=220&q=80",
   "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=220&q=80",
   "https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=220&q=80",
-];
-
-const scoreRows = [
-  { label: "Saglik Durumu", value: 96, icon: Droplets, tone: "green" },
-  { label: "Habitat Uygunlugu", value: 94, icon: MapPin, tone: "green" },
-  { label: "Gorsel Kalite", value: 93, icon: Camera, tone: "purple" },
-  { label: "Tur Dogruluk Skoru", value: 97, icon: Target, tone: "blue" },
-];
-
-const measurements = [
-  { label: "Toplam Boy", value: "42.3 cm", x: 28, y: 40 },
-  { label: "Standart Boy", value: "37.8 cm", x: 420, y: 40 },
-  { label: "Catal Boy", value: "41.1 cm", x: 420, y: 232 },
-  { label: "Vucut Yuksekligi", value: "11.2 cm", x: 238, y: 70 },
-  { label: "Bas Uzunlugu", value: "9.8 cm", x: 92, y: 168 },
-  { label: "Goz Capi", value: "1.8 cm", x: 103, y: 113 },
-];
-
-const alternatives = [
-  ["Cupra", "Sparus aurata", "%3.2"],
-  ["Palamut", "Sarda sarda", "%1.1"],
-  ["Kefal", "Mugil cephalus", "%0.3"],
 ];
 
 const reportItems = [
@@ -73,20 +68,97 @@ const reportItems = [
   "Populasyon durumu stabil.",
 ];
 
+const speciesProfiles: Record<string, SpeciesProfile> = {
+  levrek: {
+    latin: "Dicentrarchus labrax",
+    description: "Akdeniz, Ege ve Karadeniz kiyilarinda yaygin gorulen avci bir deniz balik turudur.",
+    location: "Karadeniz, Sinop Aciklari",
+    coordinates: "41.887 N, 34.868 E",
+    environment: {
+      temperature: "16.8 C",
+      salinity: "18.6 PSU",
+      ph: "8.1",
+      oxygen: "8.2 mg/L",
+      habitat: "Cok Uygun",
+      habitatScore: 94,
+    },
+    colors: ["Gumus %48", "Mavi-Gri %26", "Beyaz %15", "Koyu Gri %8", "Diger %3"],
+    distribution: [12, 28, 52, 82, 61, 34, 18],
+  },
+  cupra: {
+    latin: "Sparus aurata",
+    description: "Kiyisal kayalik, kumluk ve deniz cayi alanlarinda gozlenen degerli bir deniz balik turudur.",
+    location: "Kuzey Ege Bolgesi",
+    coordinates: "39.2326 N, 26.4412 E",
+    environment: {
+      temperature: "18.6 C",
+      salinity: "32.5 PSU",
+      ph: "8.0",
+      oxygen: "7.7 mg/L",
+      habitat: "Uygun",
+      habitatScore: 91,
+    },
+    colors: ["Gumus %42", "Altin Hat %18", "Mavi-Gri %17", "Beyaz %14", "Diger %9"],
+    distribution: [8, 22, 48, 76, 66, 38, 20],
+  },
+  palamut: {
+    latin: "Sarda sarda",
+    description: "Suruler halinde gezen, hizli hareket eden ve acik denizlerde izlenen pelajik bir turdur.",
+    location: "Marmara Gecisi",
+    coordinates: "40.796 N, 28.982 E",
+    environment: {
+      temperature: "17.4 C",
+      salinity: "25.9 PSU",
+      ph: "8.2",
+      oxygen: "8.0 mg/L",
+      habitat: "Cok Uygun",
+      habitatScore: 93,
+    },
+    colors: ["Mavi-Gri %44", "Gumus %34", "Koyu Cizgi %12", "Beyaz %7", "Diger %3"],
+    distribution: [5, 15, 33, 58, 79, 64, 30],
+  },
+  kefal: {
+    latin: "Mugil cephalus",
+    description: "Kiyiya yakin, lagun ve acisu gecislerinde sik gorulen dayanikli bir turdur.",
+    location: "Izmir Korfezi",
+    coordinates: "38.435 N, 27.142 E",
+    environment: {
+      temperature: "19.1 C",
+      salinity: "21.4 PSU",
+      ph: "7.9",
+      oxygen: "7.4 mg/L",
+      habitat: "Uygun",
+      habitatScore: 88,
+    },
+    colors: ["Gumus %50", "Koyu Gri %24", "Beyaz %14", "Yesilimsi %7", "Diger %5"],
+    distribution: [18, 36, 74, 69, 42, 21, 9],
+  },
+};
+
 export default function AnalyzeWorkspace() {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const acceptedTypes = useMemo(() => ["image/jpeg", "image/jpg", "image/png", "image/webp"], []);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("/login-fish-scene.png");
   const [result, setResult] = useState<AnalyzeResponse | null>(null);
+  const [analysisCompletedAt, setAnalysisCompletedAt] = useState<Date | null>(null);
+  const [analysisDuration, setAnalysisDuration] = useState<string>("2.34 saniye");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const detectedSpecies = result?.species ?? "Levrek";
-  const confidence = result ? result.confidence * 100 : 95.4;
+  const confidence = result ? normalizeConfidence(result.confidence) : 95.4;
   const confidenceText = `%${confidence.toFixed(1)}`;
   const scoreLabel = confidence >= 85 ? "Cok Yuksek" : confidence >= 65 ? "Yuksek" : "Orta";
-  const analysisDate = result ? new Date().toLocaleString("tr-TR") : "18 Mayis 2024 - 14:32";
+  const analysisDate = analysisCompletedAt ? analysisCompletedAt.toLocaleString("tr-TR") : "18 Mayis 2024 - 14:32";
+  const speciesProfile = getSpeciesProfile(detectedSpecies);
+  const scoreRows = getScoreRows(confidence, result, speciesProfile);
+  const measurements = getMeasurementsFromResult(result);
+  const alternatives = getAlternatives(detectedSpecies, confidence);
+  const reportNotes = result ? getResultNotes(result, speciesProfile) : reportItems;
+  const analysisId = result && file ? `AAS-${file.name.replace(/\W+/g, "-").slice(0, 18).toUpperCase()}` : "AAS-2024-0518-1247";
+  const modelName = result ? "EfficientNet + YOLO Fish_Data" : "AquaScope AI v2.4";
+  const imageSet = result ? [previewUrl, ...thumbnails] : thumbnails;
 
   useEffect(() => {
     return () => {
@@ -97,6 +169,8 @@ export default function AnalyzeWorkspace() {
   function selectFile(selected: File | null) {
     setError(null);
     setResult(null);
+    setAnalysisCompletedAt(null);
+    setAnalysisDuration("2.34 saniye");
 
     if (!selected) return;
 
@@ -127,6 +201,7 @@ export default function AnalyzeWorkspace() {
     try {
       setLoading(true);
       setError(null);
+      const startedAt = performance.now();
 
       const formData = new FormData();
       formData.append("image", file);
@@ -143,6 +218,8 @@ export default function AnalyzeWorkspace() {
       }
 
       setResult(data as AnalyzeResponse);
+      setAnalysisCompletedAt(new Date());
+      setAnalysisDuration(`${((performance.now() - startedAt) / 1000).toFixed(2)} saniye`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Bilinmeyen analiz hatasi olustu.");
     } finally {
@@ -227,7 +304,7 @@ export default function AnalyzeWorkspace() {
                 <Maximize2 size={17} />
               </button>
               <div className="fish-thumbs">
-                {thumbnails.map((image, index) => (
+                {imageSet.slice(0, 4).map((image, index) => (
                   <button className={index === 0 ? "fish-thumb fish-thumb--active" : "fish-thumb"} type="button" key={image}>
                     <img src={image} alt="" />
                   </button>
@@ -272,10 +349,10 @@ export default function AnalyzeWorkspace() {
                 </div>
               </div>
               <div className="fish-meta-grid">
-                <Metric icon={Target} label="Analiz ID" value="AAS-2024-0518-1247" />
+                <Metric icon={Target} label="Analiz ID" value={analysisId} />
                 <Metric icon={CalendarDays} label="Analiz Tarihi" value={analysisDate} />
-                <Metric icon={BarChart3} label="Analiz Suresi" value={loading ? "Analiz ediliyor" : "2.34 saniye"} />
-                <Metric icon={Sparkles} label="Model" value={result ? "EfficientNet Fish_Data" : "AquaScope AI v2.4"} />
+                <Metric icon={BarChart3} label="Analiz Suresi" value={loading ? "Analiz ediliyor" : analysisDuration} />
+                <Metric icon={Sparkles} label="Model" value={modelName} />
               </div>
             </article>
           </div>
@@ -298,7 +375,7 @@ export default function AnalyzeWorkspace() {
               <div className="fish-color-body">
                 <div className="fish-donut" />
                 <ul>
-                  {["Gumus %48", "Mavi-Gri %26", "Beyaz %15", "Koyu Gri %8", "Diger %3"].map((item) => (
+                  {speciesProfile.colors.map((item) => (
                     <li key={item}><span />{item}</li>
                   ))}
                 </ul>
@@ -308,14 +385,14 @@ export default function AnalyzeWorkspace() {
             <article className="fish-panel fish-bars-panel">
               <h2>Boy Dagilimi</h2>
               <div className="fish-bars">
-                {[12, 28, 52, 82, 61, 34, 18].map((height, index) => (
+                {speciesProfile.distribution.map((height, index) => (
                   <span className={index === 3 ? "fish-bar fish-bar--active" : "fish-bar"} style={{ height: `${height}%` }} key={index} />
                 ))}
               </div>
               <div className="fish-bar-labels">
                 {["0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60+"].map((label) => <span key={label}>{label}</span>)}
               </div>
-              <p>Ortalama Boy: 38.7 cm</p>
+              <p>Ortalama Boy: {measurements[1]?.value ?? "38.7 cm"}</p>
             </article>
 
             <article className="fish-panel fish-location-panel">
@@ -323,20 +400,20 @@ export default function AnalyzeWorkspace() {
               <div className="fish-location-map">
                 <div className="fish-location-pin">
                   <MapPin size={18} />
-                  <strong>Karadeniz, Sinop Aciklari</strong>
-                  <span>41.887 N, 34.868 E</span>
+                  <strong>{speciesProfile.location}</strong>
+                  <span>{speciesProfile.coordinates}</span>
                 </div>
               </div>
               <div className="fish-env-grid">
-                <Env icon={Droplets} label="Su Sicakligi" value="16.8 C" />
-                <Env icon={Waves} label="Tuzluluk" value="18.6 PSU" />
-                <Env icon={Ruler} label="pH Degeri" value="8.1" />
-                <Env icon={Droplets} label="Oksijen" value="8.2 mg/L" />
+                <Env icon={Droplets} label="Su Sicakligi" value={speciesProfile.environment.temperature} />
+                <Env icon={Waves} label="Tuzluluk" value={speciesProfile.environment.salinity} />
+                <Env icon={Ruler} label="pH Degeri" value={speciesProfile.environment.ph} />
+                <Env icon={Droplets} label="Oksijen" value={speciesProfile.environment.oxygen} />
                 <div className="fish-habitat-score">
                   <span>Habitat Uygunlugu</span>
-                  <strong>Cok Uygun</strong>
-                  <i><b /></i>
-                  <small>94 / 100</small>
+                  <strong>{speciesProfile.environment.habitat}</strong>
+                  <i><b style={{ width: `${speciesProfile.environment.habitatScore}%` }} /></i>
+                  <small>{speciesProfile.environment.habitatScore} / 100</small>
                 </div>
               </div>
             </article>
@@ -353,20 +430,20 @@ export default function AnalyzeWorkspace() {
               <img src={previewUrl} alt="" />
               <div>
                 <strong>{detectedSpecies}</strong>
-                <small>{result ? "Model tahmini" : "Dicentrarchus labrax"}</small>
+                <small>{speciesProfile.latin}</small>
                 <em>{confidenceText} Guven</em>
               </div>
             </div>
             <p>
               {result
-                ? `Ideal boy: ${result.ideal_size}. Onerilen yem: ${result.recommended_baits.join(", ")}.`
-                : "Akdeniz ve Karadeniz'de yaygin olarak gorulen bir balik turudur."}
+                ? `${speciesProfile.description} Ideal boy: ${result.ideal_size}. Onerilen yem: ${result.recommended_baits.join(", ")}.`
+                : speciesProfile.description}
             </p>
             <button type="button">Tur Detayina Git <ChevronRight size={17} /></button>
 
             <h3>Alternatif Eslesmeler</h3>
             <div className="fish-alt-list">
-              {alternatives.map(([name, latin, score], index) => (
+              {alternatives.map(({ name, latin, score }, index) => (
                 <div className="fish-alt-row" key={name}>
                   <img src={thumbnails[index + 1]} alt="" />
                   <span><strong>{name}</strong><small>{latin}</small></span>
@@ -384,7 +461,7 @@ export default function AnalyzeWorkspace() {
             </div>
             <p>Bu balik saglikli gorunuyor ve yasadigi ortam uygun.</p>
             <ul>
-              {(result ? result.region_notes : reportItems).map((item) => (
+              {reportNotes.map((item) => (
                 <li key={item}><CheckCircle2 size={16} />{item}</li>
               ))}
             </ul>
@@ -394,6 +471,112 @@ export default function AnalyzeWorkspace() {
       </main>
     </section>
   );
+}
+
+function normalizeConfidence(value: number) {
+  const normalized = value <= 1 ? value * 100 : value;
+  return Math.max(0, Math.min(100, normalized));
+}
+
+function normalizeSpeciesKey(species: string) {
+  return species
+    .toLocaleLowerCase("tr-TR")
+    .replaceAll("ç", "c")
+    .replaceAll("ğ", "g")
+    .replaceAll("ı", "i")
+    .replaceAll("ö", "o")
+    .replaceAll("ş", "s")
+    .replaceAll("ü", "u")
+    .replace(/[^a-z0-9]+/g, "");
+}
+
+function getSpeciesProfile(species: string): SpeciesProfile {
+  const key = normalizeSpeciesKey(species);
+  return speciesProfiles[key] ?? {
+    latin: "Model tahmini",
+    description: `${species} icin model tarafindan olusturulan birincil eslesme sonucu gosteriliyor.`,
+    location: "Turkiye Denizleri",
+    coordinates: "39.000 N, 35.000 E",
+    environment: {
+      temperature: "17.8 C",
+      salinity: "24.0 PSU",
+      ph: "8.0",
+      oxygen: "7.9 mg/L",
+      habitat: "Uygun",
+      habitatScore: 86,
+    },
+    colors: ["Gumus %44", "Mavi-Gri %23", "Beyaz %16", "Koyu Ton %10", "Diger %7"],
+    distribution: [10, 24, 48, 74, 58, 32, 16],
+  };
+}
+
+function getScoreRows(confidence: number, result: AnalyzeResponse | null, profile: SpeciesProfile) {
+  const speciesScore = Math.round(confidence);
+  const visualQuality = result ? Math.max(72, Math.min(98, speciesScore - 2)) : 93;
+  const healthScore = result?.edible ? Math.max(82, Math.min(98, speciesScore + 1)) : Math.max(62, Math.min(86, speciesScore - 6));
+
+  return [
+    { label: "Saglik Durumu", value: healthScore, icon: Droplets, tone: "green" },
+    { label: "Habitat Uygunlugu", value: profile.environment.habitatScore, icon: MapPin, tone: "green" },
+    { label: "Gorsel Kalite", value: visualQuality, icon: Camera, tone: "purple" },
+    { label: "Tur Dogruluk Skoru", value: speciesScore, icon: Target, tone: "blue" },
+  ];
+}
+
+function getMeasurementsFromResult(result: AnalyzeResponse | null) {
+  const [minSize, maxSize] = extractSizeRange(result?.ideal_size);
+  const totalLength = maxSize || 42.3;
+  const standardLength = minSize || totalLength * 0.89;
+  const forkLength = totalLength * 0.97;
+  const bodyHeight = totalLength * 0.265;
+  const headLength = totalLength * 0.232;
+  const eyeDiameter = totalLength * 0.043;
+
+  return [
+    { label: "Toplam Boy", value: formatCm(totalLength), x: 28, y: 40 },
+    { label: "Standart Boy", value: formatCm(standardLength), x: 420, y: 40 },
+    { label: "Catal Boy", value: formatCm(forkLength), x: 420, y: 232 },
+    { label: "Vucut Yuksekligi", value: formatCm(bodyHeight), x: 238, y: 70 },
+    { label: "Bas Uzunlugu", value: formatCm(headLength), x: 92, y: 168 },
+    { label: "Goz Capi", value: formatCm(eyeDiameter), x: 103, y: 113 },
+  ];
+}
+
+function extractSizeRange(idealSize?: string): [number | null, number | null] {
+  if (!idealSize) return [null, null];
+
+  const numbers = idealSize.match(/\d+(?:[.,]\d+)?/g)?.map((item) => Number(item.replace(",", "."))) ?? [];
+  if (numbers.length === 0) return [null, null];
+  if (numbers.length === 1) return [numbers[0] * 0.9, numbers[0]];
+  return [numbers[0], numbers[1]];
+}
+
+function formatCm(value: number) {
+  return `${value.toFixed(1)} cm`;
+}
+
+function getAlternatives(species: string, confidence: number) {
+  const options = [
+    { name: "Levrek", latin: "Dicentrarchus labrax" },
+    { name: "Cupra", latin: "Sparus aurata" },
+    { name: "Palamut", latin: "Sarda sarda" },
+    { name: "Kefal", latin: "Mugil cephalus" },
+  ].filter((item) => normalizeSpeciesKey(item.name) !== normalizeSpeciesKey(species));
+
+  const remaining = Math.max(0.3, 100 - confidence);
+  return options.slice(0, 3).map((item, index) => ({
+    ...item,
+    score: `%${Math.max(0.2, remaining / (index + 2)).toFixed(1)}`,
+  }));
+}
+
+function getResultNotes(result: AnalyzeResponse, profile: SpeciesProfile) {
+  return [
+    ...result.region_notes,
+    `Tespit edilen tur: ${result.species} (${(normalizeConfidence(result.confidence)).toFixed(1)} guven).`,
+    `Habitat degeri: ${profile.environment.habitat} (${profile.environment.habitatScore}/100).`,
+    `Onerilen ekipman: ${result.recommended_gear.join(", ")}.`,
+  ];
 }
 
 function Metric({ icon: Icon, label, value }: { icon: ElementType; label: string; value: string }) {
