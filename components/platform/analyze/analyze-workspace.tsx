@@ -278,15 +278,18 @@ export default function AnalyzeWorkspace() {
 
       <div className="fish-analyze-flow">
         {getFlowSteps({ hasFile: Boolean(file), loading, hasResult: Boolean(result) }).map((step, index) => (
-          <div className={`fish-flow-step fish-flow-step--${step.status}`} key={step.label}>
-            <span>{index + 1}</span>
-            <div>
-              <strong>{step.label}</strong>
-              <small>
-                {step.caption}
-                <CheckCircle2 size={15} />
-              </small>
+          <div className="fish-flow-segment" key={step.label}>
+            <div className={`fish-flow-step fish-flow-step--${step.status}`}>
+              <span>{index + 1}</span>
+              <div>
+                <strong>{step.label}</strong>
+                <small>
+                  {step.caption}
+                  <CheckCircle2 size={15} />
+                </small>
+              </div>
             </div>
+            {index < 2 ? <span className={`fish-flow-connector fish-flow-connector--${step.status}`} aria-hidden="true" /> : null}
           </div>
         ))}
       </div>

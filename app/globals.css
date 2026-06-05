@@ -13095,7 +13095,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 .fish-analyze-flow {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
   align-items: center;
   gap: clamp(18px, 3vw, 44px);
   height: var(--fish-flow);
@@ -13113,6 +13113,18 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   overflow: hidden;
 }
 
+.fish-flow-segment {
+  display: grid;
+  grid-template-columns: minmax(210px, auto) minmax(64px, 1fr);
+  align-items: center;
+  gap: clamp(18px, 2.4vw, 42px);
+  min-width: 0;
+}
+
+.fish-flow-segment:last-child {
+  grid-template-columns: minmax(210px, auto);
+}
+
 .fish-flow-step {
   position: relative;
   display: grid;
@@ -13123,24 +13135,22 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   isolation: isolate;
 }
 
-.fish-flow-step:not(:last-child)::before,
-.fish-flow-step:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  left: calc(100% - clamp(16px, 2vw, 28px));
-  right: calc(-1 * clamp(36px, 4.5vw, 68px));
-  top: 50%;
+.fish-flow-connector {
+  position: relative;
+  display: block;
+  min-width: 64px;
   height: 4px;
+  overflow: hidden;
   border-radius: 999px;
-  transform: translateY(-50%);
-}
-
-.fish-flow-step:not(:last-child)::before {
   background: rgba(44, 92, 155, 0.28);
   box-shadow: inset 0 0 0 1px rgba(103, 145, 205, 0.08);
 }
 
-.fish-flow-step:not(:last-child)::after {
+.fish-flow-connector::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
   background:
     linear-gradient(90deg, rgba(30, 144, 255, 0.95), rgba(30, 144, 255, 0.22)),
     rgba(91, 130, 185, 0.14);
@@ -13155,10 +13165,10 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
     background-color 760ms ease;
 }
 
-.fish-flow-step--completed:not(:last-child)::after,
-.fish-flow-step--active:not(:last-child)::after {
+.fish-flow-connector--completed::after,
+.fish-flow-connector--active::after {
   opacity: 1;
-  transform: translateY(-50%) scaleX(1);
+  transform: scaleX(1);
   background:
     linear-gradient(90deg, #37a1ff, #1e90ff 54%, rgba(30, 144, 255, 0.28)),
     rgba(91, 130, 185, 0.14);
@@ -14302,6 +14312,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 
   .fish-analyze-actions,
   .fish-analyze-flow,
+  .fish-flow-segment,
   .fish-analyze-rail,
   .fish-score-body,
   .fish-score-list,
@@ -14321,8 +14332,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
     width: 100%;
   }
 
-  .fish-flow-step::before,
-  .fish-flow-step::after {
+  .fish-flow-connector {
     display: none;
   }
 
