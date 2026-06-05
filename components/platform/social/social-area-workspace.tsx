@@ -99,7 +99,7 @@ export default function SocialAreaWorkspace() {
               <label className="social-search">
                 <Search size={18} />
                 <input type="search" placeholder="Search posts, people, groups..." />
-                <span>⌘ K</span>
+                <span>Ctrl K</span>
               </label>
               <button type="button" className="social-bell" aria-label="Notifications">
                 <Bell size={18} />
