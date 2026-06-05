@@ -1,6 +1,7 @@
 "use client";
 
 import type { ElementType } from "react";
+import FishMorphometricViewer from "../../analysis/FishMorphometricViewer";
 import {
   ArrowLeft,
   ArrowRight,
@@ -13,7 +14,6 @@ import {
   Download,
   Droplets,
   FileText,
-  Fish,
   MapPin,
   Maximize2,
   MoreVertical,
@@ -40,12 +40,12 @@ const scoreRows = [
 ];
 
 const measurements = [
-  ["A", "Toplam Boy", "42.3 cm"],
-  ["B", "Standart Boy", "37.8 cm"],
-  ["C", "Catal Boy", "41.1 cm"],
-  ["D", "Vucut Yuksekligi", "11.2 cm"],
-  ["E", "Bas Uzunlugu", "9.8 cm"],
-  ["F", "Goz Capi", "1.8 cm"],
+  { label: "Toplam Boy", value: "42.3 cm", x: 28, y: 40 },
+  { label: "Standart Boy", value: "37.8 cm", x: 420, y: 40 },
+  { label: "Catal Boy", value: "41.1 cm", x: 420, y: 232 },
+  { label: "Vucut Yuksekligi", value: "11.2 cm", x: 238, y: 70 },
+  { label: "Bas Uzunlugu", value: "9.8 cm", x: 92, y: 168 },
+  { label: "Goz Capi", value: "1.8 cm", x: 103, y: 113 },
 ];
 
 const alternatives = [
@@ -175,19 +175,7 @@ export default function AnalyzeWorkspace() {
           <section className="fish-detail-grid">
             <article className="fish-panel fish-measure-panel">
               <h2>Morfometrik Olcumler</h2>
-              <div className="fish-measure-body">
-                <div className="fish-silhouette">
-                  <Fish size={210} />
-                  {["A", "B", "C", "D", "E", "F"].map((label, index) => (
-                    <span className={`fish-measure-dot fish-measure-dot--${index}`} key={label}>{label}</span>
-                  ))}
-                </div>
-                <ul>
-                  {measurements.map(([key, label, value]) => (
-                    <li key={key}><b>{key}</b><span>{label}</span><strong>{value}</strong></li>
-                  ))}
-                </ul>
-              </div>
+              <FishMorphometricViewer species="Levrek" measurements={measurements} />
               <p className="fish-panel-note">Olcumler tahmini degerlerdir ve +- %3 hata payi icerebilir.</p>
             </article>
 

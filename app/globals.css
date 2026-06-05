@@ -12820,6 +12820,141 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   min-height: 0;
 }
 
+.morph-viewer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(145px, 0.52fr);
+  gap: 16px;
+  align-items: center;
+  min-height: 190px;
+}
+
+.morph-svg-wrap {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(59, 130, 246, 0.16);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 36% 42%, rgba(31, 154, 255, 0.16), transparent 44%),
+    linear-gradient(145deg, rgba(6, 23, 43, 0.95), rgba(3, 12, 24, 0.98));
+  box-shadow: inset 0 0 40px rgba(15, 135, 255, 0.08);
+}
+
+.morph-svg-wrap svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 178px;
+}
+
+.morph-grid path {
+  fill: none;
+  stroke: rgba(56, 189, 248, 0.08);
+  stroke-width: 1;
+}
+
+.morph-line {
+  stroke: rgba(76, 154, 255, 0.64);
+  stroke-width: 2;
+  stroke-dasharray: 7 6;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 5px rgba(0, 144, 255, 0.48));
+}
+
+.morph-line--primary {
+  stroke: rgba(41, 126, 255, 0.95);
+  stroke-width: 2.4;
+  stroke-dasharray: none;
+}
+
+.morph-line--vertical {
+  stroke: rgba(0, 212, 255, 0.72);
+}
+
+.morph-body,
+.morph-tail {
+  fill: url("#morphBody");
+  stroke: rgba(169, 213, 239, 0.55);
+  stroke-width: 1.5;
+  filter: url("#morphGlow") drop-shadow(0 16px 24px rgba(0, 0, 0, 0.42));
+}
+
+.morph-body-shadow,
+.morph-tail-shadow {
+  fill: rgba(0, 0, 0, 0.28);
+  transform: translate(8px, 10px);
+}
+
+.morph-belly {
+  fill: url("#morphBelly");
+  opacity: 0.74;
+}
+
+.morph-back {
+  fill: rgba(121, 162, 185, 0.2);
+}
+
+.morph-dorsal,
+.morph-fin {
+  fill: rgba(45, 73, 91, 0.82);
+  stroke: rgba(174, 218, 239, 0.4);
+  stroke-width: 1.2;
+}
+
+.morph-dorsal--rear,
+.morph-fin--pelvic {
+  opacity: 0.72;
+}
+
+.morph-gill,
+.morph-mouth,
+.morph-lateral,
+.morph-scale {
+  fill: none;
+  stroke: rgba(185, 219, 235, 0.42);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.morph-lateral {
+  stroke: rgba(129, 181, 212, 0.5);
+  stroke-dasharray: 5 8;
+}
+
+.morph-scale {
+  opacity: 0.24;
+  stroke-width: 1;
+}
+
+.morph-eye {
+  fill: url("#morphEye");
+  stroke: rgba(226, 246, 255, 0.72);
+  stroke-width: 1.2;
+}
+
+.morph-eye-dot {
+  fill: #03101b;
+}
+
+.morph-point circle {
+  fill: #1e90ff;
+  stroke: #9bdcff;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 7px rgba(30, 144, 255, 0.82));
+}
+
+.morph-point text {
+  fill: #ffffff;
+  font-size: 8px;
+  font-weight: 800;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.morph-panel-list {
+  min-width: 0;
+}
+
 .fish-silhouette {
   position: relative;
   display: grid;
@@ -12849,6 +12984,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 .fish-measure-dot--5 { right: 34%; top: 54%; }
 
 .fish-measure-body ul,
+.morph-panel-list,
 .fish-color-body ul,
 .fish-ai-card ul {
   display: grid;
@@ -12858,7 +12994,8 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   list-style: none;
 }
 
-.fish-measure-body li {
+.fish-measure-body li,
+.morph-panel-list li {
   display: grid;
   grid-template-columns: 18px minmax(88px, 1fr) auto;
   gap: 8px;
@@ -12866,7 +13003,8 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   font-size: 11px;
 }
 
-.fish-measure-body li b {
+.fish-measure-body li b,
+.morph-panel-list li b {
   display: grid;
   place-items: center;
   height: 18px;
@@ -12875,7 +13013,8 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   color: #b9d1ef;
 }
 
-.fish-measure-body li strong {
+.fish-measure-body li strong,
+.morph-panel-list li strong {
   color: #e9f3ff;
   font-weight: 560;
 }
@@ -13312,6 +13451,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   .fish-score-body,
   .fish-score-list,
   .fish-measure-body,
+  .morph-viewer,
   .fish-color-body,
   .fish-env-grid {
     grid-template-columns: 1fr;
