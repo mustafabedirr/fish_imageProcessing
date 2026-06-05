@@ -12391,6 +12391,26 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   font-weight: 650;
 }
 
+.fish-analyze-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+  transform: none;
+}
+
+.fish-upload-input {
+  display: none;
+}
+
+.fish-spinner {
+  animation: fishSpin 900ms linear infinite;
+}
+
+@keyframes fishSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .fish-action-primary {
   border-color: rgba(30, 144, 255, 0.7) !important;
   color: #7cc8ff !important;
@@ -12405,6 +12425,13 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   background: rgba(20, 68, 126, 0.7);
   box-shadow: 0 0 24px rgba(30, 144, 255, 0.18);
   transform: translateY(-1px);
+}
+
+.fish-analyze-actions button:disabled:hover {
+  border-color: rgba(105, 145, 190, 0.22);
+  background: rgba(10, 27, 48, 0.65);
+  box-shadow: none;
+  transform: none;
 }
 
 .fish-analyze-flow {
@@ -12463,6 +12490,14 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   margin-top: 4px;
   color: #00d48f;
   font-size: 12px;
+}
+
+.fish-flow-step--active > span {
+  box-shadow: 0 0 0 7px rgba(30, 144, 255, 0.16), 0 0 26px rgba(30, 144, 255, 0.42);
+}
+
+.fish-flow-step--active small {
+  color: #65d8ff;
 }
 
 .fish-analyze-layout {
@@ -12554,6 +12589,34 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   background: rgba(4, 15, 31, 0.72);
   line-height: 32px;
   font-size: 13px;
+}
+
+.fish-stage-upload {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 42px;
+  padding: 0 16px;
+  border: 1px solid rgba(30, 144, 255, 0.55);
+  border-radius: 9px;
+  color: #ffffff;
+  background: rgba(4, 18, 34, 0.78);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  backdrop-filter: blur(12px);
+  transition: border-color 180ms ease, background 180ms ease;
+}
+
+.fish-stage-upload:hover {
+  border-color: rgba(0, 212, 255, 0.8);
+  background: rgba(9, 39, 72, 0.88);
 }
 
 .fish-stage-nav {
@@ -12697,6 +12760,12 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   color: #a8bad4;
   font-size: 13px;
   line-height: 1.55;
+}
+
+.fish-score-copy .fish-analyze-error {
+  margin-top: 10px;
+  color: #fb7185;
+  font-weight: 650;
 }
 
 .fish-score-list {
