@@ -30,6 +30,9 @@ import {
 type AnalyzeResponse = {
   species: string;
   confidence: number;
+  top_predictions: TopPrediction[];
+  confidence_threshold: number;
+  is_uncertain: boolean;
   name_tr?: string;
   display_name?: string;
   edible: boolean;
@@ -37,6 +40,13 @@ type AnalyzeResponse = {
   recommended_baits: string[];
   recommended_gear: string[];
   region_notes: string[];
+};
+
+type TopPrediction = {
+  species: string;
+  confidence: number;
+  name_tr?: string;
+  display_name?: string;
 };
 
 type SpeciesProfile = {
@@ -155,14 +165,17 @@ export default function AnalyzeWorkspace() {
 
   const detectedSpecies = result?.species ?? "Levrek";
   const confidence = result ? normalizeConfidence(result.confidence) : 95.4;
+  const confidenceThreshold = result ? normalizeConfidence(result.confidence_threshold) : 45;
+  const isUncertain = Boolean(result?.is_uncertain);
   const confidenceText = `%${confidence.toFixed(1)}`;
-  const scoreLabel = confidence >= 85 ? "Cok Yuksek" : confidence >= 65 ? "Yuksek" : "Orta";
+  const scoreLabel = isUncertain ? "Dusuk Guven" : confidence >= 85 ? "Cok Yuksek" : confidence >= 65 ? "Yuksek" : "Orta";
   const analysisDate = analysisCompletedAt ? analysisCompletedAt.toLocaleString("tr-TR") : "18 Mayis 2024 - 14:32";
   const speciesProfile = getSpeciesProfile(detectedSpecies);
   const displaySpecies = result ? getDisplaySpecies(result, speciesProfile) : "Levrek";
+  const primarySpeciesLabel = isUncertain ? "Emin degil" : displaySpecies;
   const scoreRows = getScoreRows(confidence, result, speciesProfile);
   const measurements = getMeasurementsFromResult(result);
-  const alternatives = getAlternatives(detectedSpecies, confidence);
+  const alternatives = result?.top_predictions.length ? getTopPredictionAlternatives(result) : getAlternatives(detectedSpecies, confidence);
   const reportNotes = result ? getResultNotes(result, speciesProfile) : reportItems;
   const analysisId = result && file ? `AAS-${file.name.replace(/\W+/g, "-").slice(0, 18).toUpperCase()}` : "AAS-2024-0518-1247";
   const modelName = result ? "EfficientNet + YOLO Fish_Data" : "AquaScope AI v2.4";
@@ -339,7 +352,9 @@ export default function AnalyzeWorkspace() {
                 <div className="fish-score-copy">
                   <p>
                     {result
-                      ? `${displaySpecies} turu ${confidenceText} guven skoru ile tespit edildi.`
+                      ? isUncertain
+                        ? `Model bu gorsel icin yeterli guvene ulasamadi. En yakin tahmin ${displaySpecies} (${confidenceText}).`
+                        : `${displaySpecies} turu ${confidenceText} guven skoru ile tespit edildi.`
                       : "Bir balik gorseli secip analiz ettiginde model sonucu burada guncellenir."}
                   </p>
                   <div className="fish-score-list">
@@ -435,21 +450,25 @@ export default function AnalyzeWorkspace() {
           <article className="fish-panel fish-species-card">
             <div className="fish-rail-head">
               <h2>Tespit Edilen Tur</h2>
-              <span>{loading ? "Analiz Ediliyor" : result ? "Birincil Eslesme" : "Sonuc Bekleniyor"}</span>
+              <span>{loading ? "Analiz Ediliyor" : result ? (isUncertain ? "Dusuk Guven" : "Birincil Eslesme") : "Sonuc Bekleniyor"}</span>
             </div>
             <div className={`fish-species-main ${loading ? "fish-species-main--loading" : ""}`}>
               <img src={previewUrl} alt="" />
               <div>
-                <strong>{loading ? "Model calisiyor" : displaySpecies}</strong>
+                <strong>{loading ? "Model calisiyor" : primarySpeciesLabel}</strong>
                 <small>{speciesProfile.latin}</small>
-                <em>{loading ? "Analiz suruyor" : `${confidenceText} Guven`}</em>
+                <em className={isUncertain ? "fish-confidence-low" : ""}>
+                  {loading ? "Analiz suruyor" : isUncertain ? `${confidenceText} Dusuk guven` : `${confidenceText} Guven`}
+                </em>
               </div>
             </div>
             <p>
               {loading
                 ? "Yuklenen gorsel model tarafindan isleniyor. Tespit sonucu tamamlandiginda bu kart otomatik guncellenecek."
                 : result
-                ? `${speciesProfile.description} Ideal boy: ${result.ideal_size}. Onerilen yem: ${result.recommended_baits.join(", ")}.`
+                ? isUncertain
+                  ? `Tahmin guveni %${confidenceThreshold.toFixed(0)} esiginin altinda. Sonucu dogrulamak icin alternatif eslesmeleri kontrol edin.`
+                  : `${speciesProfile.description} Ideal boy: ${result.ideal_size}. Onerilen yem: ${result.recommended_baits.join(", ")}.`
                 : speciesProfile.description}
             </p>
             <button type="button">Tur Detayina Git <ChevronRight size={17} /></button>
@@ -529,6 +548,9 @@ function normalizeAnalyzeResponse(data: unknown): AnalyzeResponse {
   const payload = unwrapAnalyzePayload(data);
   const species = readString(payload, "species") || readString(payload, "class_name") || readString(payload, "prediction") || "Bilinmeyen Tur";
   const confidence = readNumber(payload, "confidence") ?? readNumber(payload, "score") ?? readNumber(payload, "probability") ?? 0;
+  const confidenceThreshold = readNumber(payload, "confidence_threshold") ?? 0.45;
+  const normalizedConfidence = normalizeConfidence(confidence);
+  const normalizedThreshold = normalizeConfidence(confidenceThreshold);
   const recommendedBaits = readStringArray(payload, "recommended_baits");
   const recommendedGear = readStringArray(payload, "recommended_gear");
   const regionNotes = readStringArray(payload, "region_notes");
@@ -536,6 +558,9 @@ function normalizeAnalyzeResponse(data: unknown): AnalyzeResponse {
   return {
     species,
     confidence,
+    top_predictions: readTopPredictions(payload),
+    confidence_threshold: confidenceThreshold,
+    is_uncertain: readBoolean(payload, "is_uncertain") ?? normalizedConfidence < normalizedThreshold,
     name_tr: readString(payload, "name_tr"),
     display_name: readString(payload, "display_name"),
     edible: readBoolean(payload, "edible") ?? false,
@@ -586,6 +611,27 @@ function readStringArray(source: Record<string, unknown>, key: string) {
   if (Array.isArray(value)) return value.filter((item): item is string => typeof item === "string");
   if (typeof value === "string" && value.trim()) return [value];
   return [];
+}
+
+function readTopPredictions(source: Record<string, unknown>): TopPrediction[] {
+  const value = source.top_predictions;
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item) => {
+      if (!isRecord(item)) return null;
+      const species = readString(item, "species") || readString(item, "class_name") || readString(item, "prediction");
+      const confidence = readNumber(item, "confidence") ?? readNumber(item, "score") ?? readNumber(item, "probability");
+      if (!species || confidence === null) return null;
+
+      return {
+        species,
+        confidence,
+        name_tr: readString(item, "name_tr"),
+        display_name: readString(item, "display_name"),
+      };
+    })
+    .filter((item): item is TopPrediction => item !== null);
 }
 
 function getDisplaySpecies(result: AnalyzeResponse, profile: SpeciesProfile) {
@@ -691,9 +737,28 @@ function getAlternatives(species: string, confidence: number) {
   }));
 }
 
+function getTopPredictionAlternatives(result: AnalyzeResponse) {
+  const primaryKey = normalizeSpeciesKey(result.species);
+  const predictions = result.top_predictions.filter((item) => normalizeSpeciesKey(item.species) !== primaryKey);
+  const source = predictions.length ? predictions : result.top_predictions.slice(1);
+  if (!source.length) return getAlternatives(result.species, normalizeConfidence(result.confidence));
+
+  return source.slice(0, 3).map((prediction) => {
+    const profile = getSpeciesProfile(prediction.species);
+    const name = prediction.name_tr || prediction.display_name || profile.commonName || prettifySpeciesName(prediction.species);
+
+    return {
+      name,
+      latin: profile.latin,
+      score: `%${normalizeConfidence(prediction.confidence).toFixed(1)}`,
+    };
+  });
+}
+
 function getResultNotes(result: AnalyzeResponse, profile: SpeciesProfile) {
   return [
     ...result.region_notes,
+    ...(result.is_uncertain ? [`Model guveni %${normalizeConfidence(result.confidence_threshold).toFixed(0)} esiginin altinda; sonuc dogrulanmali.`] : []),
     `Tespit edilen tur: ${result.species} (${(normalizeConfidence(result.confidence)).toFixed(1)} guven).`,
     `Habitat degeri: ${profile.environment.habitat} (${profile.environment.habitatScore}/100).`,
     `Onerilen ekipman: ${result.recommended_gear.join(", ")}.`,

@@ -14136,6 +14136,12 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   font-weight: 760;
 }
 
+.fish-species-main em.fish-confidence-low {
+  color: #ffd166;
+  background: rgba(255, 209, 102, 0.14);
+  box-shadow: 0 0 0 1px rgba(255, 209, 102, 0.18) inset;
+}
+
 .fish-panel button {
   justify-content: space-between;
   width: 100%;

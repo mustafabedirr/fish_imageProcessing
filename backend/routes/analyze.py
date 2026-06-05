@@ -8,15 +8,22 @@ from backend.services.inference_service import run_inference
 router = APIRouter(prefix="/api/v1", tags=["analyze"])
 
 
+class TopPrediction(BaseModel):
+    species: str
+    confidence: float = Field(..., ge=0.0, le=1.0)
+
+
 class AnalyzeFishResponse(BaseModel):
     species: str = Field(..., description="Predicted fish species")
     confidence: float = Field(..., ge=0.0, le=1.0)
+    top_predictions: list[TopPrediction] = Field(default_factory=list)
+    confidence_threshold: float = Field(default=0.45, ge=0.0, le=1.0)
+    is_uncertain: bool = False
     edible: bool
     ideal_size: str
     recommended_baits: list[str]
     recommended_gear: list[str]
     region_notes: list[str]
-
 
 SUPPORTED_IMAGE_TYPES = {
     "image/jpeg",

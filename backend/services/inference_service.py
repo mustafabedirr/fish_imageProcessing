@@ -8,6 +8,9 @@ import numpy as np
 
 from backend.services.preprocessing import preprocess_image
 
+LOW_CONFIDENCE_THRESHOLD = 0.45
+TOP_PREDICTIONS_LIMIT = 5
+
 
 DEFAULT_FISH_INFO: dict[str, dict[str, Any]] = {
     "Levrek": {
@@ -69,10 +72,10 @@ def predict_species(
     image_bytes: bytes,
     model: Any,
     class_names: list[str],
-) -> tuple[str, float]:
+) -> tuple[str, float, list[dict[str, Any]]]:
     """
     Run model inference and return:
-        (predicted_species, confidence)
+        (predicted_species, confidence, top_predictions)
     """
     image_tensor = preprocess_image(
         image_bytes,
@@ -88,11 +91,22 @@ def predict_species(
     if predictions.shape[1] != len(class_names):
         raise ValueError("prediction class count does not match class_names length")
 
-    top_index = int(np.argmax(predictions[0]))
-    confidence = float(predictions[0][top_index])
+    scores = predictions[0]
+    limit = min(TOP_PREDICTIONS_LIMIT, len(class_names))
+    top_indices = np.argsort(scores)[::-1][:limit]
+    top_predictions = [
+        {
+            "species": class_names[int(index)],
+            "confidence": round(float(scores[int(index)]), 4),
+        }
+        for index in top_indices
+    ]
+
+    top_index = int(top_indices[0])
+    confidence = float(scores[top_index])
     species = class_names[top_index]
 
-    return species, confidence
+    return species, confidence, top_predictions
 
 
 def resolve_model_target_size(model: Any) -> tuple[int, int]:
@@ -114,13 +128,18 @@ def resolve_model_target_size(model: Any) -> tuple[int, int]:
 def enrich_species_result(
     species: str,
     confidence: float,
+    top_predictions: list[dict[str, Any]],
     fish_info: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
     info = fish_info.get(species, {})
+    is_uncertain = confidence < LOW_CONFIDENCE_THRESHOLD
 
     return {
         "species": species,
         "confidence": round(confidence, 4),
+        "top_predictions": top_predictions,
+        "confidence_threshold": LOW_CONFIDENCE_THRESHOLD,
+        "is_uncertain": is_uncertain,
         "edible": bool(info.get("edible", False)),
         "ideal_size": str(info.get("ideal_size", "Bilinmiyor")),
         "recommended_baits": list(info.get("recommended_baits", ["Bilgi yok"])),
@@ -138,7 +157,7 @@ def run_inference(
     if fish_info is None:
         fish_info = DEFAULT_FISH_INFO
 
-    species, confidence = predict_species(
+    species, confidence, top_predictions = predict_species(
         image_bytes=image_bytes,
         model=model,
         class_names=class_names,
@@ -147,5 +166,6 @@ def run_inference(
     return enrich_species_result(
         species=species,
         confidence=confidence,
+        top_predictions=top_predictions,
         fish_info=fish_info,
     )
