@@ -23,7 +23,6 @@ import {
   Waves,
   Wind,
 } from "lucide-react";
-import PlatformUtilityBar from "../shell/platform-utility-bar";
 
 const layerItems = [
   { icon: Fish, title: "Balık Yoğunluğu", low: "Düşük", high: "Yüksek", active: true, tone: "blue" },
@@ -68,8 +67,6 @@ const mapMetrics = [
 export default function WorldMapWorkspace() {
   return (
     <section className="aqua-map-workspace">
-      <PlatformUtilityBar />
-
       <div className="aqua-map-screen">
         <header className="aqua-map-header">
           <div>

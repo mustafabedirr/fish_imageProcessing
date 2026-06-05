@@ -12761,7 +12761,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 .aqua-map-screen {
-  height: calc(100vh - 64px);
+  height: 100vh;
   min-height: 720px;
   padding: 20px 20px 18px;
   overflow: hidden;
@@ -13684,7 +13684,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 @media (max-width: 1480px) {
   .aqua-map-screen {
     height: auto;
-    min-height: calc(100vh - 64px);
+    min-height: 100vh;
     overflow: visible;
   }
 
@@ -13786,7 +13786,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 .fish-library-shell {
-  height: calc(100vh - 64px);
+  height: 100vh;
   min-height: 720px;
   padding: 20px 20px 18px;
   overflow: hidden;
@@ -14362,7 +14362,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 @media (max-width: 1480px) {
   .fish-library-shell {
     height: auto;
-    min-height: calc(100vh - 64px);
+    min-height: 100vh;
     overflow: visible;
   }
 

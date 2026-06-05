@@ -20,7 +20,6 @@ import {
   TrendingUp,
   Waves,
 } from "lucide-react";
-import PlatformUtilityBar from "../shell/platform-utility-bar";
 
 const speciesCards = [
   {
@@ -99,8 +98,6 @@ const tags = ["Deniz", "Tatlı Su", "Acı Su", "Etçil", "Otçul", "Dip Balığ�
 export default function SpeciesLibraryWorkspace() {
   return (
     <section className="fish-library-page">
-      <PlatformUtilityBar />
-
       <div className="fish-library-shell">
         <header className="fish-library-header">
           <div className="fish-library-title">
