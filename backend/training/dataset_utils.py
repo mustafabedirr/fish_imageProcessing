@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import random
+import re
 import shutil
 import zipfile
 from dataclasses import dataclass
@@ -152,6 +153,78 @@ def prepare_fish_data_classification_root(
         )
 
     return output_dir
+
+
+def class_image_counts(class_root: Path) -> dict[str, int]:
+    return {
+        child.name: sum(1 for file in child.rglob("*") if is_image_file(file))
+        for child in sorted(class_root.iterdir())
+        if child.is_dir()
+    }
+
+
+def prepare_filtered_classification_root(
+    class_root: Path,
+    output_dir: Path,
+    min_images_per_class: int = 10,
+    class_name_pattern: str | None = r"^[A-Za-z][A-Za-z_]+$",
+    clean: bool = False,
+) -> tuple[Path, dict[str, object]]:
+    if clean and output_dir.exists():
+        shutil.rmtree(output_dir)
+
+    if output_dir.exists() and count_class_dirs(output_dir) >= 2:
+        counts = class_image_counts(output_dir)
+        return output_dir, {
+            "source_class_count": len(class_image_counts(class_root)),
+            "filtered_class_count": len(counts),
+            "filtered_image_count": sum(counts.values()),
+            "min_images_per_class": min_images_per_class,
+            "class_name_pattern": class_name_pattern,
+            "reused_existing": True,
+        }
+
+    matcher = re.compile(class_name_pattern) if class_name_pattern else None
+    output_dir.mkdir(parents=True, exist_ok=True)
+    source_counts = class_image_counts(class_root)
+    kept: dict[str, int] = {}
+    dropped: dict[str, str] = {}
+
+    for class_name, image_count in source_counts.items():
+        if image_count < min_images_per_class:
+            dropped[class_name] = f"fewer than {min_images_per_class} images"
+            continue
+        if matcher and matcher.fullmatch(class_name) is None:
+            dropped[class_name] = "class name does not match species pattern"
+            continue
+
+        for image in sorted(file for file in (class_root / class_name).rglob("*") if is_image_file(file)):
+            destination = output_dir / class_name / image.name
+            link_or_copy(image, destination)
+        kept[class_name] = image_count
+
+    if count_class_dirs(output_dir) < 2:
+        raise ValueError(
+            f"Filtered dataset has fewer than 2 classes: {output_dir}. "
+            "Lower --min-images-per-class or relax --class-name-pattern."
+        )
+
+    summary = {
+        "source_class_count": len(source_counts),
+        "source_image_count": sum(source_counts.values()),
+        "filtered_class_count": len(kept),
+        "filtered_image_count": sum(kept.values()),
+        "min_images_per_class": min_images_per_class,
+        "class_name_pattern": class_name_pattern,
+        "dropped_class_count": len(dropped),
+        "dropped_classes": dropped,
+        "reused_existing": False,
+    }
+    (output_dir / "_filter_summary.json").write_text(
+        json.dumps(summary, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    return output_dir, summary
 
 
 def prepare_yolo_classification_split(

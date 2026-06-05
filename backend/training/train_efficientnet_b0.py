@@ -11,6 +11,7 @@ from backend.training.dataset_utils import (
     find_fish_data_root,
     is_image_file,
     prepare_fish_data_classification_root,
+    prepare_filtered_classification_root,
     safe_extract,
     write_class_names,
 )
@@ -41,6 +42,12 @@ def parse_args() -> argparse.Namespace:
         help="Class-directory dataset prepared from Fish_Data index files.",
     )
     parser.add_argument(
+        "--filtered-dir",
+        type=Path,
+        default=root / "training_runs" / "filtered_classification",
+        help="Quality-filtered class-directory dataset used for training.",
+    )
+    parser.add_argument(
         "--model-out",
         type=Path,
         default=root / "models" / "fish_model.h5",
@@ -53,10 +60,21 @@ def parse_args() -> argparse.Namespace:
         help="JSON class-name list path used by the FastAPI backend.",
     )
     parser.add_argument("--image-size", type=int, default=224)
-    parser.add_argument("--batch-size", type=int, default=16)
-    parser.add_argument("--epochs", type=int, default=18)
-    parser.add_argument("--fine-tune-epochs", type=int, default=8)
-    parser.add_argument("--fine-tune-layers", type=int, default=35)
+    parser.add_argument("--batch-size", type=int, default=24)
+    parser.add_argument("--epochs", type=int, default=35)
+    parser.add_argument("--fine-tune-epochs", type=int, default=15)
+    parser.add_argument("--fine-tune-layers", type=int, default=55)
+    parser.add_argument(
+        "--min-images-per-class",
+        type=int,
+        default=10,
+        help="Drop classes with fewer images. 483 classes with 3-5 images each will not train reliably.",
+    )
+    parser.add_argument(
+        "--class-name-pattern",
+        default=r"^[A-Za-z][A-Za-z_]+$",
+        help="Regex for valid species class folders. Use empty string to disable.",
+    )
     parser.add_argument("--validation-split", type=float, default=0.2)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument(
@@ -85,6 +103,17 @@ def find_dataset_root(args: argparse.Namespace) -> Path:
     return prepare_fish_data_classification_root(
         fish_data_root=fish_data_root,
         output_dir=args.prepared_dir,
+        clean=args.clean_extract,
+    )
+
+
+def prepare_training_root(args: argparse.Namespace, dataset_root: Path) -> tuple[Path, dict[str, object]]:
+    pattern = args.class_name_pattern or None
+    return prepare_filtered_classification_root(
+        class_root=dataset_root,
+        output_dir=args.filtered_dir,
+        min_images_per_class=args.min_images_per_class,
+        class_name_pattern=pattern,
         clean=args.clean_extract,
     )
 
@@ -186,12 +215,20 @@ def main() -> None:
         raise FileNotFoundError(f"Dataset zip not found: {args.dataset_zip}")
 
     safe_extract(args.dataset_zip, args.extract_dir, args.clean_extract)
-    dataset_root = find_dataset_root(args)
+    raw_dataset_root = find_dataset_root(args)
+    dataset_root, filter_summary = prepare_training_root(args, raw_dataset_root)
     class_names = write_class_names(dataset_root, args.class_names_out)
     class_weights = compute_class_weights(dataset_root, class_names)
 
+    print(f"Raw dataset root: {raw_dataset_root}")
     print(f"Dataset root: {dataset_root}")
     print(f"Classes: {len(class_names)}")
+    print(
+        "Filtered images:",
+        filter_summary.get("filtered_image_count"),
+        "Dropped classes:",
+        filter_summary.get("dropped_class_count", 0),
+    )
 
     train_ds, val_ds = build_datasets(args, dataset_root)
 
@@ -270,7 +307,9 @@ def main() -> None:
         json.dumps(
             {
                 "dataset_zip": str(args.dataset_zip),
+                "raw_dataset_root": str(raw_dataset_root),
                 "dataset_root": str(dataset_root),
+                "filter_summary": filter_summary,
                 "class_count": len(class_names),
                 "image_size": args.image_size,
                 "batch_size": args.batch_size,

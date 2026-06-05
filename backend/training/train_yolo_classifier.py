@@ -7,6 +7,7 @@ from pathlib import Path
 from backend.training.dataset_utils import (
     find_fish_data_root,
     prepare_fish_data_classification_root,
+    prepare_filtered_classification_root,
     prepare_yolo_classification_split,
     safe_extract,
     write_class_names,
@@ -19,15 +20,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dataset-zip", type=Path, required=True)
     parser.add_argument("--extract-dir", type=Path, default=root / "training_runs" / "dataset_all")
     parser.add_argument("--prepared-dir", type=Path, default=root / "training_runs" / "prepared_classification")
+    parser.add_argument("--filtered-dir", type=Path, default=root / "training_runs" / "filtered_classification")
     parser.add_argument("--yolo-dir", type=Path, default=root / "training_runs" / "yolo_classification")
     parser.add_argument("--class-names-out", type=Path, default=root / "data" / "class_names.json")
     parser.add_argument("--model", default="yolov8n-cls.pt")
     parser.add_argument("--project", type=Path, default=root / "models" / "yolo")
     parser.add_argument("--name", default="fish_species_cls")
-    parser.add_argument("--imgsz", type=int, default=224)
-    parser.add_argument("--epochs", type=int, default=20)
+    parser.add_argument("--imgsz", type=int, default=320)
+    parser.add_argument("--epochs", type=int, default=50)
     parser.add_argument("--batch", type=int, default=16)
     parser.add_argument("--validation-split", type=float, default=0.2)
+    parser.add_argument("--min-images-per-class", type=int, default=10)
+    parser.add_argument("--class-name-pattern", default=r"^[A-Za-z][A-Za-z_]+$")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--clean", action="store_true")
     return parser.parse_args()
@@ -47,9 +51,16 @@ def main() -> None:
     if fish_data_root is None:
         raise ValueError(f"Fish_Data root not found under {args.extract_dir}")
 
-    class_root = prepare_fish_data_classification_root(
+    raw_class_root = prepare_fish_data_classification_root(
         fish_data_root=fish_data_root,
         output_dir=args.prepared_dir,
+        clean=args.clean,
+    )
+    class_root, filter_summary = prepare_filtered_classification_root(
+        class_root=raw_class_root,
+        output_dir=args.filtered_dir,
+        min_images_per_class=args.min_images_per_class,
+        class_name_pattern=args.class_name_pattern or None,
         clean=args.clean,
     )
     yolo_root = prepare_yolo_classification_split(
@@ -77,6 +88,9 @@ def main() -> None:
         json.dumps(
             {
                 "dataset_zip": str(args.dataset_zip),
+                "raw_class_root": str(raw_class_root),
+                "filtered_class_root": str(class_root),
+                "filter_summary": filter_summary,
                 "yolo_root": str(yolo_root),
                 "class_count": len(class_names),
                 "class_names_out": str(args.class_names_out),
