@@ -23,6 +23,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--filtered-dir", type=Path, default=root / "training_runs" / "filtered_classification")
     parser.add_argument("--yolo-dir", type=Path, default=root / "training_runs" / "yolo_classification")
     parser.add_argument("--class-names-out", type=Path, default=root / "data" / "class_names.json")
+    parser.add_argument("--image-sources", default="cropped,raw_images")
     parser.add_argument("--model", default="yolov8n-cls.pt")
     parser.add_argument("--project", type=Path, default=root / "models" / "yolo")
     parser.add_argument("--name", default="fish_species_cls")
@@ -35,6 +36,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--clean", action="store_true")
     return parser.parse_args()
+
+
+def parse_image_sources(value: str) -> tuple[str, ...]:
+    sources = tuple(source.strip() for source in value.split(",") if source.strip())
+    if not sources:
+        raise ValueError("--image-sources must include at least one source")
+    return sources
 
 
 def main() -> None:
@@ -54,6 +62,7 @@ def main() -> None:
     raw_class_root = prepare_fish_data_classification_root(
         fish_data_root=fish_data_root,
         output_dir=args.prepared_dir,
+        image_sources=parse_image_sources(args.image_sources),
         clean=args.clean,
     )
     class_root, filter_summary = prepare_filtered_classification_root(
@@ -90,6 +99,7 @@ def main() -> None:
                 "dataset_zip": str(args.dataset_zip),
                 "raw_class_root": str(raw_class_root),
                 "filtered_class_root": str(class_root),
+                "image_sources": parse_image_sources(args.image_sources),
                 "filter_summary": filter_summary,
                 "yolo_root": str(yolo_root),
                 "class_count": len(class_names),

@@ -95,20 +95,36 @@ def count_class_dirs(path: Path) -> int:
     )
 
 
-def resolve_fish_data_image(fish_data_root: Path, item: FishDataItem) -> Path | None:
-    image_dirs = [
-        fish_data_root / "images" / "cropped",
-        fish_data_root / "images" / "raw_images",
-        fish_data_root / "images" / "numbered",
-    ]
-    stems = [item.image_stem, str(item.numbered_id)]
-    for image_dir in image_dirs:
+def resolve_fish_data_images(
+    fish_data_root: Path,
+    item: FishDataItem,
+    image_sources: tuple[str, ...] = ("cropped",),
+) -> list[tuple[str, Path]]:
+    resolved: list[tuple[str, Path]] = []
+    seen: set[Path] = set()
+
+    for source_name in image_sources:
+        image_dir = fish_data_root / "images" / source_name
+        stems = [str(item.numbered_id)] if source_name == "numbered" else [item.image_stem]
+
         for stem in stems:
             for extension in IMAGE_EXTENSIONS:
                 candidate = image_dir / f"{stem}{extension}"
-                if candidate.exists():
-                    return candidate
-    return None
+                if candidate.exists() and candidate not in seen:
+                    resolved.append((source_name, candidate))
+                    seen.add(candidate)
+                    break
+
+    return resolved
+
+
+def resolve_fish_data_image(fish_data_root: Path, item: FishDataItem) -> Path | None:
+    resolved = resolve_fish_data_images(
+        fish_data_root=fish_data_root,
+        item=item,
+        image_sources=("cropped", "raw_images", "numbered"),
+    )
+    return resolved[0][1] if resolved else None
 
 
 def link_or_copy(source: Path, destination: Path) -> None:
@@ -124,6 +140,7 @@ def link_or_copy(source: Path, destination: Path) -> None:
 def prepare_fish_data_classification_root(
     fish_data_root: Path,
     output_dir: Path,
+    image_sources: tuple[str, ...] = ("cropped",),
     clean: bool = False,
 ) -> Path:
     if clean and output_dir.exists():
@@ -134,17 +151,37 @@ def prepare_fish_data_classification_root(
     output_dir.mkdir(parents=True, exist_ok=True)
     items = parse_fish_data_index(fish_data_root / "final_all_index.txt")
     missing: list[str] = []
+    linked_by_source: dict[str, int] = {source: 0 for source in image_sources}
 
     for item in items:
-        source = resolve_fish_data_image(fish_data_root, item)
-        if source is None:
+        sources = resolve_fish_data_images(
+            fish_data_root=fish_data_root,
+            item=item,
+            image_sources=image_sources,
+        )
+        if not sources:
             missing.append(item.image_stem)
             continue
-        destination = output_dir / item.class_name / f"{item.image_stem}{source.suffix.lower()}"
-        link_or_copy(source, destination)
+        for source_name, source in sources:
+            destination = output_dir / item.class_name / f"{item.image_stem}_{source_name}{source.suffix.lower()}"
+            link_or_copy(source, destination)
+            linked_by_source[source_name] = linked_by_source.get(source_name, 0) + 1
 
     if count_class_dirs(output_dir) < 2:
         raise ValueError(f"Prepared dataset has fewer than 2 classes: {output_dir}")
+
+    (output_dir / "_source_summary.json").write_text(
+        json.dumps(
+            {
+                "image_sources": image_sources,
+                "linked_by_source": linked_by_source,
+                "missing_count": len(missing),
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
 
     if missing:
         (output_dir / "_missing_images.json").write_text(

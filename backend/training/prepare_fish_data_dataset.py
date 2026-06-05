@@ -22,10 +22,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--prepared-dir", type=Path, default=root / "training_runs" / "prepared_classification")
     parser.add_argument("--yolo-dir", type=Path, default=root / "training_runs" / "yolo_classification")
     parser.add_argument("--class-names-out", type=Path, default=root / "data" / "class_names.json")
+    parser.add_argument("--image-sources", default="cropped,raw_images")
     parser.add_argument("--validation-split", type=float, default=0.2)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--clean", action="store_true")
     return parser.parse_args()
+
+
+def parse_image_sources(value: str) -> tuple[str, ...]:
+    sources = tuple(source.strip() for source in value.split(",") if source.strip())
+    if not sources:
+        raise ValueError("--image-sources must include at least one source")
+    return sources
 
 
 def main() -> None:
@@ -38,6 +46,7 @@ def main() -> None:
     class_root = prepare_fish_data_classification_root(
         fish_data_root=fish_data_root,
         output_dir=args.prepared_dir,
+        image_sources=parse_image_sources(args.image_sources),
         clean=args.clean,
     )
     yolo_root = prepare_yolo_classification_split(
@@ -52,6 +61,7 @@ def main() -> None:
     summary = {
         "fish_data_root": str(fish_data_root),
         "classification_root": str(class_root),
+        "image_sources": parse_image_sources(args.image_sources),
         "yolo_classification_root": str(yolo_root),
         "class_count": len(class_names),
         "prepared_class_dirs": count_class_dirs(class_root),

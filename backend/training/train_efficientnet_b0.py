@@ -48,6 +48,11 @@ def parse_args() -> argparse.Namespace:
         help="Quality-filtered class-directory dataset used for training.",
     )
     parser.add_argument(
+        "--image-sources",
+        default="cropped,raw_images",
+        help="Comma-separated Fish_Data image sources to train on, e.g. cropped,raw_images,numbered.",
+    )
+    parser.add_argument(
         "--model-out",
         type=Path,
         default=root / "models" / "fish_model.h5",
@@ -103,8 +108,16 @@ def find_dataset_root(args: argparse.Namespace) -> Path:
     return prepare_fish_data_classification_root(
         fish_data_root=fish_data_root,
         output_dir=args.prepared_dir,
+        image_sources=parse_image_sources(args.image_sources),
         clean=args.clean_extract,
     )
+
+
+def parse_image_sources(value: str) -> tuple[str, ...]:
+    sources = tuple(source.strip() for source in value.split(",") if source.strip())
+    if not sources:
+        raise ValueError("--image-sources must include at least one source")
+    return sources
 
 
 def prepare_training_root(args: argparse.Namespace, dataset_root: Path) -> tuple[Path, dict[str, object]]:
@@ -309,6 +322,7 @@ def main() -> None:
                 "dataset_zip": str(args.dataset_zip),
                 "raw_dataset_root": str(raw_dataset_root),
                 "dataset_root": str(dataset_root),
+                "image_sources": parse_image_sources(args.image_sources),
                 "filter_summary": filter_summary,
                 "class_count": len(class_names),
                 "image_size": args.image_size,
