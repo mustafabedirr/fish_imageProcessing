@@ -8,7 +8,6 @@ import {
   BookOpen,
   BrainCircuit,
   Camera,
-  CheckCircle2,
   CirclePlay,
   Fish,
   Instagram,
@@ -101,31 +100,10 @@ const heroTitleLines = ["Balık Türlerini", "Keşfet, Analiz Et,", "Dünyayla P
 
 const technologies = ["Next.js", "FastAPI", "TensorFlow / Keras", "Leaflet", "TypeScript"];
 
-const processSteps = [
-  {
-    title: "Görsel Yükle",
-    body: "Balık görselinizi yükleyin. Desteklenen formatlar: JPG, PNG, WEBP",
-    visual: "upload",
-    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=320&q=80",
-  },
-  {
-    title: "AI Analiz",
-    body: "Yapay zeka modelimiz görseli analiz eder ve türü tahmin eder.",
-    visual: "network",
-  },
-  {
-    title: "Sonucu Keşfet",
-    body: "Analiz sonucunu inceleyin, detaylı bilgileri ve önerileri görüntüleyin.",
-    visual: "result",
-    image: "https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=320&q=80",
-  },
-] as const;
-
 export default function LandingPage() {
   const statsRef = useRef<HTMLElement | null>(null);
   const [animateStats, setAnimateStats] = useState(false);
   const [typedTitle, setTypedTitle] = useState<string[]>(() => heroTitleLines.map(() => ""));
-  const [activeProcessStep, setActiveProcessStep] = useState(0);
 
   useEffect(() => {
     const statsNode = statsRef.current;
@@ -373,39 +351,41 @@ export default function LandingPage() {
           <p>Görsel yükleyin, analizi bekleyin, sonucu keşfedin.</p>
         </div>
 
-        <div className="landing-steps" role="tablist" aria-label="Tür analizi adımları">
-          {processSteps.map((step, index) => {
-            const isActive = index === activeProcessStep;
-            const isCompleted = index < activeProcessStep;
-            const stateClass = isActive ? "is-active" : isCompleted ? "is-complete" : "is-pending";
+        <div className="landing-steps">
+          <article>
+            <div className="landing-step-visual upload">
+              <Camera size={28} />
+              <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=320&q=80" alt="Upload fish" />
+            </div>
+            <span>1</span>
+            <h3>Görsel Yükle</h3>
+            <p>Balık fotoğrafınızı yükleyin veya kameranızla çekin.</p>
+          </article>
 
-            return (
-              <button
-                type="button"
-                className={`landing-step-card ${stateClass}`}
-                aria-selected={isActive}
-                role="tab"
-                key={step.title}
-                onClick={() => setActiveProcessStep(index)}
-              >
-                <span className="landing-step-index">
-                  <b>{index + 1}</b>
-                  <CheckCircle2 size={24} />
-                </span>
-                <div className="landing-step-copy">
-                  <h3>{step.title}</h3>
-                  <p>{step.body}</p>
-                </div>
-                <LandingStepVisual step={step} />
-                {index < processSteps.length - 1 ? (
-                  <span
-                    className={index < activeProcessStep ? "landing-step-connector is-complete" : "landing-step-connector"}
-                    aria-hidden="true"
-                  />
-                ) : null}
-              </button>
-            );
-          })}
+          <article>
+            <div className="landing-step-visual network">
+              <BrainCircuit size={38} />
+            </div>
+            <span>2</span>
+            <h3>AI Analiz</h3>
+            <p>Yapay zeka modelimiz görseli analiz eder ve tür tahmini yapar.</p>
+          </article>
+
+          <article>
+            <div className="landing-step-visual result">
+              <div>
+                <img src="https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=320&q=80" alt="Prediction result" />
+                <aside>
+                  <strong>Levrek</strong>
+                  <small>Dicentrarchus labrax</small>
+                  <b>%95.4</b>
+                </aside>
+              </div>
+            </div>
+            <span>3</span>
+            <h3>Sonucu Keşfet</h3>
+            <p>Tahmin sonucunu, güven skorunu ve detayları görüntüleyin.</p>
+          </article>
         </div>
       </section>
 
@@ -485,38 +465,6 @@ export default function LandingPage() {
         </div>
       </footer>
     </main>
-  );
-}
-
-function LandingStepVisual({ step }: { step: (typeof processSteps)[number] }) {
-  if (step.visual === "upload") {
-    return (
-      <div className="landing-step-visual upload">
-        <Camera size={28} />
-        <img src={step.image} alt="" />
-      </div>
-    );
-  }
-
-  if (step.visual === "network") {
-    return (
-      <div className="landing-step-visual network">
-        <BrainCircuit size={38} />
-      </div>
-    );
-  }
-
-  return (
-    <div className="landing-step-visual result">
-      <div>
-        <img src={step.image} alt="" />
-        <aside>
-          <strong>Beta</strong>
-          <small>splendens</small>
-          <b>%98.7</b>
-        </aside>
-      </div>
-    </div>
   );
 }
 
