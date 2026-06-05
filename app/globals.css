@@ -13775,3 +13775,661 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
     display: none;
   }
 }
+
+/* AquaScope species library */
+.fish-library-page {
+  min-height: 100%;
+  color: #f7fbff;
+  background:
+    radial-gradient(circle at 54% 0%, rgba(0, 212, 255, 0.13), transparent 32%),
+    linear-gradient(135deg, #04101e 0%, #06172a 52%, #03101c 100%);
+}
+
+.fish-library-shell {
+  height: calc(100vh - 64px);
+  min-height: 720px;
+  padding: 20px 20px 18px;
+  overflow: hidden;
+}
+
+.fish-library-header {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(620px, 2fr);
+  gap: 22px;
+  align-items: center;
+  min-height: 62px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(82, 132, 188, 0.18);
+}
+
+.fish-library-title h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(1.55rem, 2vw, 2rem);
+  font-weight: 740;
+  letter-spacing: 0;
+}
+
+.fish-library-title p {
+  margin: 7px 0 0;
+  color: #a1b5cc;
+  font-size: 0.95rem;
+}
+
+.fish-library-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  min-width: 0;
+}
+
+.fish-library-search,
+.fish-library-action,
+.fish-library-primary,
+.fish-library-view-toggle,
+.fish-library-view-toggle button,
+.fish-library-select button,
+.fish-library-result-row button,
+.fish-library-pagination button,
+.fish-library-favorite,
+.fish-library-tags button {
+  border: 1px solid rgba(62, 121, 190, 0.35);
+  background: linear-gradient(180deg, rgba(12, 35, 62, 0.92), rgba(7, 23, 43, 0.92));
+  color: #dcecff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 14px 32px rgba(0, 0, 0, 0.18);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease;
+}
+
+.fish-library-search:focus-within,
+.fish-library-action:hover,
+.fish-library-primary:hover,
+.fish-library-view-toggle button:hover,
+.fish-library-select button:hover,
+.fish-library-result-row button:hover,
+.fish-library-pagination button:hover,
+.fish-library-favorite:hover,
+.fish-library-tags button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0, 212, 255, 0.62);
+  color: #ffffff;
+  background: linear-gradient(180deg, rgba(17, 55, 96, 0.96), rgba(8, 34, 62, 0.96));
+  box-shadow: 0 18px 42px rgba(0, 119, 255, 0.16);
+}
+
+.fish-library-search {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: min(430px, 34vw);
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 9px;
+}
+
+.fish-library-search input {
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #f8fbff;
+  font: inherit;
+}
+
+.fish-library-search input::placeholder {
+  color: #7f94ad;
+}
+
+.fish-library-search span {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 7px;
+  color: #8da1b8;
+  background: rgba(148, 181, 218, 0.08);
+}
+
+.fish-library-action,
+.fish-library-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 9px;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.fish-library-primary {
+  min-width: 164px;
+  border-color: rgba(39, 145, 255, 0.78);
+  color: #ffffff;
+  background: linear-gradient(180deg, #2488ff, #0c55cc);
+  box-shadow: 0 20px 40px rgba(30, 144, 255, 0.24);
+}
+
+.fish-library-view-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, 44px);
+  height: 44px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 9px;
+}
+
+.fish-library-view-toggle button {
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.fish-library-view-toggle button.is-active {
+  color: #20c8ff;
+  background: rgba(30, 112, 219, 0.28);
+}
+
+.fish-library-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  gap: 20px;
+  height: calc(100% - 80px);
+  min-height: 0;
+  padding-top: 18px;
+}
+
+.fish-library-main,
+.fish-library-side {
+  min-width: 0;
+  min-height: 0;
+}
+
+.fish-library-main {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 14px;
+}
+
+.fish-library-filter-panel,
+.fish-library-panel,
+.fish-library-card {
+  border: 1px solid rgba(77, 132, 190, 0.26);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(10, 31, 55, 0.88), rgba(5, 20, 37, 0.92)),
+    radial-gradient(circle at 35% 10%, rgba(0, 212, 255, 0.08), transparent 42%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 24px 58px rgba(0, 0, 0, 0.22);
+}
+
+.fish-library-filter-panel {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(140px, 1fr));
+  gap: 18px;
+  padding: 18px 20px;
+}
+
+.fish-library-select {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.fish-library-select span {
+  color: #9fb3ca;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.fish-library-select button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 8px;
+  color: #f2f8ff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.fish-library-result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 28px;
+  color: #7f95ae;
+  font-size: 0.88rem;
+}
+
+.fish-library-result-row button {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 13px;
+  border-radius: 8px;
+  color: #90a9c4;
+  font: inherit;
+  cursor: pointer;
+}
+
+.fish-library-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.fish-library-card {
+  position: relative;
+  min-height: 260px;
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.fish-library-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(0, 212, 255, 0.44);
+  box-shadow: 0 26px 70px rgba(0, 120, 255, 0.18);
+}
+
+.fish-library-card img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.04) brightness(0.82);
+  transition: transform 240ms ease, filter 240ms ease;
+}
+
+.fish-library-card:hover img {
+  transform: scale(1.04);
+  filter: saturate(1.12) brightness(0.9);
+}
+
+.fish-library-card-shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(3, 14, 25, 0.08) 0%, rgba(3, 14, 25, 0.32) 40%, rgba(3, 14, 25, 0.96) 100%),
+    radial-gradient(circle at 35% 12%, rgba(0, 212, 255, 0.12), transparent 34%);
+}
+
+.fish-library-favorite {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  color: #e5f3ff;
+  background: rgba(4, 16, 30, 0.72);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+}
+
+.fish-library-card-copy {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 66px;
+}
+
+.fish-library-card h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.fish-library-card p {
+  margin: 7px 0 0;
+  color: #c3d2e4;
+  font-size: 0.88rem;
+}
+
+.fish-library-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.fish-library-card-tags span,
+.fish-library-tags button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: #5bcaff;
+  background: rgba(0, 133, 255, 0.16);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.fish-library-card footer {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 54px;
+  border-top: 1px solid rgba(132, 168, 204, 0.16);
+}
+
+.fish-library-card footer strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #22e0a7;
+  font-size: 0.84rem;
+  font-weight: 650;
+}
+
+.fish-library-card footer span {
+  color: #b3c2d4;
+  font-size: 0.84rem;
+}
+
+.fish-library-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+.fish-library-pagination button {
+  display: grid;
+  place-items: center;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 10px;
+  color: #b5c7dc;
+  font: inherit;
+  cursor: pointer;
+}
+
+.fish-library-pagination button.is-active {
+  border-color: rgba(30, 144, 255, 0.88);
+  color: #ffffff;
+  background: rgba(30, 112, 219, 0.25);
+}
+
+.fish-library-pagination span {
+  color: #8ba3bf;
+}
+
+.fish-library-side {
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  gap: 14px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.fish-library-panel {
+  padding: 18px;
+}
+
+.fish-library-panel h2,
+.fish-library-panel-head h2 {
+  margin: 0;
+  color: #f7fbff;
+  font-size: 1rem;
+  font-weight: 720;
+}
+
+.fish-library-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.fish-library-panel-head a {
+  color: #22bfff;
+  font-size: 0.82rem;
+  text-decoration: none;
+}
+
+.fish-library-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.fish-library-summary article {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.fish-library-summary-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  color: #32d1ff;
+  background: rgba(0, 133, 255, 0.16);
+}
+
+.fish-library-summary-icon--blue {
+  color: #5aa4ff;
+}
+
+.fish-library-summary-icon--white {
+  color: #e4f1ff;
+}
+
+.fish-library-summary-icon--yellow {
+  color: #ffd452;
+  background: rgba(255, 212, 82, 0.12);
+}
+
+.fish-library-summary strong {
+  display: block;
+  color: #ffffff;
+  font-size: 1.22rem;
+  font-weight: 760;
+}
+
+.fish-library-summary small {
+  color: #9fb3ca;
+  font-size: 0.78rem;
+}
+
+.fish-library-popular {
+  display: grid;
+  gap: 10px;
+}
+
+.fish-library-popular article {
+  display: grid;
+  grid-template-columns: 38px 26px minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.fish-library-popular img {
+  width: 38px;
+  height: 28px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.fish-library-popular b {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  color: #d5eaff;
+  background: rgba(93, 155, 220, 0.22);
+  font-size: 0.74rem;
+}
+
+.fish-library-popular strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #f7fbff;
+  font-size: 0.88rem;
+  font-weight: 650;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.fish-library-popular span,
+.fish-library-popular svg {
+  color: #22e0a7;
+  font-size: 0.82rem;
+}
+
+.fish-library-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 16px;
+}
+
+.fish-library-tags button {
+  border-color: rgba(30, 144, 255, 0.38);
+  background: rgba(5, 28, 51, 0.62);
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.fish-library-shortcuts {
+  display: grid;
+  gap: 15px;
+  margin-top: 16px;
+}
+
+.fish-library-shortcuts a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #c6d8ec;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.fish-library-shortcuts a:hover {
+  color: #ffffff;
+  transform: translateX(2px);
+}
+
+.fish-library-shortcuts svg {
+  color: #27c8ff;
+}
+
+@media (max-width: 1480px) {
+  .fish-library-shell {
+    height: auto;
+    min-height: calc(100vh - 64px);
+    overflow: visible;
+  }
+
+  .fish-library-layout {
+    height: auto;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fish-library-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto;
+  }
+}
+
+@media (max-width: 1180px) {
+  .fish-library-header,
+  .fish-library-filter-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .fish-library-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .fish-library-search {
+    width: min(100%, 520px);
+  }
+
+  .fish-library-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+  }
+}
+
+@media (max-width: 760px) {
+  .fish-library-shell {
+    padding: 14px;
+  }
+
+  .fish-library-actions,
+  .fish-library-action,
+  .fish-library-primary,
+  .fish-library-search {
+    width: 100%;
+  }
+
+  .fish-library-view-toggle {
+    width: 100%;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .fish-library-grid,
+  .fish-library-side,
+  .fish-library-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .fish-library-card {
+    min-height: 250px;
+  }
+
+  .fish-library-popular article {
+    grid-template-columns: 38px 24px minmax(0, 1fr) auto;
+  }
+
+  .fish-library-popular article svg {
+    display: none;
+  }
+}

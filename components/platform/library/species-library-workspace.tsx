@@ -2,16 +2,21 @@
 
 import type { ReactNode } from "react";
 import {
+  AlertTriangle,
+  BarChart3,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   Fish,
-  Globe2,
+  Grid2X2,
+  Hash,
+  Heart,
+  Layers,
+  List,
+  Plus,
   Search,
   SlidersHorizontal,
   Star,
-  Tags,
-  TrendingDown,
   TrendingUp,
   Waves,
 } from "lucide-react";
@@ -19,182 +24,245 @@ import PlatformUtilityBar from "../shell/platform-utility-bar";
 
 const speciesCards = [
   {
-    name: "Largemouth Bass",
-    latin: "Micropterus salmoides",
-    type: "Freshwater",
-    identified: "1,254 identified",
-    image: "https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=700&q=80",
+    name: "Levrek",
+    latin: "Dicentrarchus labrax",
+    tags: ["Deniz", "Etçil"],
+    score: "%95.4",
+    records: "1,254 kayıt",
+    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=900&q=80",
+    favorite: false,
   },
   {
-    name: "Rainbow Trout",
-    latin: "Oncorhynchus mykiss",
-    type: "Freshwater",
-    identified: "932 identified",
-    image: "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=700&q=80",
+    name: "Çipura",
+    latin: "Sparus aurata",
+    tags: ["Deniz", "Otçul"],
+    score: "%92.1",
+    records: "1,032 kayıt",
+    image: "https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=900&q=80",
+    favorite: true,
   },
   {
-    name: "Perch",
-    latin: "Perca fluviatilis",
-    type: "Freshwater",
-    identified: "817 identified",
-    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=700&q=80",
+    name: "Palamut",
+    latin: "Sarda sarda",
+    tags: ["Deniz", "Etçil"],
+    score: "%91.3",
+    records: "876 kayıt",
+    image: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?auto=format&fit=crop&w=900&q=80",
+    favorite: true,
   },
   {
-    name: "Walleye",
-    latin: "Sander vitreus",
-    type: "Freshwater",
-    identified: "589 identified",
-    image: "https://images.unsplash.com/photo-1559825481-12a05cc00344?auto=format&fit=crop&w=700&q=80",
+    name: "Kefal",
+    latin: "Mugil cephalus",
+    tags: ["Deniz / Acısu", "Otçul"],
+    score: "%90.3",
+    records: "754 kayıt",
+    image: "https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=900&q=80",
+    favorite: true,
   },
   {
-    name: "Salmon",
-    latin: "Salmo salar",
-    type: "Freshwater / Saltwater",
-    identified: "466 identified",
-    image: "https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=700&q=80",
+    name: "Sardalya",
+    latin: "Sardina pilchardus",
+    tags: ["Deniz", "Otçul"],
+    score: "%89.7",
+    records: "689 kayıt",
+    image: "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=900&q=80",
+    favorite: false,
   },
   {
-    name: "Bluefin Tuna",
-    latin: "Thunnus thynnus",
-    type: "Saltwater",
-    identified: "413 identified",
-    image: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?auto=format&fit=crop&w=700&q=80",
+    name: "Kalkan",
+    latin: "Scophthalmus maximus",
+    tags: ["Deniz", "Dip Balığı"],
+    score: "%88.6",
+    records: "612 kayıt",
+    image: "https://images.unsplash.com/photo-1559825481-12a05cc00344?auto=format&fit=crop&w=900&q=80",
+    favorite: true,
   },
 ];
 
-const trendingSpecies = [
-  { name: "Clupeidae", value: "325", trend: "up", color: "orange" },
-  { name: "Carangidae", value: "238", trend: "up", color: "amber" },
-  { name: "Scombridae", value: "256", trend: "up", color: "green" },
-  { name: "Serranidae", value: "214", trend: "down", color: "red" },
+const popularSpecies = [
+  { name: "Levrek", score: "%95.4", image: speciesCards[0].image },
+  { name: "Çipura", score: "%92.1", image: speciesCards[1].image },
+  { name: "Palamut", score: "%91.3", image: speciesCards[2].image },
+  { name: "Kefal", score: "%90.3", image: speciesCards[3].image },
+  { name: "Sardalya", score: "%89.7", image: speciesCards[4].image },
 ];
 
-const popularTags = ["Freshwater", "Saltwater", "Bass", "Perch", "Tropical", "Deepwater", "Coastal"];
-
-const overviewStats = [
-  { label: "Total Species", value: "128", icon: Fish },
-  { label: "Regions", value: "45", icon: Globe2 },
-  { label: "Types", value: "8", icon: Tags },
+const summaryItems = [
+  { label: "Toplam Tür", value: "128", icon: Fish, tone: "cyan" },
+  { label: "Aile", value: "45", icon: Layers, tone: "blue" },
+  { label: "Yaşam Alanı", value: "8", icon: Waves, tone: "white" },
+  { label: "Tehlike Altında", value: "4", icon: AlertTriangle, tone: "yellow" },
 ];
+
+const tags = ["Deniz", "Tatlı Su", "Acı Su", "Etçil", "Otçul", "Dip Balığı", "Sürünen", "Pelajik", "Nesli Tehlikede", "Koruma Altında"];
 
 export default function SpeciesLibraryWorkspace() {
   return (
-    <section className="species-catalog-page">
+    <section className="fish-library-page">
       <PlatformUtilityBar />
 
-      <div className="species-catalog-shell">
-        <header className="dark-page-head">
-          <div>
-            <h1>Species Library</h1>
-            <p>View and manage details for various fish species</p>
+      <div className="fish-library-shell">
+        <header className="fish-library-header">
+          <div className="fish-library-title">
+            <h1>Tür Kütüphanesi</h1>
+            <p>Çeşitli balık türlerinin detaylarını görüntüleyin ve yönetin.</p>
+          </div>
+
+          <div className="fish-library-actions">
+            <label className="fish-library-search">
+              <Search size={18} />
+              <input type="search" placeholder="Tür, bilimsel ad veya anahtar kelime ara..." />
+              <span>⌘ K</span>
+            </label>
+            <button type="button" className="fish-library-action">
+              <SlidersHorizontal size={18} />
+              Filtreleri Gizle
+            </button>
+            <div className="fish-library-view-toggle" aria-label="Görünüm seçimi">
+              <button type="button" className="is-active" aria-label="Grid görünümü">
+                <Grid2X2 size={18} />
+              </button>
+              <button type="button" aria-label="Liste görünümü">
+                <List size={18} />
+              </button>
+            </div>
+            <button type="button" className="fish-library-primary">
+              <Plus size={18} />
+              Yeni Tür Ekle
+            </button>
           </div>
         </header>
 
-        <div className="species-catalog-layout">
-          <div className="species-catalog-main">
-            <div className="species-catalog-toolbar">
-              <DarkLibraryFilter icon={<Fish size={16} />} label="Select Type" />
-              <DarkLibraryFilter icon={<Waves size={16} />} label="Select Region" />
-              <DarkLibraryFilter icon={<SlidersHorizontal size={16} />} label="Sort by: Popularity" />
+        <div className="fish-library-layout">
+          <main className="fish-library-main">
+            <section className="fish-library-filter-panel" aria-label="Tür filtreleri">
+              <LibrarySelect label="Tür Grubu" value="Tümü" />
+              <LibrarySelect label="Yaşam Alanı" value="Tümü" />
+              <LibrarySelect label="Dağılım Bölgesi" value="Tümü" />
+              <LibrarySelect label="Koruma Durumu" value="Tümü" />
+              <LibrarySelect label="Sırala" value="Popülerlik" icon={<SlidersHorizontal size={16} />} />
+            </section>
 
-              <label className="species-catalog-search">
-                <Search size={18} />
-                <input placeholder="Search species..." aria-label="Search species" />
-              </label>
+            <div className="fish-library-result-row">
+              <span>128 tür bulundu</span>
+              <button type="button">Temizle</button>
             </div>
 
-            <div className="species-catalog-grid">
+            <section className="fish-library-grid" aria-label="Balık türleri">
               {speciesCards.map((fish) => (
-                <article className="species-catalog-card" key={fish.name}>
-                  <button type="button" className="species-catalog-favorite" aria-label={`Save ${fish.name}`}>
-                    <Star size={18} />
+                <article className="fish-library-card" key={fish.name}>
+                  <img src={fish.image} alt="" />
+                  <button type="button" className="fish-library-favorite" aria-label={`${fish.name} favori`}>
+                    <Star size={18} fill={fish.favorite ? "currentColor" : "none"} />
                   </button>
-
-                  <img src={fish.image} alt={fish.name} />
-
-                  <div className="species-catalog-copy">
+                  <div className="fish-library-card-shade" />
+                  <div className="fish-library-card-copy">
                     <h2>{fish.name}</h2>
                     <p>{fish.latin}</p>
+                    <div className="fish-library-card-tags">
+                      {fish.tags.map((tag) => (
+                        <span key={tag}>{tag}</span>
+                      ))}
+                    </div>
                   </div>
-
-                  <div className="species-catalog-meta">
-                    <span>{fish.type}</span>
-                    <small>{fish.identified}</small>
-                  </div>
-
-                  <div className="species-catalog-sparkline" />
+                  <footer>
+                    <strong>
+                      {fish.score} Uygunluk
+                      <TrendingUp size={14} />
+                    </strong>
+                    <span>{fish.records}</span>
+                  </footer>
                 </article>
               ))}
-            </div>
+            </section>
 
-            <footer className="species-catalog-pagination">
-              <button type="button" aria-label="Previous page">
+            <nav className="fish-library-pagination" aria-label="Sayfalama">
+              <button type="button" aria-label="Önceki sayfa">
                 <ChevronLeft size={18} />
               </button>
-              <span>1-33 of 128 species</span>
-              <button className="active" type="button">
-                1
-              </button>
-              <button type="button">2</button>
-              <button type="button">3</button>
-              <button type="button" aria-label="Next page">
+              {[1, 2, 3, 4, 5].map((page) => (
+                <button key={page} type="button" className={page === 1 ? "is-active" : ""}>
+                  {page}
+                </button>
+              ))}
+              <span>...</span>
+              <button type="button">13</button>
+              <button type="button" aria-label="Sonraki sayfa">
                 <ChevronRight size={18} />
               </button>
-            </footer>
-          </div>
+            </nav>
+          </main>
 
-          <aside className="species-catalog-side">
-            <section className="species-catalog-panel">
-              <div className="species-catalog-panel-head">
-                <h2>Trending Species</h2>
-                <a href="/platform/analyze">View all</a>
+          <aside className="fish-library-side">
+            <section className="fish-library-panel">
+              <div className="fish-library-panel-head">
+                <h2>Kütüphane Özeti</h2>
+                <a href="/platform/analyze">Detaylı Rapor</a>
               </div>
-
-              <div className="species-catalog-trends">
-                {trendingSpecies.map((item) => (
-                  <article key={item.name}>
-                    <span className={`species-catalog-badge species-catalog-badge--${item.color}`}>{item.name.slice(0, 1)}</span>
-                    <strong>{item.name}</strong>
-                    <small>{item.value}</small>
-                    {item.trend === "up" ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+              <div className="fish-library-summary">
+                {summaryItems.map(({ icon: Icon, label, value, tone }) => (
+                  <article key={label}>
+                    <span className={`fish-library-summary-icon fish-library-summary-icon--${tone}`}>
+                      <Icon size={19} />
+                    </span>
+                    <div>
+                      <strong>{value}</strong>
+                      <small>{label}</small>
+                    </div>
                   </article>
                 ))}
               </div>
             </section>
 
-            <section className="species-catalog-panel">
-              <div className="species-catalog-panel-head">
-                <h2>Popular Species Tags</h2>
+            <section className="fish-library-panel">
+              <div className="fish-library-panel-head">
+                <h2>Popüler Türler</h2>
+                <a href="/platform/library">Tümünü Gör</a>
               </div>
+              <div className="fish-library-popular">
+                {popularSpecies.map((item, index) => (
+                  <article key={item.name}>
+                    <img src={item.image} alt="" />
+                    <b>{index + 1}</b>
+                    <strong>{item.name}</strong>
+                    <span>{item.score}</span>
+                    <TrendingUp size={15} />
+                  </article>
+                ))}
+              </div>
+            </section>
 
-              <div className="species-catalog-tags">
-                {popularTags.map((tag) => (
-                  <button key={tag} type="button">
+            <section className="fish-library-panel">
+              <h2>Tür Etiketleri</h2>
+              <div className="fish-library-tags">
+                {tags.map((tag) => (
+                  <button type="button" key={tag}>
                     {tag}
                   </button>
                 ))}
               </div>
             </section>
 
-            <section className="species-catalog-panel species-catalog-panel--overview">
-              <div className="species-catalog-panel-head">
-                <h2>Library Overview</h2>
-                <ChevronRight size={18} />
+            <section className="fish-library-panel">
+              <h2>Hızlı Erişim</h2>
+              <div className="fish-library-shortcuts">
+                <a href="/platform/library">
+                  <Star size={17} />
+                  Favori Türlerim
+                </a>
+                <a href="/platform/library">
+                  <Hash size={17} />
+                  Son Görüntülenenler
+                </a>
+                <a href="/platform/analyze">
+                  <BarChart3 size={17} />
+                  Karşılaştırma Aracı
+                </a>
+                <a href="/platform/library">
+                  <Heart size={17} />
+                  Tür Ekle / Düzenle
+                </a>
               </div>
-
-              <div className="species-catalog-overview">
-                {overviewStats.map(({ icon: Icon, label, value }) => (
-                  <article key={label}>
-                    <span><Icon size={18} /></span>
-                    <strong>{value}</strong>
-                    <small>{label}</small>
-                  </article>
-                ))}
-              </div>
-
-              <a className="species-catalog-report" href="/platform/analyze">
-                View Full Report
-              </a>
             </section>
           </aside>
         </div>
@@ -203,12 +271,14 @@ export default function SpeciesLibraryWorkspace() {
   );
 }
 
-function DarkLibraryFilter({ icon, label }: { icon: ReactNode; label: string }) {
+function LibrarySelect({ label, value, icon }: { label: string; value: string; icon?: ReactNode }) {
   return (
-    <button type="button" className="species-catalog-filter">
-      {icon}
+    <label className="fish-library-select">
       <span>{label}</span>
-      <ChevronDown size={16} />
-    </button>
+      <button type="button">
+        {value}
+        {icon ?? <ChevronDown size={16} />}
+      </button>
+    </label>
   );
 }
