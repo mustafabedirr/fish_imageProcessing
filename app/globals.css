@@ -13093,43 +13093,79 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 .fish-analyze-flow {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: center;
-  gap: var(--fish-gap);
+  gap: clamp(22px, 4vw, 56px);
   height: var(--fish-flow);
-  padding: 0 var(--fish-pad);
+  margin: 0 var(--fish-pad);
+  padding: 14px clamp(26px, 4vw, 70px);
+  border: 1px solid rgba(48, 126, 230, 0.44);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 46% 42%, rgba(30, 144, 255, 0.14), transparent 30%),
+    linear-gradient(180deg, rgba(4, 16, 33, 0.98), rgba(2, 10, 24, 0.98));
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 0 0 1px rgba(30, 144, 255, 0.08);
+  overflow: hidden;
 }
 
 .fish-flow-step {
   position: relative;
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
+  grid-template-columns: clamp(50px, 4.5vw, 68px) minmax(0, 1fr);
   align-items: center;
-  gap: 12px;
+  gap: clamp(14px, 1.6vw, 24px);
   min-width: 0;
+  isolation: isolate;
 }
 
 .fish-flow-step:not(:last-child)::after {
   content: "";
   position: absolute;
-  left: calc(100% - 46px);
-  right: -10px;
+  left: calc(100% - 22px);
+  right: calc(-1 * clamp(34px, 5vw, 76px));
   top: 50%;
-  height: 2px;
-  background: linear-gradient(90deg, #1e90ff, rgba(30, 144, 255, 0.2));
+  height: 4px;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, rgba(30, 144, 255, 0.95), rgba(30, 144, 255, 0.22)),
+    rgba(91, 130, 185, 0.14);
+  box-shadow: 0 0 18px rgba(30, 144, 255, 0.22);
+  opacity: 0.22;
+  transform: translateY(-50%);
+  transition: opacity 260ms ease, box-shadow 260ms ease, background 260ms ease;
+}
+
+.fish-flow-step--completed:not(:last-child)::after,
+.fish-flow-step--active:not(:last-child)::after {
+  opacity: 1;
+  box-shadow: 0 0 20px rgba(30, 144, 255, 0.46);
 }
 
 .fish-flow-step > span {
+  position: relative;
+  z-index: 2;
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  width: clamp(50px, 4.5vw, 68px);
+  height: clamp(50px, 4.5vw, 68px);
+  border: 2px solid rgba(68, 124, 196, 0.58);
   border-radius: 999px;
-  color: #ffffff;
-  background: linear-gradient(135deg, #1e90ff, #1d4ed8);
-  font-size: 13px;
+  color: #eef6ff;
+  background: rgba(5, 17, 35, 0.8);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  font-size: clamp(1.05rem, 1.6vw, 1.55rem);
   font-weight: 800;
+  transition:
+    color 260ms ease,
+    border-color 260ms ease,
+    background 260ms ease,
+    box-shadow 260ms ease,
+    transform 260ms ease;
 }
 
 .fish-flow-step strong,
@@ -13141,21 +13177,78 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 
 .fish-flow-step strong {
   color: #ffffff;
-  font-size: 13px;
+  font-size: clamp(0.95rem, 1.1vw, 1.25rem);
+  font-weight: 760;
+  transition: color 260ms ease, transform 260ms ease;
 }
 
 .fish-flow-step small {
-  margin-top: 4px;
-  color: #00d48f;
-  font-size: 12px;
+  margin-top: 7px;
+  color: #8ea0ba;
+  font-size: clamp(0.82rem, 0.95vw, 1rem);
+  transition: color 260ms ease, transform 260ms ease;
+}
+
+.fish-flow-step small svg {
+  color: #22d7b8;
+  opacity: 0.94;
+  transition: color 260ms ease, transform 260ms ease;
+}
+
+.fish-flow-step--completed > span {
+  border-color: rgba(52, 211, 153, 0.58);
+  color: #ffffff;
+  background: linear-gradient(135deg, rgba(8, 92, 88, 0.9), rgba(18, 65, 115, 0.88));
+  box-shadow: 0 0 0 7px rgba(52, 211, 153, 0.08), 0 0 24px rgba(34, 215, 184, 0.18);
+}
+
+.fish-flow-step--completed small {
+  color: #22d7b8;
 }
 
 .fish-flow-step--active > span {
-  box-shadow: 0 0 0 7px rgba(30, 144, 255, 0.16), 0 0 26px rgba(30, 144, 255, 0.42);
+  border-color: rgba(44, 150, 255, 0.98);
+  color: #ffffff;
+  background: linear-gradient(180deg, #3a8cff, #2657f4);
+  box-shadow:
+    0 0 0 12px rgba(30, 144, 255, 0.13),
+    0 0 0 24px rgba(30, 144, 255, 0.05),
+    0 0 34px rgba(30, 144, 255, 0.58);
+  transform: scale(1.06);
+  animation: fish-step-pulse 2.1s ease-in-out infinite;
+}
+
+.fish-flow-step--active strong,
+.fish-flow-step--active small {
+  transform: translateX(2px);
 }
 
 .fish-flow-step--active small {
   color: #65d8ff;
+}
+
+.fish-flow-step--pending {
+  opacity: 0.78;
+}
+
+.fish-flow-step--pending > span {
+  color: #d9e8ff;
+}
+
+@keyframes fish-step-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 10px rgba(30, 144, 255, 0.12),
+      0 0 0 22px rgba(30, 144, 255, 0.045),
+      0 0 30px rgba(30, 144, 255, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 0 15px rgba(30, 144, 255, 0.18),
+      0 0 0 30px rgba(30, 144, 255, 0.075),
+      0 0 42px rgba(30, 144, 255, 0.72);
+  }
 }
 
 .fish-analyze-layout {
@@ -14180,6 +14273,12 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   .fish-analyze-flow,
   .fish-analyze-layout {
     padding: 12px;
+  }
+
+  .fish-analyze-flow {
+    height: auto;
+    margin: 0 12px 12px;
+    gap: 12px;
   }
 
   .fish-analyze-actions,

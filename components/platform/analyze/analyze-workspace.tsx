@@ -277,14 +277,14 @@ export default function AnalyzeWorkspace() {
       </header>
 
       <div className="fish-analyze-flow">
-        {["Gorsel Yukleme", "AI Analiz", "Sonuclar"].map((step, index) => (
-          <div className={`fish-flow-step ${index === 1 && loading ? "fish-flow-step--active" : ""}`} key={step}>
+        {getFlowSteps({ hasFile: Boolean(file), loading, hasResult: Boolean(result) }).map((step, index) => (
+          <div className={`fish-flow-step fish-flow-step--${step.status}`} key={step.label}>
             <span>{index + 1}</span>
             <div>
-              <strong>{step}</strong>
+              <strong>{step.label}</strong>
               <small>
-                {index === 0 && file ? "Tamamlandi" : index === 1 && loading ? "Calisiyor" : index === 2 && result ? "Tamamlandi" : "Bekliyor"}
-                <CheckCircle2 size={13} />
+                {step.caption}
+                <CheckCircle2 size={15} />
               </small>
             </div>
           </div>
@@ -482,6 +482,34 @@ export default function AnalyzeWorkspace() {
       </main>
     </section>
   );
+}
+
+function getFlowSteps({
+  hasFile,
+  loading,
+  hasResult,
+}: {
+  hasFile: boolean;
+  loading: boolean;
+  hasResult: boolean;
+}) {
+  return [
+    {
+      label: "Gorsel Yukleme",
+      caption: hasFile ? "Tamamlandi" : "Bekliyor",
+      status: hasFile ? "completed" : "active",
+    },
+    {
+      label: "AI Analiz",
+      caption: loading ? "Calisiyor" : hasResult ? "Tamamlandi" : "Bekliyor",
+      status: loading ? "active" : hasResult ? "completed" : "pending",
+    },
+    {
+      label: "Sonuclar",
+      caption: hasResult ? "Tamamlandi" : "Bekliyor",
+      status: hasResult ? "active" : "pending",
+    },
+  ];
 }
 
 function normalizeConfidence(value: number) {
