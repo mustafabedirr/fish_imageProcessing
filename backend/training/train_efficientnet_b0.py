@@ -2,14 +2,18 @@ from __future__ import annotations
 
 import argparse
 import json
-import shutil
-import zipfile
 from pathlib import Path
 
 import tensorflow as tf
 
-
-IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".gif", ".webp"}
+from backend.training.dataset_utils import (
+    find_class_directory_root,
+    find_fish_data_root,
+    is_image_file,
+    prepare_fish_data_classification_root,
+    safe_extract,
+    write_class_names,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -29,6 +33,12 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=root / "training_runs" / "dataset_all",
         help="Directory where the dataset zip will be extracted.",
+    )
+    parser.add_argument(
+        "--prepared-dir",
+        type=Path,
+        default=root / "training_runs" / "prepared_classification",
+        help="Class-directory dataset prepared from Fish_Data index files.",
     )
     parser.add_argument(
         "--model-out",
@@ -63,61 +73,20 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def safe_extract(zip_path: Path, extract_dir: Path, clean: bool) -> None:
-    if clean and extract_dir.exists():
-        shutil.rmtree(extract_dir)
+def find_dataset_root(args: argparse.Namespace) -> Path:
+    class_root = find_class_directory_root(args.extract_dir)
+    if class_root is not None:
+        return class_root
 
-    if extract_dir.exists() and any(extract_dir.iterdir()):
-        return
+    fish_data_root = find_fish_data_root(args.extract_dir)
+    if fish_data_root is None:
+        raise ValueError(f"No supported dataset found under {args.extract_dir}")
 
-    extract_dir.mkdir(parents=True, exist_ok=True)
-
-    with zipfile.ZipFile(zip_path) as zf:
-        for member in zf.infolist():
-            target = (extract_dir / member.filename).resolve()
-            if not str(target).startswith(str(extract_dir.resolve())):
-                raise ValueError(f"Unsafe zip member path: {member.filename}")
-        zf.extractall(extract_dir)
-
-
-def find_dataset_root(extract_dir: Path) -> Path:
-    candidates = [extract_dir]
-    candidates.extend(path for path in extract_dir.iterdir() if path.is_dir())
-
-    best = max(candidates, key=count_class_dirs)
-    class_count = count_class_dirs(best)
-
-    if class_count < 2:
-        raise ValueError(f"No class-directory dataset found under {extract_dir}")
-
-    return best
-
-
-def count_class_dirs(path: Path) -> int:
-    return sum(
-        1
-        for child in path.iterdir()
-        if child.is_dir() and any(is_image_file(file) for file in child.rglob("*"))
+    return prepare_fish_data_classification_root(
+        fish_data_root=fish_data_root,
+        output_dir=args.prepared_dir,
+        clean=args.clean_extract,
     )
-
-
-def is_image_file(path: Path) -> bool:
-    return path.is_file() and path.suffix.lower() in IMAGE_EXTENSIONS
-
-
-def write_class_names(dataset_root: Path, output_path: Path) -> list[str]:
-    class_names = sorted(
-        child.name
-        for child in dataset_root.iterdir()
-        if child.is_dir() and any(is_image_file(file) for file in child.rglob("*"))
-    )
-
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(
-        json.dumps(class_names, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-    return class_names
 
 
 def compute_class_weights(dataset_root: Path, class_names: list[str]) -> dict[int, float]:
@@ -217,7 +186,7 @@ def main() -> None:
         raise FileNotFoundError(f"Dataset zip not found: {args.dataset_zip}")
 
     safe_extract(args.dataset_zip, args.extract_dir, args.clean_extract)
-    dataset_root = find_dataset_root(args.extract_dir)
+    dataset_root = find_dataset_root(args)
     class_names = write_class_names(dataset_root, args.class_names_out)
     class_weights = compute_class_weights(dataset_root, class_names)
 

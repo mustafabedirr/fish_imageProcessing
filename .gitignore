@@ -25,6 +25,8 @@ __pycache__/
 .venv/
 venv/
 env/
+backend/training_runs/
+backend/models/*.best.keras
 
 # OS / Editor
 .DS_Store

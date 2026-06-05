@@ -9,10 +9,4 @@ Pillow
 # Model inference (Keras .h5)
 tensorflow
 h5py
-fastapi
-uvicorn[standard]
-python-multipart
-pydantic
-tensorflow
-numpy
-pillow
+ultralytics

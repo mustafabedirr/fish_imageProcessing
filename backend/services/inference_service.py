@@ -74,7 +74,10 @@ def predict_species(
     Run model inference and return:
         (predicted_species, confidence)
     """
-    image_tensor = preprocess_image(image_bytes)
+    image_tensor = preprocess_image(
+        image_bytes,
+        target_size=resolve_model_target_size(model),
+    )
 
     predictions = model.predict(image_tensor, verbose=0)
     predictions = np.asarray(predictions)
@@ -90,6 +93,22 @@ def predict_species(
     species = class_names[top_index]
 
     return species, confidence
+
+
+def resolve_model_target_size(model: Any) -> tuple[int, int]:
+    input_shape = getattr(model, "input_shape", None)
+    if isinstance(input_shape, list):
+        input_shape = input_shape[0] if input_shape else None
+
+    if (
+        isinstance(input_shape, tuple)
+        and len(input_shape) >= 4
+        and isinstance(input_shape[1], int)
+        and isinstance(input_shape[2], int)
+    ):
+        return (input_shape[1], input_shape[2])
+
+    return (224, 224)
 
 
 def enrich_species_result(

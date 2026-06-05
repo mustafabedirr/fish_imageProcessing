@@ -1,0 +1,20 @@
+{
+  "dataset_zip": "C:\\Users\\Mustafa\\Downloads\\archive.zip",
+  "dataset_root": "C:\\aquascope_project\\aquascope\\backend\\training_runs\\prepared_classification",
+  "class_count": 483,
+  "image_size": 128,
+  "batch_size": 32,
+  "epochs": 1,
+  "fine_tune_epochs": 0,
+  "model_out": "C:\\aquascope_project\\aquascope\\backend\\models\\fish_model.h5",
+  "class_names_out": "C:\\aquascope_project\\aquascope\\backend\\data\\class_names.json",
+  "history_keys": [
+    "accuracy",
+    "learning_rate",
+    "loss",
+    "top5_accuracy",
+    "val_accuracy",
+    "val_loss",
+    "val_top5_accuracy"
+  ]
+}

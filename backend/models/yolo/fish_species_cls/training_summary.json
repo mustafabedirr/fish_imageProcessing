@@ -1,0 +1,7 @@
+{
+  "dataset_zip": "C:\\Users\\Mustafa\\Downloads\\archive.zip",
+  "yolo_root": "C:\\aquascope_project\\aquascope\\backend\\training_runs\\yolo_classification",
+  "class_count": 483,
+  "class_names_out": "C:\\aquascope_project\\aquascope\\backend\\data\\class_names.json",
+  "results": "ultralytics.utils.metrics.ClassifyMetrics object with attributes:\n\nconfusion_matrix: <ultralytics.utils.metrics.ConfusionMatrix object at 0x0000021F6B77BD40>\ncurves: []\ncurves_results: []\nfitness: 0.009702458046376705\nkeys: ['metrics/accuracy_top1', 'metrics/accuracy_top5']\nresults_dict: {'metrics/accuracy_top1': 0.005174644291400909, 'metrics/accuracy_top5': 0.014230271801352501, 'fitness': 0.009702458046376705}\nsave_dir: WindowsPath('C:/aquascope_project/aquascope/backend/models/yolo/fish_species_cls')\nspeed: {'preprocess': 0.0005880985041552575, 'inference': 1.3446072443300452, 'loss': 2.0310332104660098e-05, 'postprocess': 6.248377791255289e-05}\ntop1: 0.005174644291400909\ntop5: 0.014230271801352501"
+}
