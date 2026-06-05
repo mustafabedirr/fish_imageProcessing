@@ -13158,10 +13158,10 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   transform: translateY(-50%) scaleX(0);
   transform-origin: left center;
   transition:
-    opacity 420ms ease,
-    transform 760ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 760ms ease,
-    background-color 760ms ease;
+    opacity 520ms ease,
+    transform 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 900ms ease,
+    background 900ms ease;
 }
 
 .fish-flow-connector--completed::after,
@@ -13197,11 +13197,23 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
     opacity 260ms ease;
 }
 
-.fish-flow-step > span svg {
+.fish-flow-step-icon {
+  grid-area: 1 / 1;
   transition:
-    opacity 320ms ease,
-    transform 360ms cubic-bezier(0.22, 1, 0.36, 1),
-    color 260ms ease;
+    opacity 520ms ease,
+    transform 620ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 520ms ease;
+}
+
+.fish-flow-step-icon--default {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+.fish-flow-step-icon--complete {
+  color: #27efc0;
+  opacity: 0;
+  transform: scale(0.72) rotate(-18deg);
 }
 
 .fish-flow-step--completed > span {
@@ -13211,9 +13223,14 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   box-shadow: 0 0 0 5px rgba(52, 211, 153, 0.07), 0 0 18px rgba(34, 215, 184, 0.16);
 }
 
-.fish-flow-step--completed > span svg {
-  color: #27efc0;
-  transform: scale(1.05);
+.fish-flow-step--completed .fish-flow-step-icon--default {
+  opacity: 0;
+  transform: scale(0.68) rotate(18deg);
+}
+
+.fish-flow-step--completed .fish-flow-step-icon--complete {
+  opacity: 1;
+  transform: scale(1.04) rotate(0deg);
 }
 
 .fish-flow-step--active > span {

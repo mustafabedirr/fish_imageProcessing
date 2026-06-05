@@ -284,7 +284,8 @@ export default function AnalyzeWorkspace() {
           <div className="fish-flow-segment" key={step.label}>
             <div className={`fish-flow-step fish-flow-step--${step.status}`}>
               <span aria-label={step.label}>
-                {step.status === "completed" ? <CheckCircle2 size={18} /> : <step.icon size={18} />}
+                <step.icon className="fish-flow-step-icon fish-flow-step-icon--default" size={18} />
+                <CheckCircle2 className="fish-flow-step-icon fish-flow-step-icon--complete" size={18} />
               </span>
             </div>
             {index < 2 ? <span className={`fish-flow-connector fish-flow-connector--${step.status}`} aria-hidden="true" /> : null}
