@@ -1,10 +1,11 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { FormEvent, ReactNode } from "react";
 import { useMemo, useState } from "react";
 import {
   AlertTriangle,
   BarChart3,
+  Check,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -20,6 +21,7 @@ import {
   Star,
   TrendingUp,
   Waves,
+  X,
 } from "lucide-react";
 
 type FishSpecies = {
@@ -37,7 +39,7 @@ type FishSpecies = {
   favorite: boolean;
 };
 
-const speciesCards: FishSpecies[] = [
+const initialSpeciesCards: FishSpecies[] = [
   {
     id: "levrek",
     name: "Levrek",
@@ -156,9 +158,20 @@ const tags = ["Deniz", "Tatli Su", "Aci Su", "Etcil", "Otcul", "Dip Baligi", "Pe
 const pageSize = 6;
 
 export default function SpeciesLibraryWorkspace() {
+  const [speciesList, setSpeciesList] = useState<FishSpecies[]>(initialSpeciesCards);
   const [query, setQuery] = useState("");
   const [filtersVisible, setFiltersVisible] = useState(true);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [newSpecies, setNewSpecies] = useState({
+    name: "",
+    latin: "",
+    group: "Etcil",
+    habitat: "Deniz",
+    region: "Akdeniz",
+    protection: "Guvenli",
+    tags: "Deniz, Etcil",
+  });
   const [group, setGroup] = useState("Tumu");
   const [habitat, setHabitat] = useState("Tumu");
   const [region, setRegion] = useState("Tumu");
@@ -166,12 +179,12 @@ export default function SpeciesLibraryWorkspace() {
   const [sortBy, setSortBy] = useState("Populerlik");
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [favoriteOnly, setFavoriteOnly] = useState(false);
-  const [favorites, setFavorites] = useState(() => new Set(speciesCards.filter((fish) => fish.favorite).map((fish) => fish.id)));
+  const [favorites, setFavorites] = useState(() => new Set(initialSpeciesCards.filter((fish) => fish.favorite).map((fish) => fish.id)));
   const [page, setPage] = useState(1);
 
   const filteredSpecies = useMemo(() => {
     const normalizedQuery = normalize(query);
-    const result = speciesCards.filter((fish) => {
+    const result = speciesList.filter((fish) => {
       const haystack = normalize([fish.name, fish.latin, fish.group, fish.habitat, fish.region, fish.protection, ...fish.tags].join(" "));
       const matchesQuery = !normalizedQuery || haystack.includes(normalizedQuery);
       const matchesGroup = group === "Tumu" || fish.group === group;
@@ -190,16 +203,16 @@ export default function SpeciesLibraryWorkspace() {
       if (sortBy === "Uygunluk") return b.score - a.score;
       return b.score + b.records / 1000 - (a.score + a.records / 1000);
     });
-  }, [activeTag, favoriteOnly, favorites, group, habitat, protection, query, region, sortBy]);
+  }, [activeTag, favoriteOnly, favorites, group, habitat, protection, query, region, sortBy, speciesList]);
 
   const pageCount = Math.max(1, Math.ceil(filteredSpecies.length / pageSize));
   const currentPage = Math.min(page, pageCount);
   const pagedSpecies = filteredSpecies.slice((currentPage - 1) * pageSize, currentPage * pageSize);
   const favoriteCount = favorites.size;
-  const endangeredCount = speciesCards.filter((fish) => fish.protection === "Nesli Tehlikede").length;
-  const familyCount = new Set(speciesCards.map((fish) => fish.group)).size;
-  const habitatCount = new Set(speciesCards.map((fish) => fish.habitat)).size;
-  const popularSpecies = [...speciesCards].sort((a, b) => b.score - a.score).slice(0, 5);
+  const endangeredCount = speciesList.filter((fish) => fish.protection === "Nesli Tehlikede").length;
+  const familyCount = new Set(speciesList.map((fish) => fish.group)).size;
+  const habitatCount = new Set(speciesList.map((fish) => fish.habitat)).size;
+  const popularSpecies = [...speciesList].sort((a, b) => b.score - a.score).slice(0, 5);
 
   function resetFilters() {
     setQuery("");
@@ -233,8 +246,48 @@ export default function SpeciesLibraryWorkspace() {
     setPage(1);
   }
 
+  function submitNewSpecies(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const name = newSpecies.name.trim();
+    const latin = newSpecies.latin.trim();
+
+    if (!name || !latin) return;
+
+    const id = normalize(name).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `tur-${Date.now()}`;
+    const created: FishSpecies = {
+      id: `${id}-${Date.now().toString(36)}`,
+      name,
+      latin,
+      group: newSpecies.group,
+      habitat: newSpecies.habitat,
+      region: newSpecies.region,
+      protection: newSpecies.protection,
+      tags: newSpecies.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
+      score: 82.5,
+      records: 1,
+      image: "https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=900&q=80",
+      favorite: false,
+    };
+
+    setSpeciesList((current) => [created, ...current]);
+    setQuery(name);
+    setFavoriteOnly(false);
+    setActiveTag(null);
+    setPage(1);
+    setAddModalOpen(false);
+    setNewSpecies({
+      name: "",
+      latin: "",
+      group: "Etcil",
+      habitat: "Deniz",
+      region: "Akdeniz",
+      protection: "Guvenli",
+      tags: "Deniz, Etcil",
+    });
+  }
+
   const summaryItems = [
-    { label: "Toplam Tur", value: speciesCards.length.toString(), icon: Fish, tone: "cyan" },
+    { label: "Toplam Tur", value: speciesList.length.toString(), icon: Fish, tone: "cyan" },
     { label: "Aile", value: familyCount.toString(), icon: Layers, tone: "blue" },
     { label: "Yasam Alani", value: habitatCount.toString(), icon: Waves, tone: "white" },
     { label: "Tehlike Altinda", value: endangeredCount.toString(), icon: AlertTriangle, tone: "yellow" },
@@ -275,7 +328,7 @@ export default function SpeciesLibraryWorkspace() {
                 <List size={18} />
               </button>
             </div>
-            <button type="button" className="fish-library-primary" onClick={() => alert("Yeni tur ekleme akisi yakinda aktif olacak.")}>
+            <button type="button" className="fish-library-primary" onClick={() => setAddModalOpen(true)}>
               <Plus size={18} />
               Yeni Tur Ekle
             </button>
@@ -428,6 +481,61 @@ export default function SpeciesLibraryWorkspace() {
           </aside>
         </div>
       </div>
+      {addModalOpen ? (
+        <div className="fish-library-modal-backdrop" role="presentation" onMouseDown={() => setAddModalOpen(false)}>
+          <section className="fish-library-modal" role="dialog" aria-modal="true" aria-labelledby="new-species-title" onMouseDown={(event) => event.stopPropagation()}>
+            <header>
+              <div>
+                <h2 id="new-species-title">Yeni Tur Ekle</h2>
+                <p>Kutuphaneye yeni bir balik turu kaydi olusturun.</p>
+              </div>
+              <button type="button" aria-label="Kapat" onClick={() => setAddModalOpen(false)}>
+                <X size={18} />
+              </button>
+            </header>
+
+            <form onSubmit={submitNewSpecies}>
+              <label>
+                <span>Tur Adi</span>
+                <input
+                  required
+                  value={newSpecies.name}
+                  placeholder="Orn. Minekop"
+                  onChange={(event) => setNewSpecies((current) => ({ ...current, name: event.target.value }))}
+                />
+              </label>
+              <label>
+                <span>Bilimsel Ad</span>
+                <input
+                  required
+                  value={newSpecies.latin}
+                  placeholder="Orn. Umbrina cirrosa"
+                  onChange={(event) => setNewSpecies((current) => ({ ...current, latin: event.target.value }))}
+                />
+              </label>
+              <LibrarySelect label="Tur Grubu" value={newSpecies.group} options={["Etcil", "Otcul", "Dip Baligi"]} onChange={(value) => setNewSpecies((current) => ({ ...current, group: value }))} />
+              <LibrarySelect label="Yasam Alani" value={newSpecies.habitat} options={["Deniz", "Tatli Su", "Aci Su"]} onChange={(value) => setNewSpecies((current) => ({ ...current, habitat: value }))} />
+              <LibrarySelect label="Dagilim Bolgesi" value={newSpecies.region} options={["Akdeniz", "Ege", "Karadeniz", "Ic Anadolu"]} onChange={(value) => setNewSpecies((current) => ({ ...current, region: value }))} />
+              <LibrarySelect label="Koruma Durumu" value={newSpecies.protection} options={["Guvenli", "Koruma Altinda", "Nesli Tehlikede"]} onChange={(value) => setNewSpecies((current) => ({ ...current, protection: value }))} />
+              <label className="fish-library-modal-wide">
+                <span>Etiketler</span>
+                <input
+                  value={newSpecies.tags}
+                  placeholder="Deniz, Etcil"
+                  onChange={(event) => setNewSpecies((current) => ({ ...current, tags: event.target.value }))}
+                />
+              </label>
+              <footer>
+                <button type="button" onClick={() => setAddModalOpen(false)}>Vazgec</button>
+                <button type="submit">
+                  <Check size={17} />
+                  Turu Ekle
+                </button>
+              </footer>
+            </form>
+          </section>
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -445,23 +553,42 @@ function LibrarySelect({
   onChange: (value: string) => void;
   icon?: ReactNode;
 }) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <label className="fish-library-select">
+    <div className={`fish-library-select ${open ? "is-open" : ""}`}>
       <span>{label}</span>
-      <select
-        value={value}
-        onChange={(event) => {
-          onChange(event.target.value);
-        }}
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen((current) => !current)}
       >
-        {options.map((option) => (
-          <option value={option} key={option}>
-            {option}
-          </option>
-        ))}
-      </select>
-      <i aria-hidden="true">{icon ?? <ChevronDown size={16} />}</i>
-    </label>
+        {value}
+        <i aria-hidden="true">{icon ?? <ChevronDown size={16} />}</i>
+      </button>
+      {open ? (
+        <div className="fish-library-dropdown" role="listbox">
+          {options.map((option) => (
+            <button
+              type="button"
+              role="option"
+              aria-selected={option === value}
+              className={option === value ? "is-selected" : ""}
+              value={option}
+              key={option}
+              onClick={() => {
+                onChange(option);
+                setOpen(false);
+              }}
+            >
+              <span>{option}</span>
+              {option === value ? <Check size={15} /> : null}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
