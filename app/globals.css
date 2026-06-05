@@ -13097,7 +13097,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
   align-items: center;
-  gap: clamp(18px, 3vw, 44px);
+  gap: clamp(10px, 2vw, 28px);
   height: var(--fish-flow);
   margin: 0 var(--fish-pad) var(--fish-gap);
   padding: 12px clamp(24px, 3.4vw, 54px);
@@ -13115,22 +13115,22 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 
 .fish-flow-segment {
   display: grid;
-  grid-template-columns: minmax(210px, auto) minmax(64px, 1fr);
-  align-items: center;
-  gap: clamp(18px, 2.4vw, 42px);
+  grid-template-columns: clamp(62px, 5vw, 82px) minmax(72px, 1fr);
+  align-items: start;
+  gap: clamp(16px, 2.6vw, 46px);
   min-width: 0;
 }
 
 .fish-flow-segment:last-child {
-  grid-template-columns: minmax(210px, auto);
+  grid-template-columns: clamp(62px, 5vw, 82px);
 }
 
 .fish-flow-step {
   position: relative;
   display: grid;
-  grid-template-columns: clamp(42px, 3.4vw, 56px) minmax(0, 1fr);
-  align-items: center;
-  gap: clamp(14px, 1.6vw, 24px);
+  justify-items: center;
+  align-items: start;
+  gap: 8px;
   min-width: 0;
   isolation: isolate;
 }
@@ -13140,6 +13140,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   display: block;
   min-width: 64px;
   height: 4px;
+  margin-top: calc(clamp(42px, 3.4vw, 56px) / 2 - 2px);
   overflow: hidden;
   border-radius: 999px;
   background: rgba(44, 92, 155, 0.28);
@@ -13197,24 +13198,18 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
     transform 260ms ease;
 }
 
-.fish-flow-step strong,
 .fish-flow-step small {
   display: flex;
   align-items: center;
   gap: 7px;
 }
 
-.fish-flow-step strong {
-  color: #ffffff;
-  font-size: clamp(0.88rem, 0.95vw, 1.05rem);
-  font-weight: 760;
-  transition: color 260ms ease, transform 260ms ease;
-}
-
 .fish-flow-step small {
-  margin-top: 4px;
+  justify-content: center;
+  margin-top: 0;
   color: #8ea0ba;
   font-size: clamp(0.74rem, 0.82vw, 0.9rem);
+  white-space: nowrap;
   transition: color 260ms ease, transform 260ms ease;
 }
 
@@ -13247,9 +13242,8 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   animation: fish-step-pulse 2.1s ease-in-out infinite;
 }
 
-.fish-flow-step--active strong,
 .fish-flow-step--active small {
-  transform: translateX(2px);
+  transform: translateY(1px);
 }
 
 .fish-flow-step--active small {
