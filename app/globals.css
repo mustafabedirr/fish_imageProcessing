@@ -12974,7 +12974,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 /* Fish analysis mockup */
 .fish-analyze-page {
   --fish-topbar: clamp(70px, 8vh, 86px);
-  --fish-flow: clamp(76px, 9vh, 96px);
+  --fish-flow: clamp(48px, 6vh, 62px);
   --fish-pad: clamp(14px, 1.6vw, 28px);
   --fish-gap: clamp(12px, 1vw, 18px);
   --fish-panel-pad: clamp(14px, 1vw, 20px);
@@ -13099,30 +13099,24 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   align-items: center;
   gap: clamp(10px, 2vw, 28px);
   height: var(--fish-flow);
-  margin: 0 var(--fish-pad) var(--fish-gap);
-  padding: 12px clamp(24px, 3.4vw, 54px);
-  border: 1px solid rgba(48, 126, 230, 0.44);
-  border-radius: 14px;
-  background:
-    radial-gradient(circle at 46% 42%, rgba(30, 144, 255, 0.14), transparent 30%),
-    linear-gradient(180deg, rgba(4, 16, 33, 0.98), rgba(2, 10, 24, 0.98));
-  box-shadow:
-    0 18px 42px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    inset 0 0 0 1px rgba(30, 144, 255, 0.08);
+  margin: 0 var(--fish-pad) calc(var(--fish-gap) * 0.7);
+  padding: 2px clamp(24px, 3.4vw, 54px) 6px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
   overflow: hidden;
 }
 
 .fish-flow-segment {
   display: grid;
-  grid-template-columns: clamp(62px, 5vw, 82px) minmax(72px, 1fr);
+  grid-template-columns: clamp(46px, 3.8vw, 58px) minmax(72px, 1fr);
   align-items: start;
   gap: clamp(16px, 2.6vw, 46px);
   min-width: 0;
 }
 
 .fish-flow-segment:last-child {
-  grid-template-columns: clamp(62px, 5vw, 82px);
+  grid-template-columns: clamp(46px, 3.8vw, 58px);
 }
 
 .fish-flow-step {
@@ -13139,8 +13133,8 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   position: relative;
   display: block;
   min-width: 64px;
-  height: 4px;
-  margin-top: calc(clamp(42px, 3.4vw, 56px) / 2 - 2px);
+  height: 3px;
+  margin-top: calc(clamp(32px, 2.7vw, 40px) / 2 - 1.5px);
   overflow: hidden;
   border-radius: 999px;
   background: rgba(44, 92, 155, 0.28);
@@ -13181,14 +13175,14 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   z-index: 2;
   display: grid;
   place-items: center;
-  width: clamp(42px, 3.4vw, 56px);
-  height: clamp(42px, 3.4vw, 56px);
+  width: clamp(32px, 2.7vw, 40px);
+  height: clamp(32px, 2.7vw, 40px);
   border: 2px solid rgba(68, 124, 196, 0.58);
   border-radius: 999px;
   color: #eef6ff;
   background: rgba(5, 17, 35, 0.8);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
-  font-size: clamp(1rem, 1.25vw, 1.3rem);
+  font-size: clamp(0.9rem, 1vw, 1.05rem);
   font-weight: 800;
   transition:
     color 260ms ease,
@@ -13208,7 +13202,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   justify-content: center;
   margin-top: 0;
   color: #8ea0ba;
-  font-size: clamp(0.74rem, 0.82vw, 0.9rem);
+  font-size: clamp(0.68rem, 0.74vw, 0.8rem);
   white-space: nowrap;
   transition: color 260ms ease, transform 260ms ease;
 }
@@ -13223,7 +13217,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   border-color: rgba(52, 211, 153, 0.58);
   color: #ffffff;
   background: linear-gradient(135deg, rgba(8, 92, 88, 0.9), rgba(18, 65, 115, 0.88));
-  box-shadow: 0 0 0 7px rgba(52, 211, 153, 0.08), 0 0 24px rgba(34, 215, 184, 0.18);
+  box-shadow: 0 0 0 5px rgba(52, 211, 153, 0.07), 0 0 18px rgba(34, 215, 184, 0.16);
 }
 
 .fish-flow-step--completed small {
@@ -13235,9 +13229,9 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   color: #ffffff;
   background: linear-gradient(180deg, #3a8cff, #2657f4);
   box-shadow:
-    0 0 0 8px rgba(30, 144, 255, 0.12),
-    0 0 0 16px rgba(30, 144, 255, 0.05),
-    0 0 34px rgba(30, 144, 255, 0.58);
+    0 0 0 6px rgba(30, 144, 255, 0.12),
+    0 0 0 12px rgba(30, 144, 255, 0.05),
+    0 0 24px rgba(30, 144, 255, 0.5);
   transform: scale(1.06);
   animation: fish-step-pulse 2.1s ease-in-out infinite;
 }
@@ -13263,14 +13257,14 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   100% {
     box-shadow:
       0 0 0 10px rgba(30, 144, 255, 0.12),
-      0 0 0 18px rgba(30, 144, 255, 0.045),
-      0 0 30px rgba(30, 144, 255, 0.5);
+      0 0 0 14px rgba(30, 144, 255, 0.045),
+      0 0 24px rgba(30, 144, 255, 0.44);
   }
   50% {
     box-shadow:
       0 0 0 12px rgba(30, 144, 255, 0.18),
-      0 0 0 22px rgba(30, 144, 255, 0.075),
-      0 0 42px rgba(30, 144, 255, 0.72);
+      0 0 0 18px rgba(30, 144, 255, 0.07),
+      0 0 32px rgba(30, 144, 255, 0.62);
   }
 }
 

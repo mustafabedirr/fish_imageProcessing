@@ -207,10 +207,11 @@ export default function AnalyzeWorkspace() {
       return;
     }
 
+    const startedAt = performance.now();
+
     try {
       setLoading(true);
       setError(null);
-      const startedAt = performance.now();
 
       const formData = new FormData();
       formData.append("image", targetFile);
@@ -226,10 +227,12 @@ export default function AnalyzeWorkspace() {
         throw new Error(message);
       }
 
+      await waitForMinimumDuration(startedAt, 2000);
       setResult(normalizeAnalyzeResponse(data));
       setAnalysisCompletedAt(new Date());
       setAnalysisDuration(`${((performance.now() - startedAt) / 1000).toFixed(2)} saniye`);
     } catch (err) {
+      await waitForMinimumDuration(startedAt, 2000);
       setError(err instanceof Error ? err.message : "Bilinmeyen analiz hatasi olustu.");
     } finally {
       setLoading(false);
@@ -281,7 +284,7 @@ export default function AnalyzeWorkspace() {
           <div className="fish-flow-segment" key={step.label}>
             <div className={`fish-flow-step fish-flow-step--${step.status}`}>
               <span aria-label={step.label}>
-                <step.icon size={22} />
+                <step.icon size={18} />
               </span>
               <small>
                 {step.caption}
@@ -515,6 +518,12 @@ function getFlowSteps({
       icon: Target,
     },
   ];
+}
+
+function waitForMinimumDuration(startedAt: number, minimumMs: number) {
+  const remaining = minimumMs - (performance.now() - startedAt);
+  if (remaining <= 0) return Promise.resolve();
+  return new Promise((resolve) => window.setTimeout(resolve, remaining));
 }
 
 function normalizeConfidence(value: number) {
