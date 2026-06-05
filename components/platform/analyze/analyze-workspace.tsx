@@ -284,12 +284,8 @@ export default function AnalyzeWorkspace() {
           <div className="fish-flow-segment" key={step.label}>
             <div className={`fish-flow-step fish-flow-step--${step.status}`}>
               <span aria-label={step.label}>
-                <step.icon size={18} />
+                {step.status === "completed" ? <CheckCircle2 size={18} /> : <step.icon size={18} />}
               </span>
-              <small>
-                {step.caption}
-                <CheckCircle2 size={15} />
-              </small>
             </div>
             {index < 2 ? <span className={`fish-flow-connector fish-flow-connector--${step.status}`} aria-hidden="true" /> : null}
           </div>
@@ -501,19 +497,16 @@ function getFlowSteps({
   return [
     {
       label: "Gorsel Yukleme",
-      caption: hasFile ? "Tamamlandi" : "Bekliyor",
       status: hasFile ? "completed" : "active",
       icon: Upload,
     },
     {
       label: "AI Analiz",
-      caption: loading ? "Calisiyor" : hasResult ? "Tamamlandi" : "Bekliyor",
       status: loading ? "active" : hasResult ? "completed" : "pending",
       icon: Sparkles,
     },
     {
       label: "Sonuclar",
-      caption: hasResult ? "Tamamlandi" : "Bekliyor",
       status: hasResult ? "active" : "pending",
       icon: Target,
     },
