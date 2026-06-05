@@ -172,7 +172,7 @@ export default function AnalyzeWorkspace() {
   const analysisDate = analysisCompletedAt ? analysisCompletedAt.toLocaleString("tr-TR") : "18 Mayis 2024 - 14:32";
   const speciesProfile = getSpeciesProfile(detectedSpecies);
   const displaySpecies = result ? getDisplaySpecies(result, speciesProfile) : "Levrek";
-  const primarySpeciesLabel = isUncertain ? "Emin degil" : displaySpecies;
+  const primarySpeciesLabel = isUncertain ? "Emin değilim" : displaySpecies;
   const scoreRows = getScoreRows(confidence, result, speciesProfile);
   const measurements = getMeasurementsFromResult(result);
   const alternatives = result?.top_predictions.length ? getTopPredictionAlternatives(result) : getAlternatives(detectedSpecies, confidence);
@@ -458,7 +458,7 @@ export default function AnalyzeWorkspace() {
                 <strong>{loading ? "Model calisiyor" : primarySpeciesLabel}</strong>
                 <small>{speciesProfile.latin}</small>
                 <em className={isUncertain ? "fish-confidence-low" : ""}>
-                  {loading ? "Analiz suruyor" : isUncertain ? `${confidenceText} Dusuk guven` : `${confidenceText} Guven`}
+                  {loading ? "Analiz suruyor" : isUncertain ? `${confidenceText} düşük güven` : `${confidenceText} Guven`}
                 </em>
               </div>
             </div>
