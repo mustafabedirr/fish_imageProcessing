@@ -19,6 +19,7 @@ import {
   MapPin,
   Maximize2,
   MoreVertical,
+  Plus,
   Ruler,
   Share2,
   ShieldCheck,
@@ -308,53 +309,50 @@ export default function AnalyzeWorkspace() {
 
       <main className="fish-analyze-layout">
         <section className="fish-analyze-main">
-          <div className="fish-hero-card">
-            <article className="fish-image-stage">
-              <span className="fish-stage-chip">Orijinal</span>
-              <span className="fish-stage-secure">
-                <ShieldCheck size={17} />
-                Yuklemeleriniz guvenli ve gizlidir
+          <div className={!file ? "fish-hero-card fish-hero-card--upload" : "fish-hero-card"}>
+            <article className={!file ? "fish-image-stage fish-image-stage--empty" : "fish-image-stage"}>
+              <span className="fish-stage-chip">
+                {!file ? <ImageIcon size={15} /> : null}
+                {file ? "Orijinal" : "JPG, PNG, WEBP"}
               </span>
+              {file ? (
+                <span className="fish-stage-secure">
+                  <ShieldCheck size={17} />
+                  Yuklemeleriniz guvenli ve gizlidir
+                </span>
+              ) : null}
               <img src={previewUrl} alt="Analiz edilen balik" />
               {!file ? (
                 <>
                   <div className="fish-upload-panel">
                     <span className="fish-upload-panel__icon">
-                      <ImageIcon size={34} />
+                      <Upload size={46} />
                     </span>
                     <h2>Gorsel Yukle</h2>
-                    <p>Dosyayi surukleyip birakin veya cihazinizdan secin.</p>
+                    <p>Dosyalari buraya surukleyip birakin veya cihazinizdan secin.</p>
                     <button type="button" onClick={() => inputRef.current?.click()}>
                       <Upload size={17} />
-                      Gorsel Sec
+                      Dosya Sec
                     </button>
-                    <small>JPG, PNG, WEBP - Maks. 20 MB</small>
-                    <div className="fish-upload-panel__divider"><span>veya</span></div>
-                    <button className="fish-upload-panel__camera" type="button">
-                      <Camera size={18} />
-                      Kamera ile cek
-                    </button>
-                  </div>
-                  <div className="fish-stage-guide-frame" aria-hidden="true">
-                    <span className="fish-stage-guide-tip">
-                      <Maximize2 size={18} />
-                      En iyi analiz icin baligi cerceve icine alin
-                    </span>
-                    <i className="fish-guide-plus">+</i>
-                  </div>
-                  <button type="button" className="fish-stage-upload fish-stage-upload--bottom" onClick={() => inputRef.current?.click()}>
-                    <Upload size={17} />
-                    Gorsel Sec
-                  </button>
-                  <div className="fish-stage-quality" aria-hidden="true">
-                    <span className="fish-quality-gauge"><i /></span>
-                    <small>Gorsel Kalitesi</small>
-                    <strong>Iyi</strong>
-                  </div>
-                  <div className="fish-stage-progress-dots" aria-hidden="true">
-                    {Array.from({ length: 11 }).map((_, dotIndex) => (
-                      <span className={dotIndex === 5 ? "fish-dot fish-dot--active" : "fish-dot"} key={dotIndex} />
-                    ))}
+                    <small>Maksimum 20 MB</small>
+                    <div className="fish-upload-features" aria-label="Yukleme ozellikleri">
+                      <article>
+                        <Sparkles size={19} />
+                        <span>Yuksek cozunurlukte<br />daha iyi analiz</span>
+                      </article>
+                      <article>
+                        <Upload size={19} />
+                        <span>Desteklenen formatlar:<br />JPG, PNG, WEBP</span>
+                      </article>
+                      <article>
+                        <ShieldCheck size={19} />
+                        <span>Maksimum dosya boyutu<br />20 MB</span>
+                      </article>
+                      <article>
+                        <ShieldCheck size={19} />
+                        <span>Guvenli ve gizli<br />veri isleme</span>
+                      </article>
+                    </div>
                   </div>
                 </>
               ) : null}
@@ -377,9 +375,12 @@ export default function AnalyzeWorkspace() {
                 {imageSet.slice(0, 4).map((image, index) => (
                   <button className={index === 0 ? "fish-thumb fish-thumb--active" : "fish-thumb"} type="button" key={image}>
                     <img src={image} alt="" />
+                    {!file ? <span className="fish-thumb-remove" aria-hidden="true">x</span> : null}
                   </button>
                 ))}
-                <button className="fish-thumb fish-thumb-more" type="button">+3</button>
+                <button className={!file ? "fish-thumb fish-thumb-add" : "fish-thumb fish-thumb-more"} type="button" onClick={() => inputRef.current?.click()}>
+                  {!file ? <><Plus size={24} /> <span>Daha fazla ekle</span></> : "+3"}
+                </button>
               </div>
             </article>
 
