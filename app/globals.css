@@ -16661,7 +16661,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   max-height: calc(100% - 18px);
   min-height: 0;
   padding: 18px;
-  overflow: auto;
+  overflow: hidden;
   scrollbar-width: none;
   backdrop-filter: blur(18px);
   animation: aquaLayerPanelIn 220ms ease both;
@@ -16713,10 +16713,16 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 .aqua-layer-list {
   display: grid;
   gap: 14px;
+  flex: 1 1 auto;
   min-height: 0;
   margin-top: 18px;
   padding-right: 2px;
-  overflow: visible;
+  overflow: auto;
+  scrollbar-width: none;
+}
+
+.aqua-layer-list::-webkit-scrollbar {
+  display: none;
 }
 
 .aqua-layer-row {
@@ -16817,7 +16823,16 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 .aqua-map-date {
   display: grid;
   gap: 12px;
-  margin-top: 18px;
+  margin-top: 0;
+}
+
+.aqua-layer-footer {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(96, 139, 186, 0.2);
 }
 
 .aqua-map-view-controls h3,
@@ -16858,7 +16873,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 .aqua-manage-layers {
-  margin-top: auto;
+  margin-top: 0;
   color: #ecf6ff;
   font-weight: 650;
 }
@@ -16981,6 +16996,11 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   grid-template-columns: repeat(3, minmax(130px, 1fr));
   gap: 10px;
   width: min(460px, calc(100% - 116px));
+}
+
+.aqua-map-content:not(.is-layer-panel-closed) .aqua-map-metric-strip {
+  left: 330px;
+  width: min(460px, calc(100% - 430px));
 }
 
 .aqua-map-content.is-layer-panel-closed .aqua-map-metric-strip {
@@ -17346,8 +17366,37 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   font-weight: 650;
 }
 
+.aqua-region-title button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(80, 136, 194, 0.28);
+  border-radius: 9px;
+  color: #a8bed8;
+  background: rgba(8, 28, 53, 0.48);
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+
+.aqua-region-title button:hover,
+.aqua-region-title button.is-favorite {
+  transform: translateY(-1px);
+  border-color: rgba(0, 212, 255, 0.58);
+  color: #5bd4ff;
+  background: rgba(30, 144, 255, 0.16);
+}
+
+.aqua-region-title button.is-favorite svg {
+  fill: rgba(91, 212, 255, 0.24);
+}
+
 .aqua-region-title svg {
   color: #d7e7ff;
+}
+
+.aqua-region-title button.is-favorite svg {
+  color: #5bd4ff;
 }
 
 .aqua-region-card h2 {
@@ -17445,6 +17494,31 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   color: #00c996;
 }
 
+.aqua-region-tab-detail,
+.aqua-selected-observation {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid rgba(77, 132, 190, 0.2);
+  border-radius: 10px;
+  background: rgba(7, 25, 46, 0.58);
+}
+
+.aqua-region-tab-detail strong,
+.aqua-selected-observation strong {
+  color: #ffffff;
+  font-size: 0.9rem;
+}
+
+.aqua-region-tab-detail span,
+.aqua-selected-observation span,
+.aqua-selected-observation small {
+  color: #8fa7c2;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
 .aqua-observation-card {
   display: flex;
   flex-direction: column;
@@ -17473,11 +17547,17 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   padding: 8px;
   border-radius: 9px;
   transition: background 180ms ease, transform 180ms ease;
+  cursor: pointer;
 }
 
-.aqua-observation-list article:hover {
+.aqua-observation-list article:hover,
+.aqua-observation-list article.is-selected {
   transform: translateX(2px);
   background: rgba(31, 92, 154, 0.2);
+}
+
+.aqua-observation-list article.is-selected {
+  box-shadow: inset 3px 0 0 rgba(0, 212, 255, 0.78);
 }
 
 .aqua-observation-list img {
@@ -17619,6 +17699,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
     width: calc(100% - 82px);
   }
 
+  .aqua-map-content:not(.is-layer-panel-closed) .aqua-map-metric-strip,
   .aqua-map-content.is-layer-panel-closed .aqua-map-metric-strip {
     top: 72px;
     left: 18px;

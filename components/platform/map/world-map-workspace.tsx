@@ -196,8 +196,11 @@ export default function WorldMapWorkspace() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeRegionIndex, setActiveRegionIndex] = useState(0);
   const [activeRegionTab, setActiveRegionTab] = useState<(typeof regionTabs)[number]>("Ozet");
+  const [favoriteRegion, setFavoriteRegion] = useState(false);
+  const [selectedObservationIndex, setSelectedObservationIndex] = useState(0);
 
   const selectedRegion = mapRegions[activeRegionIndex];
+  const selectedObservation = observations[selectedObservationIndex];
 
   const activeMapStyle = useMemo(() => {
     const rasterPaint =
@@ -397,34 +400,36 @@ export default function WorldMapWorkspace() {
               })}
             </div>
 
-            <div className="aqua-map-view-controls">
-              <h3>Harita Gorunumu</h3>
-              <div>
-                {["Standart", "Uydu", "Koyu"].map((view) => (
-                  <button className={mapView === view ? "is-selected" : ""} type="button" onClick={() => setMapView(view)} key={view}>
-                    {view}
-                  </button>
-                ))}
+            <div className="aqua-layer-footer">
+              <div className="aqua-map-view-controls">
+                <h3>Harita Gorunumu</h3>
+                <div>
+                  {["Standart", "Uydu", "Koyu"].map((view) => (
+                    <button className={mapView === view ? "is-selected" : ""} type="button" onClick={() => setMapView(view)} key={view}>
+                      {view}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            <label className="aqua-map-date">
-              <span>Zaman Araligi</span>
-              <button
-                type="button"
-                onClick={() => {
-                  const nextIndex = (days.indexOf(selectedDay) + 1) % days.length;
-                  setSelectedDay(days[nextIndex]);
-                }}
-              >
-                {selectedDay} - 18 Mayis 2024
-                <CalendarDays size={16} />
+              <label className="aqua-map-date">
+                <span>Zaman Araligi</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const nextIndex = (days.indexOf(selectedDay) + 1) % days.length;
+                    setSelectedDay(days[nextIndex]);
+                  }}
+                >
+                  {selectedDay} - 18 Mayis 2024
+                  <CalendarDays size={16} />
+                </button>
+              </label>
+
+              <button type="button" className="aqua-manage-layers" onClick={enableAllLayers}>
+                Katmanlari Yonet
               </button>
-            </label>
-
-            <button type="button" className="aqua-manage-layers" onClick={enableAllLayers}>
-              Katmanlari Yonet
-            </button>
+            </div>
           </aside>
           ) : null}
 
@@ -629,7 +634,14 @@ export default function WorldMapWorkspace() {
             <section className="aqua-region-card">
               <div className="aqua-region-title">
                 <span>Secili Bolge</span>
-                <Star size={18} />
+                <button
+                  type="button"
+                  className={favoriteRegion ? "is-favorite" : ""}
+                  aria-label="Bolgeyi favorilere ekle"
+                  onClick={() => setFavoriteRegion((current) => !current)}
+                >
+                  <Star size={18} />
+                </button>
               </div>
               <h2>{selectedRegion.name}</h2>
               <p>{selectedRegion.coordinatesText}</p>
@@ -673,6 +685,18 @@ export default function WorldMapWorkspace() {
                   <strong>{selectedRegion.wind}</strong>
                 </article>
               </div>
+              <div className="aqua-region-tab-detail">
+                <strong>{activeRegionTab}</strong>
+                <span>
+                  {activeRegionTab === "Ozet"
+                    ? `${selectedRegion.name} icin ${selectedDay} verileri guncel olarak izleniyor.`
+                    : activeRegionTab === "Canli Veriler"
+                    ? `Anlik sicaklik ${selectedRegion.temperature}, akinti ${selectedRegion.current}, ruzgar ${selectedRegion.wind}.`
+                    : activeRegionTab === "Analiz"
+                    ? `${selectedRegion.density} balik yogunlugu ve ${selectedRegion.chlorophyll.toLocaleLowerCase("tr-TR")} klorofil seviyesi raporlandi.`
+                    : "Bu bolge icin saha notu eklenmedi."}
+                </span>
+              </div>
             </section>
 
             <section className="aqua-observation-card">
@@ -681,8 +705,15 @@ export default function WorldMapWorkspace() {
                 <a href="/platform/analyze">Tumunu Gor</a>
               </div>
               <div className="aqua-observation-list">
-                {observations.map((item) => (
-                  <article key={item.name}>
+                {observations.map((item, index) => (
+                  <article
+                    className={index === selectedObservationIndex ? "is-selected" : ""}
+                    key={item.name}
+                    onClick={() => {
+                      setSelectedObservationIndex(index);
+                      focusRegion(index % mapRegions.length);
+                    }}
+                  >
                     <img src={item.image} alt="" />
                     <div>
                       <strong>{item.name}</strong>
@@ -693,6 +724,11 @@ export default function WorldMapWorkspace() {
                     <ChevronRight size={18} />
                   </article>
                 ))}
+              </div>
+              <div className="aqua-selected-observation">
+                <span>Secili gozlem</span>
+                <strong>{selectedObservation.name}</strong>
+                <small>{selectedObservation.score} guven skoru ile {selectedObservation.time.toLocaleLowerCase("tr-TR")} kaydedildi.</small>
               </div>
               <a className="aqua-map-analysis-link" href="/platform/analyze">
                 Detayli Analize Git
