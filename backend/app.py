@@ -14,10 +14,20 @@ from tensorflow.keras.models import load_model
 
 
 BASE_DIR = Path(__file__).resolve().parent
-MODEL_PATH = BASE_DIR / "models" / "fish_model.h5"
+MODEL_CANDIDATES = (
+    BASE_DIR / "models" / "fish_model.best.keras",
+    BASE_DIR / "models" / "fish_model.h5",
+)
 CLASS_NAMES_PATH = BASE_DIR / "data" / "class_names.json"
 FISH_INFO_PATH = BASE_DIR / "data" / "fish_species.json"
 
+
+def resolve_model_path() -> Path:
+    for model_path in MODEL_CANDIDATES:
+        if model_path.exists():
+            return model_path
+
+    return MODEL_CANDIDATES[0]
 
 
 class HealthResponse(BaseModel):
@@ -29,16 +39,26 @@ class HealthResponse(BaseModel):
 async def lifespan(app: FastAPI):
     print("AquaScope AI backend starting...")
 
-    if not MODEL_PATH.exists():
-        raise FileNotFoundError(f"Model file not found: {MODEL_PATH}")
+    model_path = resolve_model_path()
+
+    if not model_path.exists():
+        raise FileNotFoundError(f"Model file not found: {model_path}")
 
     if not CLASS_NAMES_PATH.exists():
         raise FileNotFoundError(f"Class names file not found: {CLASS_NAMES_PATH}")
 
-    app.state.model = load_model(MODEL_PATH)
+    app.state.model = load_model(model_path)
     app.state.class_names = load_class_names(CLASS_NAMES_PATH)
     app.state.fish_info = load_fish_info(FISH_INFO_PATH)
 
+    output_shape = getattr(app.state.model, "output_shape", None)
+    output_classes = output_shape[-1] if isinstance(output_shape, tuple) and output_shape else None
+    if output_classes != len(app.state.class_names):
+        raise ValueError(
+            f"Model output class count ({output_classes}) does not match class_names ({len(app.state.class_names)})"
+        )
+
+    print("Model path:", model_path)
     print("Model output shape:", app.state.model.output_shape)
     print("Class names count:", len(app.state.class_names))
     print("Class names:", app.state.class_names)
