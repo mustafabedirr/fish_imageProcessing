@@ -2,6 +2,7 @@
 
 import type { FormEvent, ReactNode } from "react";
 import { useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
   BarChart3,
@@ -554,42 +555,117 @@ function LibrarySelect({
   icon?: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const selectedIndex = Math.max(options.findIndex((option) => option === value), 0);
 
   return (
-    <div className={`fish-library-select ${open ? "is-open" : ""}`}>
+    <div
+      className={`fish-library-select ${open ? "is-open" : ""}`}
+      onMouseLeave={() => setOpen(false)}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          setOpen(false);
+        }
+      }}
+    >
       <span>{label}</span>
       <button
         type="button"
         aria-haspopup="listbox"
         aria-expanded={open}
+        onMouseEnter={() => setOpen(true)}
+        onFocus={() => setOpen(true)}
         onClick={() => setOpen((current) => !current)}
       >
-        {value}
+        <span>{value}</span>
         <i aria-hidden="true">{icon ?? <ChevronDown size={16} />}</i>
       </button>
-      {open ? (
-        <div className="fish-library-dropdown" role="listbox">
-          {options.map((option) => (
-            <button
-              type="button"
-              role="option"
-              aria-selected={option === value}
-              className={option === value ? "is-selected" : ""}
-              value={option}
-              key={option}
-              onClick={() => {
-                onChange(option);
-                setOpen(false);
-              }}
-            >
-              <span>{option}</span>
-              {option === value ? <Check size={15} /> : null}
-            </button>
-          ))}
-        </div>
-      ) : null}
+      <AnimatePresence>
+        {open ? (
+          <motion.div
+            className="fish-library-dropdown"
+            role="listbox"
+            initial={{ opacity: 0, y: 10, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+          >
+            <span className="fish-library-dropdown-bridge" aria-hidden="true" />
+            <motion.span
+              className="fish-library-dropdown-nub"
+              aria-hidden="true"
+              layout
+              transition={{ duration: 0.22, ease: "easeInOut" }}
+            />
+            {options.map((option, index) => {
+              const selected = option === value;
+
+              return (
+                <motion.button
+                  type="button"
+                  role="option"
+                  aria-selected={selected}
+                  className={selected ? "is-selected" : ""}
+                  value={option}
+                  key={option}
+                  initial={{ opacity: 0, x: index < selectedIndex ? -10 : 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.18, delay: index * 0.025, ease: "easeOut" }}
+                  onClick={() => {
+                    onChange(option);
+                    setOpen(false);
+                  }}
+                >
+                  <span>
+                    <strong>{option}</strong>
+                    <small>{getLibraryOptionMeta(label, option)}</small>
+                  </span>
+                  {selected ? <Check size={15} /> : null}
+                </motion.button>
+              );
+            })}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
+}
+
+function getLibraryOptionMeta(label: string, option: string) {
+  const meta: Record<string, Record<string, string>> = {
+    "Tur Grubu": {
+      Tumu: "Tum beslenme gruplari",
+      Etcil: "Avci ve protein agirlikli turler",
+      Otcul: "Bitkisel kaynaklarla beslenen turler",
+      "Dip Baligi": "Taban habitatina yakin yasayanlar",
+    },
+    "Yasam Alani": {
+      Tumu: "Tum sucul habitatlar",
+      Deniz: "Tuzlu su ve kiyi ekosistemleri",
+      "Tatli Su": "Gol, nehir ve ic sular",
+      "Aci Su": "Nehir agzi ve lagun gecisleri",
+    },
+    "Dagilim Bolgesi": {
+      Tumu: "Tum izleme bolgeleri",
+      Akdeniz: "Sicak deniz kusagi",
+      Ege: "Kiyisal ve ada ekosistemi",
+      Karadeniz: "Kuzey kiyilari ve serin sular",
+      "Ic Anadolu": "Ic su kaynaklari",
+    },
+    "Koruma Durumu": {
+      Tumu: "Tum koruma siniflari",
+      Guvenli: "Populasyon riski dusuk",
+      "Koruma Altinda": "Izlemeye ve korumaya tabi",
+      "Nesli Tehlikede": "Hassas tur grubu",
+    },
+    Sirala: {
+      Populerlik: "En cok incelenen turler",
+      Uygunluk: "Analiz uyum skoruna gore",
+      "Kayit Sayisi": "Veri havuzu buyuklugune gore",
+      "Ada Gore": "Alfabetik listeleme",
+    },
+  };
+
+  return meta[label]?.[option] ?? "Secimi uygula";
 }
 
 function normalize(value: string) {
