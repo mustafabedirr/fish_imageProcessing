@@ -25,6 +25,7 @@ import {
   Thermometer,
   Waves,
   Wind,
+  X,
 } from "lucide-react";
 
 const layerItems = [
@@ -88,11 +89,11 @@ const mapStyle = {
       type: "raster",
       source: "carto-dark",
       paint: {
-        "raster-opacity": 0.74,
-        "raster-saturation": -0.58,
-        "raster-contrast": 0.18,
-        "raster-brightness-min": 0.02,
-        "raster-brightness-max": 0.74,
+        "raster-opacity": 0.92,
+        "raster-saturation": -0.28,
+        "raster-contrast": 0.06,
+        "raster-brightness-min": 0.08,
+        "raster-brightness-max": 0.96,
       },
     },
   ],
@@ -147,6 +148,7 @@ export default function WorldMapWorkspace() {
   );
   const [selectedDay, setSelectedDay] = useState("16 May");
   const [mapView, setMapView] = useState("Standart");
+  const [isLayerPanelOpen, setIsLayerPanelOpen] = useState(true);
 
   const mapData = useMemo(() => {
     const densityPoints = featureCollection(
@@ -207,7 +209,12 @@ export default function WorldMapWorkspace() {
               <Bell size={18} />
               <b>3</b>
             </button>
-            <button type="button">
+            <button
+              type="button"
+              className={isLayerPanelOpen ? "is-selected" : ""}
+              aria-expanded={isLayerPanelOpen}
+              onClick={() => setIsLayerPanelOpen((current) => !current)}
+            >
               <Layers size={18} />
               Veri Katmanlari
             </button>
@@ -217,11 +224,14 @@ export default function WorldMapWorkspace() {
           </div>
         </header>
 
-        <div className="aqua-map-content">
+        <div className={isLayerPanelOpen ? "aqua-map-content" : "aqua-map-content is-layer-panel-closed"}>
+          {isLayerPanelOpen ? (
           <aside className="aqua-layer-panel">
             <div className="aqua-panel-title">
               <h2>Veri Katmanlari</h2>
-              <button type="button" aria-label="Katman panelini kapat">x</button>
+              <button type="button" aria-label="Katman panelini kapat" onClick={() => setIsLayerPanelOpen(false)}>
+                <X size={17} />
+              </button>
             </div>
 
             <div className="aqua-layer-list">
@@ -273,9 +283,16 @@ export default function WorldMapWorkspace() {
               Katmanlari Yonet
             </button>
           </aside>
+          ) : null}
 
           <main className="aqua-map-stage">
             <section className="aqua-map-viewport">
+              {!isLayerPanelOpen ? (
+                <button type="button" className="aqua-map-floating-layers" onClick={() => setIsLayerPanelOpen(true)}>
+                  <Layers size={18} />
+                  Veri Katmanlari
+                </button>
+              ) : null}
               <div className="aqua-map-metric-strip">
                 {mapMetrics.map((metric) => {
                   const Icon = metric.icon;
