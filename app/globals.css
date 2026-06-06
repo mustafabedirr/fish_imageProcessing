@@ -7459,15 +7459,19 @@ body.profile-dark-theme .profile-following img {
 
 .social-composer {
   display: grid;
-  gap: 14px;
+  gap: 16px;
   height: auto;
-  padding: 18px 20px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 16% 0%, rgba(0, 212, 255, 0.08), transparent 32%),
+    linear-gradient(180deg, rgba(8, 28, 52, 0.92), rgba(4, 18, 34, 0.94));
 }
 
 .social-composer-row {
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
-  gap: 14px;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 13px;
   align-items: center;
 }
 
@@ -7480,19 +7484,20 @@ body.profile-dark-theme .profile-following img {
 }
 
 .social-composer img {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(126, 188, 255, 0.26);
 }
 
 .social-composer input {
   min-width: 0;
-  height: 52px;
-  border: 1px solid rgba(72, 128, 186, 0.23);
-  border-radius: 9px;
+  height: 42px;
+  border: 0;
+  border-radius: 0;
   outline: 0;
-  padding: 0 16px;
-  background: rgba(9, 31, 56, 0.78);
-  color: #f7fbff;
+  padding: 0 4px;
+  background: transparent;
+  color: #eef7ff;
   font: inherit;
 }
 
@@ -7501,26 +7506,49 @@ body.profile-dark-theme .profile-following img {
 }
 
 .social-status-line {
-  margin: -4px 0 0 58px;
+  min-height: 16px;
+  margin: -8px 0 0 55px;
   color: #7fb8dd;
   font-size: 0.8rem;
 }
 
 .social-composer-tools {
-  display: grid;
-  grid-template-columns: repeat(4, auto) minmax(0, 1fr) auto 108px;
-  gap: 12px;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-left: 55px;
+}
+
+.social-composer-actions,
+.social-composer-submit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.social-composer-actions {
+  flex-wrap: wrap;
 }
 
 .social-composer-tools button {
-  height: 38px;
-  padding: 0 12px;
+  height: 36px;
+  padding: 0 13px;
+  border-radius: 7px;
+  background:
+    linear-gradient(180deg, rgba(11, 34, 61, 0.82), rgba(7, 24, 44, 0.88));
   box-shadow: none;
+  white-space: nowrap;
 }
 
 .social-audience {
-  min-width: 126px;
+  min-width: 132px;
+  color: #d8eaff;
+}
+
+.social-post-button {
+  min-width: 96px;
 }
 
 .social-tabs {
@@ -8622,12 +8650,31 @@ body.profile-dark-theme .profile-following img {
   }
 
   .social-area-title,
-  .social-composer-tools,
   .social-tabs,
   .social-post-stack,
   .social-interactions-panel,
   .social-post-photos--grid {
     grid-template-columns: 1fr;
+  }
+
+  .social-composer-tools {
+    flex-direction: column;
+    align-items: stretch;
+    padding-left: 0;
+  }
+
+  .social-composer-actions,
+  .social-composer-submit {
+    width: 100%;
+  }
+
+  .social-composer-actions button,
+  .social-composer-submit button {
+    flex: 1 1 auto;
+  }
+
+  .social-status-line {
+    margin-left: 0;
   }
 
   .social-top-actions {

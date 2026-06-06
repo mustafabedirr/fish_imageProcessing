@@ -8,6 +8,7 @@ import {
   Bookmark,
   CalendarDays,
   ChevronDown,
+  Globe2,
   Heart,
   Image as ImageIcon,
   MapPin,
@@ -237,6 +238,8 @@ export default function SocialAreaWorkspace() {
     setAudience((current) => (current === "Everyone" ? "Followers" : "Everyone"));
   };
 
+  const audienceLabel = audience === "Everyone" ? "Herkese Acik" : "Takipciler";
+
   const openModal = (modal: Exclude<SocialModal, null>, postId?: string) => {
     setActiveFlowPostId(postId ?? null);
     setActiveModal(modal);
@@ -284,7 +287,7 @@ export default function SocialAreaWorkspace() {
             <div className="social-composer-row">
               <img src={avatar} alt="Derya Yilmaz" />
               <input
-                placeholder="Share your latest catch or fishing adventure..."
+                placeholder="Bugun nasil bir av deneyimi yasadin?"
                 aria-label="Share a post"
                 value={composerText}
                 onChange={(event) => setComposerText(event.target.value)}
@@ -294,31 +297,34 @@ export default function SocialAreaWorkspace() {
               />
             </div>
             <div className="social-composer-tools">
-              <button type="button" onClick={() => openModal("media")}>
-                <ImageIcon size={16} />
-                Photo / Video
-              </button>
-              <button type="button" onClick={() => openModal("location")}>
-                <MapPin size={16} />
-                Location
-              </button>
-              <button type="button" onClick={() => openModal("poll")}>
-                <SlidersHorizontal size={16} />
-                Poll
-              </button>
-              <button type="button" onClick={() => openModal("achievement")}>
-                <Trophy size={16} />
-                Achievement
-              </button>
-              <span />
-              <button type="button" className="social-audience" onClick={toggleAudience}>
-                <Users size={16} />
-                {audience}
-                <ChevronDown size={15} />
-              </button>
-              <button type="button" className="social-post-button" onClick={createPost}>
-                Post
-              </button>
+              <div className="social-composer-actions" aria-label="Paylasim ekleri">
+                <button type="button" onClick={() => openModal("media")}>
+                  <ImageIcon size={16} />
+                  Fotograf / Video
+                </button>
+                <button type="button" onClick={() => openModal("location")}>
+                  <MapPin size={16} />
+                  Konum
+                </button>
+                <button type="button" onClick={() => openModal("poll")}>
+                  <SlidersHorizontal size={16} />
+                  Anket
+                </button>
+                <button type="button" onClick={() => openModal("achievement")}>
+                  <Trophy size={16} />
+                  Basarim
+                </button>
+              </div>
+              <div className="social-composer-submit">
+                <button type="button" className="social-audience" onClick={toggleAudience}>
+                  <Globe2 size={16} />
+                  {audienceLabel}
+                  <ChevronDown size={15} />
+                </button>
+                <button type="button" className="social-post-button" onClick={createPost}>
+                  Paylas
+                </button>
+              </div>
             </div>
             <p className="social-status-line">{notice}</p>
           </section>
