@@ -6415,6 +6415,227 @@ body.profile-dark-theme .profile-following img {
   gap: 8px;
 }
 
+.profile-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  color: #a5b7cc;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.profile-action:hover,
+.profile-action--active {
+  color: #4fd1ff;
+  transform: translateY(-1px);
+}
+
+.profile-action--active svg {
+  fill: rgba(79, 209, 255, 0.18);
+}
+
+.profile-tab-panel {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  min-height: 0;
+  overflow: auto;
+}
+
+.profile-tab-panel article {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid rgba(77, 132, 190, 0.26);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(10, 31, 55, 0.88), rgba(5, 20, 37, 0.92)),
+    radial-gradient(circle at 20% 0%, rgba(0, 212, 255, 0.1), transparent 44%);
+}
+
+.profile-tab-panel article > span {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border: 1px solid rgba(30, 144, 255, 0.28);
+  border-radius: 12px;
+  color: #4fd1ff;
+  background: rgba(30, 144, 255, 0.12);
+  font-weight: 760;
+}
+
+.profile-tab-panel strong {
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.profile-tab-panel p {
+  margin: 6px 0 0;
+  color: #a9bad0;
+  line-height: 1.55;
+}
+
+.profile-tab-panel--photos {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.profile-tab-panel--photos figure {
+  position: relative;
+  min-height: 220px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(77, 132, 190, 0.26);
+  border-radius: 10px;
+  background: #04111f;
+}
+
+.profile-tab-panel--photos img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.96) brightness(0.86);
+  transition: transform 220ms ease, filter 220ms ease;
+}
+
+.profile-tab-panel--photos figure:hover img {
+  transform: scale(1.035);
+  filter: saturate(1.06) brightness(0.95);
+}
+
+.profile-tab-panel--photos figcaption {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  padding: 8px 11px;
+  border-radius: 8px;
+  color: #ffffff;
+  background: rgba(4, 15, 28, 0.76);
+  font-weight: 720;
+  backdrop-filter: blur(10px);
+}
+
+.profile-modal-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(1, 8, 18, 0.72);
+  backdrop-filter: blur(10px);
+}
+
+.profile-edit-modal {
+  width: min(480px, 100%);
+  padding: 20px;
+  border: 1px solid rgba(77, 132, 190, 0.34);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 24% 0%, rgba(0, 212, 255, 0.14), transparent 42%),
+    linear-gradient(180deg, rgba(9, 29, 52, 0.98), rgba(4, 17, 32, 0.98));
+  box-shadow: 0 28px 74px rgba(0, 0, 0, 0.42);
+}
+
+.profile-edit-modal header,
+.profile-edit-modal footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.profile-edit-modal h2 {
+  margin: 0;
+  color: #ffffff;
+}
+
+.profile-edit-modal p {
+  margin: 5px 0 0;
+  color: #9eb1ca;
+}
+
+.profile-edit-modal header button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(105, 145, 190, 0.22);
+  border-radius: 9px;
+  color: #dcecff;
+  background: rgba(105, 145, 190, 0.08);
+  cursor: pointer;
+}
+
+.profile-edit-modal label {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  color: #dcecff;
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
+.profile-edit-modal input,
+.profile-edit-modal textarea {
+  width: 100%;
+  border: 1px solid rgba(105, 145, 190, 0.26);
+  border-radius: 9px;
+  color: #f7fbff;
+  background: rgba(4, 17, 32, 0.76);
+  font: inherit;
+  outline: none;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.profile-edit-modal input {
+  height: 42px;
+  padding: 0 12px;
+}
+
+.profile-edit-modal textarea {
+  min-height: 96px;
+  padding: 12px;
+  resize: vertical;
+}
+
+.profile-edit-modal input:focus,
+.profile-edit-modal textarea:focus {
+  border-color: rgba(30, 144, 255, 0.7);
+  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.14);
+}
+
+.profile-edit-modal footer {
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
+.profile-edit-modal footer button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid rgba(105, 145, 190, 0.26);
+  border-radius: 9px;
+  color: #dcecff;
+  background: rgba(105, 145, 190, 0.08);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.profile-edit-modal footer button:last-child {
+  border-color: rgba(30, 144, 255, 0.64);
+  color: #ffffff;
+  background: linear-gradient(180deg, #2488ff, #0c55cc);
+}
+
 .profile-side-card {
   display: grid;
   gap: 16px;

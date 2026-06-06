@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import {
   Award,
   Check,
@@ -9,6 +10,7 @@ import {
   Image,
   MessageCircle,
   MoreHorizontal,
+  Save,
   Quote,
   Share2,
   Star,
@@ -40,6 +42,7 @@ const achievements = [
 
 const posts = [
   {
+    id: "catch-bass",
     text: "Last weekend's catch! Managed to reel in this 6.4 lb Largemouth Bass from Lake Sammamish.",
     time: "5 days ago",
     tags: ["#LargemouthBass", "#WeekendFishing"],
@@ -49,6 +52,7 @@ const posts = [
     comments: 17,
   },
   {
+    id: "lake-washington",
     text: "Beautiful morning at Lake Washington.",
     time: "2 weeks ago",
     tags: [],
@@ -58,7 +62,57 @@ const posts = [
   },
 ];
 
+const tabs = [
+  { id: "posts", label: "Posts", icon: Image },
+  { id: "achievements", label: "Achievements", icon: Star },
+  { id: "photos", label: "Photos", icon: Image },
+  { id: "tips", label: "Pro Tips", icon: CircleHelp },
+] as const;
+
+type ProfileTab = (typeof tabs)[number]["id"];
+
 export default function UserProfileWorkspace() {
+  const [activeTab, setActiveTab] = useState<ProfileTab>("posts");
+  const [isEditing, setIsEditing] = useState(false);
+  const [profile, setProfile] = useState({
+    name: "Alicia Vikander",
+    handle: "@avikander",
+    bio: "Passionate angler from Seattle, WA. Always on the lookout for the next big catch!",
+  });
+  const [draftProfile, setDraftProfile] = useState(profile);
+  const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
+  const [sharedPosts, setSharedPosts] = useState<Record<string, boolean>>({});
+
+  const postStats = useMemo(
+    () =>
+      Object.fromEntries(
+        posts.map((post) => [
+          post.id,
+          {
+            likes: post.likes + (likedPosts[post.id] ? 1 : 0),
+            shared: Boolean(sharedPosts[post.id]),
+          },
+        ])
+      ),
+    [likedPosts, sharedPosts]
+  ) as Record<string, { likes: number; shared: boolean }>;
+
+  const openEditProfile = () => {
+    setDraftProfile(profile);
+    setIsEditing(true);
+  };
+
+  const saveProfile = () => {
+    setProfile({
+      name: draftProfile.name.trim() || profile.name,
+      handle: draftProfile.handle.trim().startsWith("@")
+        ? draftProfile.handle.trim()
+        : `@${draftProfile.handle.trim() || profile.handle.replace("@", "")}`,
+      bio: draftProfile.bio.trim() || profile.bio,
+    });
+    setIsEditing(false);
+  };
+
   return (
     <section className="user-profile-page">
       <div className="user-profile-content">
@@ -67,14 +121,14 @@ export default function UserProfileWorkspace() {
             <div className="profile-cover" />
             <div className="profile-identity">
               <span className="profile-avatar-wrap">
-                <img src={avatar} alt="Alicia Vikander" />
+                <img src={avatar} alt={profile.name} />
                 <i>
                   <Check size={14} />
                 </i>
               </span>
-              <h1>Alicia Vikander</h1>
-              <p>@avikander</p>
-              <span>Passionate angler from Seattle, WA. Always on the lookout for the next big catch!</span>
+              <h1>{profile.name}</h1>
+              <p>{profile.handle}</p>
+              <span>{profile.bio}</span>
             </div>
 
             <div className="profile-stats-row">
@@ -87,74 +141,76 @@ export default function UserProfileWorkspace() {
               <strong>
                 178 <span>Following</span>
               </strong>
-              <button type="button">Edit Profile</button>
+              <button type="button" onClick={openEditProfile}>Edit Profile</button>
             </div>
 
             <nav className="profile-tabs" aria-label="Profile sections">
-              <button className="active" type="button">
-                <Image size={18} />
-                Posts
-              </button>
-              <button type="button">
-                <Star size={18} />
-                Achievements
-              </button>
-              <button type="button">
-                <Image size={18} />
-                Photos
-              </button>
-              <button type="button">
-                <CircleHelp size={18} />
-                Pro Tips
-              </button>
+              {tabs.map(({ id, label, icon: Icon }) => (
+                <button className={activeTab === id ? "active" : ""} type="button" onClick={() => setActiveTab(id)} key={id}>
+                  <Icon size={18} />
+                  {label}
+                </button>
+              ))}
             </nav>
           </section>
 
-          <div className="profile-feed">
-            {posts.map((post) => (
-              <article className="profile-post-card" key={post.text}>
-                <header>
-                  <img src={avatar} alt="Alicia Vikander" />
-                  <div>
-                    <strong>Alicia Vikander</strong>
-                    <span>{post.time}</span>
-                    <small>Public</small>
-                  </div>
-                  <MoreHorizontal size={19} />
-                </header>
+          {activeTab === "posts" ? (
+            <div className="profile-feed">
+              {posts.map((post) => (
+                <article className="profile-post-card" key={post.text}>
+                  <header>
+                    <img src={avatar} alt={profile.name} />
+                    <div>
+                      <strong>{profile.name}</strong>
+                      <span>{post.time}</span>
+                      <small>Public</small>
+                    </div>
+                    <MoreHorizontal size={19} />
+                  </header>
 
-                <p>{post.text}</p>
+                  <p>{post.text}</p>
 
-                {post.tags.length > 0 ? (
-                  <div className="profile-post-tags">
-                    {post.tags.map((tag) => (
-                      <span key={tag}>{tag}</span>
-                    ))}
-                  </div>
-                ) : null}
+                  {post.tags.length > 0 ? (
+                    <div className="profile-post-tags">
+                      {post.tags.map((tag) => (
+                        <span key={tag}>{tag}</span>
+                      ))}
+                    </div>
+                  ) : null}
 
-                <figure className="profile-post-image">
-                  <img src={post.image} alt="" />
-                  {post.weight ? <figcaption>{post.weight}</figcaption> : null}
-                </figure>
+                  <figure className="profile-post-image">
+                    <img src={post.image} alt="" />
+                    {post.weight ? <figcaption>{post.weight}</figcaption> : null}
+                  </figure>
 
-                <footer>
-                  <span>
-                    <Heart size={19} />
-                    {post.likes}
-                  </span>
-                  <span>
-                    <MessageCircle size={19} />
-                    {post.comments}
-                  </span>
-                  <span>
-                    <Share2 size={18} />
-                    Share
-                  </span>
-                </footer>
-              </article>
-            ))}
-          </div>
+                  <footer>
+                    <button
+                      className={likedPosts[post.id] ? "profile-action profile-action--active" : "profile-action"}
+                      type="button"
+                      onClick={() => setLikedPosts((current) => ({ ...current, [post.id]: !current[post.id] }))}
+                    >
+                      <Heart size={19} />
+                      {postStats[post.id].likes}
+                    </button>
+                    <button className="profile-action" type="button">
+                      <MessageCircle size={19} />
+                      {post.comments}
+                    </button>
+                    <button
+                      className={postStats[post.id].shared ? "profile-action profile-action--active" : "profile-action"}
+                      type="button"
+                      onClick={() => setSharedPosts((current) => ({ ...current, [post.id]: !current[post.id] }))}
+                    >
+                      <Share2 size={18} />
+                      {postStats[post.id].shared ? "Shared" : "Share"}
+                    </button>
+                  </footer>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <ProfileTabPanel activeTab={activeTab} />
+          )}
         </main>
 
         <aside className="profile-side-card">
@@ -223,6 +279,90 @@ export default function UserProfileWorkspace() {
           </section>
         </aside>
       </div>
+
+      {isEditing ? (
+        <div className="profile-modal-layer" role="dialog" aria-modal="true" aria-labelledby="profile-edit-title">
+          <div className="profile-edit-modal">
+            <header>
+              <div>
+                <h2 id="profile-edit-title">Edit Profile</h2>
+                <p>Update the visible profile details.</p>
+              </div>
+              <button type="button" onClick={() => setIsEditing(false)} aria-label="Close edit profile">
+                <MoreHorizontal size={20} />
+              </button>
+            </header>
+            <label>
+              Name
+              <input value={draftProfile.name} onChange={(event) => setDraftProfile((current) => ({ ...current, name: event.target.value }))} />
+            </label>
+            <label>
+              Handle
+              <input value={draftProfile.handle} onChange={(event) => setDraftProfile((current) => ({ ...current, handle: event.target.value }))} />
+            </label>
+            <label>
+              Bio
+              <textarea value={draftProfile.bio} onChange={(event) => setDraftProfile((current) => ({ ...current, bio: event.target.value }))} />
+            </label>
+            <footer>
+              <button type="button" onClick={() => setIsEditing(false)}>Cancel</button>
+              <button type="button" onClick={saveProfile}>
+                <Save size={17} />
+                Save Changes
+              </button>
+            </footer>
+          </div>
+        </div>
+      ) : null}
     </section>
+  );
+}
+
+function ProfileTabPanel({ activeTab }: { activeTab: ProfileTab }) {
+  if (activeTab === "achievements") {
+    return (
+      <div className="profile-tab-panel">
+        {achievements.map(({ icon: Icon, title, body }) => (
+          <article key={title}>
+            <span><Icon size={22} /></span>
+            <div>
+              <strong>{title}</strong>
+              <p>{body}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    );
+  }
+
+  if (activeTab === "photos") {
+    return (
+      <div className="profile-tab-panel profile-tab-panel--photos">
+        {posts.map((post) => (
+          <figure key={post.id}>
+            <img src={post.image} alt="" />
+            <figcaption>{post.weight ?? post.time}</figcaption>
+          </figure>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="profile-tab-panel">
+      {[
+        "Keep your rod tip low when landing larger bass near cover.",
+        "Track water temperature changes before choosing bait depth.",
+        "Upload clear side-profile fish images for stronger AI measurements.",
+      ].map((tip, index) => (
+        <article key={tip}>
+          <span>{index + 1}</span>
+          <div>
+            <strong>Pro Tip</strong>
+            <p>{tip}</p>
+          </div>
+        </article>
+      ))}
+    </div>
   );
 }
