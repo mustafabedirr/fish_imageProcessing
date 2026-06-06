@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Map, { Layer, Marker, Source, type MapRef } from "react-map-gl/maplibre";
 import { circle, featureCollection, lineString, point, polygon as turfPolygon } from "@turf/turf";
 import {
@@ -141,6 +141,47 @@ const portMarkers = [
 
 const days = ["12 May", "13 May", "14 May", "15 May", "16 May", "17 May", "18 May"];
 
+const regionTabs = ["Ozet", "Canli Veriler", "Analiz", "Notlar"] as const;
+
+const mapRegions = [
+  {
+    name: "Kuzey Ege Bolgesi",
+    coordinatesText: "39.2326 N, 26.4412 E",
+    center: [26.4412, 39.2326],
+    density: "Yuksek",
+    densityScore: "%78",
+    temperature: "18.6 C",
+    chlorophyll: "Orta",
+    current: "0.8 m/s",
+    wave: "0.3 m",
+    wind: "12 kn",
+  },
+  {
+    name: "Izmir Korfezi",
+    coordinatesText: "38.4237 N, 27.1428 E",
+    center: [27.1428, 38.4237],
+    density: "Orta",
+    densityScore: "%62",
+    temperature: "19.1 C",
+    chlorophyll: "Orta",
+    current: "0.6 m/s",
+    wave: "0.2 m",
+    wind: "9 kn",
+  },
+  {
+    name: "Bodrum Resif Bolgesi",
+    coordinatesText: "37.0344 N, 27.4305 E",
+    center: [27.4305, 37.0344],
+    density: "Yuksek",
+    densityScore: "%74",
+    temperature: "20.2 C",
+    chlorophyll: "Dusuk",
+    current: "0.7 m/s",
+    wave: "0.4 m",
+    wind: "14 kn",
+  },
+] as const;
+
 export default function WorldMapWorkspace() {
   const mapRef = useRef<MapRef | null>(null);
   const [activeLayers, setActiveLayers] = useState<Record<string, boolean>>(
@@ -149,6 +190,34 @@ export default function WorldMapWorkspace() {
   const [selectedDay, setSelectedDay] = useState("16 May");
   const [mapView, setMapView] = useState("Standart");
   const [isLayerPanelOpen, setIsLayerPanelOpen] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [activeRegionIndex, setActiveRegionIndex] = useState(0);
+  const [activeRegionTab, setActiveRegionTab] = useState<(typeof regionTabs)[number]>("Ozet");
+
+  const selectedRegion = mapRegions[activeRegionIndex];
+
+  const activeMapStyle = useMemo(() => {
+    const rasterPaint =
+      mapView === "Uydu"
+        ? { "raster-opacity": 0.98, "raster-saturation": -0.1, "raster-contrast": 0.14, "raster-brightness-min": 0.12, "raster-brightness-max": 1 }
+        : mapView === "Koyu"
+        ? { "raster-opacity": 0.82, "raster-saturation": -0.5, "raster-contrast": 0.16, "raster-brightness-min": 0.02, "raster-brightness-max": 0.72 }
+        : mapStyle.layers[1].paint;
+
+    return {
+      ...mapStyle,
+      layers: [
+        mapStyle.layers[0],
+        {
+          ...mapStyle.layers[1],
+          paint: rasterPaint,
+        },
+      ],
+    };
+  }, [mapView]);
 
   const mapData = useMemo(() => {
     const densityPoints = featureCollection(
@@ -186,8 +255,61 @@ export default function WorldMapWorkspace() {
     setActiveLayers((current) => ({ ...current, [id]: !current[id] }));
   };
 
+  const focusRegion = (index: number) => {
+    const region = mapRegions[index];
+    setActiveRegionIndex(index);
+    mapRef.current?.flyTo({ center: region.center as [number, number], zoom: 7.25, duration: 850 });
+  };
+
+  const runSearch = () => {
+    const query = searchQuery.trim().toLocaleLowerCase("tr-TR");
+    if (!query) return;
+
+    const regionIndex = mapRegions.findIndex((region) => region.name.toLocaleLowerCase("tr-TR").includes(query));
+    if (regionIndex >= 0) {
+      focusRegion(regionIndex);
+      return;
+    }
+
+    if (query.includes("izmir")) focusRegion(1);
+    if (query.includes("bodrum")) focusRegion(2);
+    if (query.includes("ege")) focusRegion(0);
+  };
+
+  const applyFilterPreset = (preset: "density" | "environment" | "navigation") => {
+    setActiveLayers((current) => ({
+      ...current,
+      "fish-density": preset !== "navigation",
+      "water-temperature": preset !== "navigation",
+      chlorophyll: preset === "environment",
+      "current-direction": preset !== "density",
+      "protected-areas": preset !== "density",
+      ports: preset === "navigation",
+      weather: preset === "environment",
+    }));
+    setFiltersOpen(false);
+    setIsLayerPanelOpen(true);
+  };
+
+  const enableAllLayers = () => {
+    setActiveLayers(Object.fromEntries(layerItems.map((layer) => [layer.id, true])));
+  };
+
+  useEffect(() => {
+    if (!isPlaying) return undefined;
+
+    const timer = window.setInterval(() => {
+      setSelectedDay((current) => {
+        const nextIndex = (days.indexOf(current) + 1) % days.length;
+        return days[nextIndex];
+      });
+    }, 900);
+
+    return () => window.clearInterval(timer);
+  }, [isPlaying]);
+
   return (
-    <section className="aqua-map-workspace">
+    <section className={isExpanded ? "aqua-map-workspace is-expanded" : "aqua-map-workspace"}>
       <div className="aqua-map-screen">
         <header className="aqua-map-header">
           <div>
@@ -198,13 +320,28 @@ export default function WorldMapWorkspace() {
           <div className="aqua-map-actions">
             <label className="aqua-map-search">
               <Search size={18} />
-              <input type="search" placeholder="Konum, bolge veya koordinat ara..." />
+              <input
+                type="search"
+                placeholder="Konum, bolge veya koordinat ara..."
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") runSearch();
+                }}
+              />
               <span>Ctrl K</span>
             </label>
-            <button type="button">
+            <button type="button" className={filtersOpen ? "is-selected" : ""} onClick={() => setFiltersOpen((current) => !current)}>
               <Filter size={18} />
               Filtreler
             </button>
+            {filtersOpen ? (
+              <div className="aqua-map-filter-menu">
+                <button type="button" onClick={() => applyFilterPreset("density")}>Yogunluk odagi</button>
+                <button type="button" onClick={() => applyFilterPreset("environment")}>Cevre verileri</button>
+                <button type="button" onClick={() => applyFilterPreset("navigation")}>Navigasyon</button>
+              </div>
+            ) : null}
             <button type="button" className="aqua-map-icon-button" aria-label="Bildirimler">
               <Bell size={18} />
               <b>3</b>
@@ -218,7 +355,7 @@ export default function WorldMapWorkspace() {
               <Layers size={18} />
               Veri Katmanlari
             </button>
-            <button type="button" className="aqua-map-icon-button" aria-label="Tam ekran">
+            <button type="button" className="aqua-map-icon-button" aria-label="Tam ekran" onClick={() => setIsExpanded((current) => !current)}>
               <Expand size={18} />
             </button>
           </div>
@@ -273,13 +410,19 @@ export default function WorldMapWorkspace() {
 
             <label className="aqua-map-date">
               <span>Zaman Araligi</span>
-              <button type="button">
-                12 Mayis - 18 Mayis 2024
+              <button
+                type="button"
+                onClick={() => {
+                  const nextIndex = (days.indexOf(selectedDay) + 1) % days.length;
+                  setSelectedDay(days[nextIndex]);
+                }}
+              >
+                {selectedDay} - 18 Mayis 2024
                 <CalendarDays size={16} />
               </button>
             </label>
 
-            <button type="button" className="aqua-manage-layers">
+            <button type="button" className="aqua-manage-layers" onClick={enableAllLayers}>
               Katmanlari Yonet
             </button>
           </aside>
@@ -310,7 +453,7 @@ export default function WorldMapWorkspace() {
                 <Map
                   ref={mapRef}
                   initialViewState={{ longitude: 26.35, latitude: 38.1, zoom: 6.15, pitch: 12 }}
-                  mapStyle={mapStyle as any}
+                  mapStyle={activeMapStyle as any}
                   attributionControl={false}
                   style={{ width: "100%", height: "100%" }}
                   minZoom={4.4}
@@ -453,7 +596,7 @@ export default function WorldMapWorkspace() {
                 >
                   <MapPin size={18} />
                 </button>
-                <button type="button" aria-label="Katmanlar">
+                <button type="button" aria-label="Katmanlar" onClick={() => setIsLayerPanelOpen((current) => !current)}>
                   <Layers size={18} />
                 </button>
               </div>
@@ -463,7 +606,12 @@ export default function WorldMapWorkspace() {
               </div>
 
               <div className="aqua-map-timeline">
-                <button type="button" aria-label="Zaman cizelgesini oynat" onClick={() => setSelectedDay("18 May")}>
+                <button
+                  type="button"
+                  className={isPlaying ? "is-active" : ""}
+                  aria-label="Zaman cizelgesini oynat"
+                  onClick={() => setIsPlaying((current) => !current)}
+                >
                   <Play size={18} />
                 </button>
                 <div className="aqua-timeline-track">
@@ -483,45 +631,46 @@ export default function WorldMapWorkspace() {
                 <span>Secili Bolge</span>
                 <Star size={18} />
               </div>
-              <h2>Kuzey Ege Bolgesi</h2>
-              <p>39.2326 N, 26.4412 E</p>
+              <h2>{selectedRegion.name}</h2>
+              <p>{selectedRegion.coordinatesText}</p>
               <div className="aqua-region-preview">
                 <span />
               </div>
 
               <nav className="aqua-region-tabs" aria-label="Bolge detay sekmeleri">
-                <button type="button" className="is-active">Ozet</button>
-                <button type="button">Canli Veriler</button>
-                <button type="button">Analiz</button>
-                <button type="button">Notlar</button>
+                {regionTabs.map((tab) => (
+                  <button type="button" className={activeRegionTab === tab ? "is-active" : ""} onClick={() => setActiveRegionTab(tab)} key={tab}>
+                    {tab}
+                  </button>
+                ))}
               </nav>
 
               <div className="aqua-region-metrics">
                 <article>
                   <span>Balik Yogunlugu</span>
-                  <strong>Yuksek</strong>
-                  <small>%78</small>
+                  <strong>{selectedRegion.density}</strong>
+                  <small>{selectedRegion.densityScore}</small>
                 </article>
                 <article>
                   <span>Su Sicakligi</span>
-                  <strong>18.6 C</strong>
+                  <strong>{selectedRegion.temperature}</strong>
                 </article>
                 <article>
                   <span>Klorofil Seviyesi</span>
-                  <strong>Orta</strong>
+                  <strong>{selectedRegion.chlorophyll}</strong>
                   <small>3.2 mg/m3</small>
                 </article>
                 <article>
                   <span>Akinti Hizi</span>
-                  <strong>0.8 m/s</strong>
+                  <strong>{selectedRegion.current}</strong>
                 </article>
                 <article>
                   <span>Dalga Yuksekligi</span>
-                  <strong>0.3 m</strong>
+                  <strong>{selectedRegion.wave}</strong>
                 </article>
                 <article>
                   <span>Ruzgar Hizi</span>
-                  <strong>12 kn</strong>
+                  <strong>{selectedRegion.wind}</strong>
                 </article>
               </div>
             </section>

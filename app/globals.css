@@ -16437,6 +16437,13 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
     linear-gradient(135deg, #04101e 0%, #06162a 48%, #03101c 100%);
 }
 
+.aqua-map-workspace.is-expanded {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: #03101c;
+}
+
 .aqua-map-screen {
   height: 100vh;
   min-height: 720px;
@@ -16469,6 +16476,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 .aqua-map-actions {
+  position: relative;
   display: flex;
   justify-content: flex-end;
   gap: 14px;
@@ -16504,6 +16512,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 .aqua-manage-layers:hover,
 .aqua-map-zoom button:hover,
 .aqua-map-timeline button:hover,
+.aqua-map-timeline button.is-active,
 .aqua-map-analysis-link:hover,
 .aqua-panel-title button:hover {
   transform: translateY(-1px);
@@ -16581,6 +16590,39 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   font-size: 0.72rem;
 }
 
+.aqua-map-filter-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 150px;
+  z-index: 20;
+  display: grid;
+  gap: 7px;
+  width: 190px;
+  padding: 8px;
+  border: 1px solid rgba(77, 132, 190, 0.34);
+  border-radius: 10px;
+  background: rgba(5, 20, 37, 0.96);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(12px);
+}
+
+.aqua-map-filter-menu button {
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  color: #dcecff;
+  background: transparent;
+  text-align: left;
+  padding: 0 10px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.aqua-map-filter-menu button:hover {
+  color: #ffffff;
+  background: rgba(30, 144, 255, 0.16);
+}
+
 .aqua-map-content {
   position: relative;
   display: grid;
@@ -16619,9 +16661,14 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   max-height: calc(100% - 18px);
   min-height: 0;
   padding: 18px;
-  overflow: hidden;
+  overflow: auto;
+  scrollbar-width: none;
   backdrop-filter: blur(18px);
   animation: aquaLayerPanelIn 220ms ease both;
+}
+
+.aqua-layer-panel::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes aquaLayerPanelIn {
@@ -16669,7 +16716,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   min-height: 0;
   margin-top: 18px;
   padding-right: 2px;
-  overflow: auto;
+  overflow: visible;
 }
 
 .aqua-layer-row {
@@ -17516,6 +17563,11 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
     flex-wrap: wrap;
   }
 
+  .aqua-map-filter-menu {
+    left: 0;
+    right: auto;
+  }
+
   .aqua-map-search {
     width: min(100%, 520px);
   }
@@ -17538,6 +17590,11 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   .aqua-map-actions,
   .aqua-map-actions button,
   .aqua-map-search {
+    width: 100%;
+  }
+
+  .aqua-map-filter-menu {
+    position: static;
     width: 100%;
   }
 
