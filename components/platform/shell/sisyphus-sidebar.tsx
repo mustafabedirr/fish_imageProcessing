@@ -2,16 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { ElementType } from "react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   BarChart3,
   Bell,
-  BookOpen,
   ChevronDown,
   ChevronsLeft,
-  Database,
-  FileText,
   Fish,
   LayoutDashboard,
   LogOut,
@@ -22,8 +20,15 @@ import {
   Users,
 } from "lucide-react";
 
-const primaryItems = [
-  { href: "/platform/dashboard", label: "Dashboard", icon: LayoutDashboard, matches: ["/platform", "/platform/dashboard"] },
+type SidebarNavItem = {
+  href: string;
+  label: string;
+  icon: ElementType;
+  rootMatch?: string;
+};
+
+const primaryItems: SidebarNavItem[] = [
+  { href: "/platform/dashboard", label: "Dashboard", icon: LayoutDashboard, rootMatch: "/platform" },
   { href: "/platform/analyze", label: "Analiz", icon: BarChart3 },
   { href: "/platform/map", label: "Harita", icon: MapPin },
   { href: "/platform/library", label: "Tür Kütüphanesi", icon: Fish },
@@ -31,10 +36,7 @@ const primaryItems = [
   { href: "/platform/profile", label: "Profil", icon: User },
 ];
 
-const lowerItems = [
-  { href: "/platform/social", label: "Raporlar", icon: FileText },
-  { href: "/platform/messages", label: "Veri Setleri", icon: Database },
-  { href: "/platform/dashboard", label: "İstatistikler", icon: BookOpen },
+const lowerItems: SidebarNavItem[] = [
   { href: "/platform/settings", label: "Ayarlar", icon: Settings },
 ];
 
@@ -80,7 +82,10 @@ export default function SisyphusSidebar() {
                 <LogoMark />
 
                 <div className="aqua-sidebar__brand-copy">
-                  <h1>AquaScope</h1>
+                  <h1 aria-label="AquaScope">
+                    <span>Aqua</span>
+                    <span className="aqua-sidebar__brand-accent">Scope</span>
+                  </h1>
                 </div>
               </div>
 
@@ -94,9 +99,7 @@ export default function SisyphusSidebar() {
         <nav className="aqua-sidebar__menu aqua-sidebar__menu--top" aria-label="Primary navigation">
           <SectionTitle title="ANA MENÜ" />
           {primaryItems.map((item) => {
-            const active = item.matches
-              ? item.matches.some((match) => pathname === match || pathname.startsWith(`${match}/`))
-              : pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const active = isSidebarItemActive(pathname, item.href, item.rootMatch);
             return <SidebarItem key={item.label} href={item.href} label={item.label} icon={item.icon} active={active} />;
           })}
         </nav>
@@ -106,7 +109,7 @@ export default function SisyphusSidebar() {
 
           <div className="aqua-sidebar__menu aqua-sidebar__menu--org">
             {lowerItems.map((item) => {
-              const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const active = isSidebarItemActive(pathname, item.href);
               return <SidebarItem key={item.label} href={item.href} label={item.label} icon={item.icon} active={active} compact />;
             })}
           </div>
@@ -200,7 +203,7 @@ function LogoMark() {
 type SidebarItemProps = {
   href: string;
   label: string;
-  icon: React.ElementType;
+  icon: ElementType;
   active?: boolean;
   compact?: boolean;
 };
@@ -215,6 +218,11 @@ function SidebarItem({ href, label, icon: Icon, active, compact }: SidebarItemPr
       <span className="aqua-sidebar__item-label">{label}</span>
     </Link>
   );
+}
+
+function isSidebarItemActive(pathname: string, href: string, rootMatch?: string) {
+  if (rootMatch && pathname === rootMatch) return true;
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 function SectionTitle({ title }: { title: string }) {

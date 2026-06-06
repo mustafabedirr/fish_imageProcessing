@@ -12121,11 +12121,29 @@ body:has(.landing-page) {
 }
 
 .aqua-sidebar__brand-copy h1 {
+  display: inline-flex;
   margin: 0;
-  font-size: 20px;
-  font-weight: 760;
-  letter-spacing: -0.02em;
   color: #ffffff;
+  font-family: "Exo 2", Inter, "SF Pro Display", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  text-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.08),
+    0 0 22px rgba(0, 212, 255, 0.22);
+  filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.12));
+}
+
+.aqua-sidebar__brand-copy h1 span:first-child {
+  color: #ffffff;
+}
+
+.aqua-sidebar__brand-accent {
+  background:
+    linear-gradient(180deg, #bff5ff 0%, #62dcff 42%, #35b8ff 72%, #268bff 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
 .aqua-sidebar__brand-copy p {
