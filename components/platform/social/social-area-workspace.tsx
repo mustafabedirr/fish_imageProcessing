@@ -105,6 +105,12 @@ const members = [
 
 const feedTabs = ["For You", "Following", "Popular", "Recent"] as const;
 type FeedTab = (typeof feedTabs)[number];
+const feedTabLabels: Record<FeedTab, string> = {
+  "For You": "Senin icin",
+  Following: "Takip Ettiklerin",
+  Popular: "Populer",
+  Recent: "Yeni Gonderiler",
+};
 type SocialModal = "create" | "media" | "location" | "poll" | "achievement" | "notifications" | "comments" | "share" | "friends" | "topics" | "members" | "events" | null;
 
 const modalCopy: Record<Exclude<SocialModal, null>, { title: string; eyebrow: string; description: string }> = {
@@ -332,12 +338,12 @@ export default function SocialAreaWorkspace() {
           <nav className="social-tabs" aria-label="Social feed tabs">
             {feedTabs.map((tab) => (
               <button type="button" className={activeTab === tab ? "is-active" : ""} onClick={() => setActiveTab(tab)} key={tab}>
-                {tab}
+                {feedTabLabels[tab]}
               </button>
             ))}
             <button type="button" className={filtersOpen ? "social-filter is-open" : "social-filter"} onClick={() => setFiltersOpen((open) => !open)}>
               <SlidersHorizontal size={15} />
-              Filters
+              Filtreler
               <ChevronDown size={15} />
             </button>
             {filtersOpen ? (
@@ -370,9 +376,10 @@ export default function SocialAreaWorkspace() {
                 </div>
 
                 <div className={post.photos.length > 1 ? "social-post-photos social-post-photos--grid" : "social-post-photos"}>
-                  {post.photos.map((photo, index) => (
+                  {post.photos.slice(0, 2).map((photo, index) => (
                     <figure key={photo}>
                       <img src={photo} alt={`${post.author} catch ${index + 1}`} />
+                      {index === 1 && post.photos.length > 2 ? <figcaption>+{post.photos.length - 1}</figcaption> : null}
                     </figure>
                   ))}
                 </div>
@@ -400,7 +407,7 @@ export default function SocialAreaWorkspace() {
                     onClick={() => openModal("share", post.id)}
                   >
                     <Share2 size={18} />
-                    {sharedPosts[post.id] ? "Shared" : "Share"}
+                    {sharedPosts[post.id] ? "Paylasildi" : "Paylas"}
                   </button>
                   <button
                     className={bookmarkedPosts[post.id] ? "social-bookmark is-active" : "social-bookmark"}
