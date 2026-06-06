@@ -127,6 +127,11 @@ export default function SisyphusSidebar() {
           <span>3</span>
         </button>
 
+        <button className="aqua-sidebar__logout" type="button" onClick={() => setShowLogoutModal(true)}>
+          <LogOut className="aqua-sidebar__logout-icon" size={20} />
+          <span>Cikis Yap</span>
+        </button>
+
         <Link href="/platform/profile" className="aqua-sidebar__user">
           <div className="aqua-sidebar__avatar-wrap">
             <img

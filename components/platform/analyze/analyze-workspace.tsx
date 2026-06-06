@@ -7,7 +7,6 @@ import {
   ArrowLeft,
   ArrowRight,
   BarChart3,
-  Bot,
   CalendarDays,
   Camera,
   CheckCircle2,
@@ -15,12 +14,14 @@ import {
   Download,
   Droplets,
   FileText,
+  ImageIcon,
   Loader2,
   MapPin,
   Maximize2,
   MoreVertical,
   Ruler,
   Share2,
+  ShieldCheck,
   Sparkles,
   Target,
   Upload,
@@ -49,6 +50,13 @@ type TopPrediction = {
   display_name?: string;
 };
 
+type PredictionDisplay = {
+  name: string;
+  latin: string;
+  score: string;
+  isPrimary?: boolean;
+};
+
 type SpeciesProfile = {
   commonName: string;
   latin: string;
@@ -72,13 +80,6 @@ const thumbnails = [
   "https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=220&q=80",
   "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=220&q=80",
   "https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=220&q=80",
-];
-
-const reportItems = [
-  "Su sicakligi ideal aralikta.",
-  "Besin kaynaklari yeterli.",
-  "Kirlilik seviyesi dusuk.",
-  "Populasyon durumu stabil.",
 ];
 
 const speciesProfiles: Record<string, SpeciesProfile> = {
@@ -172,11 +173,10 @@ export default function AnalyzeWorkspace() {
   const analysisDate = analysisCompletedAt ? analysisCompletedAt.toLocaleString("tr-TR") : "18 Mayis 2024 - 14:32";
   const speciesProfile = getSpeciesProfile(detectedSpecies);
   const displaySpecies = result ? getDisplaySpecies(result, speciesProfile) : "Levrek";
-  const primarySpeciesLabel = isUncertain ? "Emin değilim" : displaySpecies;
+  const primarySpeciesLabel = isUncertain ? "Emin degilim" : displaySpecies;
   const scoreRows = getScoreRows(confidence, result, speciesProfile);
   const measurements = getMeasurementsFromResult(result);
-  const alternatives = result?.top_predictions.length ? getTopPredictionAlternatives(result) : getAlternatives(detectedSpecies, confidence);
-  const reportNotes = result ? getResultNotes(result, speciesProfile) : reportItems;
+  const topPredictionRows = result?.top_predictions.length ? getTopPredictionRows(result) : getFallbackPredictionRows(detectedSpecies, confidence);
   const analysisId = result && file ? `AAS-${file.name.replace(/\W+/g, "-").slice(0, 18).toUpperCase()}` : "AAS-2024-0518-1247";
   const modelName = result ? "EfficientNet + YOLO Fish_Data" : "AquaScope AI v2.4";
   const imageSet = result ? [previewUrl, ...thumbnails] : thumbnails;
@@ -311,11 +311,57 @@ export default function AnalyzeWorkspace() {
           <div className="fish-hero-card">
             <article className="fish-image-stage">
               <span className="fish-stage-chip">Orijinal</span>
+              <span className="fish-stage-secure">
+                <ShieldCheck size={17} />
+                Yuklemeleriniz guvenli ve gizlidir
+              </span>
               <img src={previewUrl} alt="Analiz edilen balik" />
               {!file ? (
-                <button type="button" className="fish-stage-upload" onClick={() => inputRef.current?.click()}>
-                  <Upload size={17} />
-                  Gorsel Sec
+                <>
+                  <div className="fish-upload-panel">
+                    <span className="fish-upload-panel__icon">
+                      <ImageIcon size={34} />
+                    </span>
+                    <h2>Gorsel Yukle</h2>
+                    <p>Dosyayi surukleyip birakin veya cihazinizdan secin.</p>
+                    <button type="button" onClick={() => inputRef.current?.click()}>
+                      <Upload size={17} />
+                      Gorsel Sec
+                    </button>
+                    <small>JPG, PNG, WEBP - Maks. 20 MB</small>
+                    <div className="fish-upload-panel__divider"><span>veya</span></div>
+                    <button className="fish-upload-panel__camera" type="button">
+                      <Camera size={18} />
+                      Kamera ile cek
+                    </button>
+                  </div>
+                  <div className="fish-stage-guide-frame" aria-hidden="true">
+                    <span className="fish-stage-guide-tip">
+                      <Maximize2 size={18} />
+                      En iyi analiz icin baligi cerceve icine alin
+                    </span>
+                    <i className="fish-guide-plus">+</i>
+                  </div>
+                  <button type="button" className="fish-stage-upload fish-stage-upload--bottom" onClick={() => inputRef.current?.click()}>
+                    <Upload size={17} />
+                    Gorsel Sec
+                  </button>
+                  <div className="fish-stage-quality" aria-hidden="true">
+                    <span className="fish-quality-gauge"><i /></span>
+                    <small>Gorsel Kalitesi</small>
+                    <strong>Iyi</strong>
+                  </div>
+                  <div className="fish-stage-progress-dots" aria-hidden="true">
+                    {Array.from({ length: 11 }).map((_, dotIndex) => (
+                      <span className={dotIndex === 5 ? "fish-dot fish-dot--active" : "fish-dot"} key={dotIndex} />
+                    ))}
+                  </div>
+                </>
+              ) : null}
+              {result ? (
+                <button type="button" className="fish-stage-new-analysis" onClick={() => inputRef.current?.click()}>
+                  <Upload size={16} />
+                  Yeni Analiz
                 </button>
               ) : null}
               <button type="button" className="fish-stage-nav fish-stage-nav--left" aria-label="Onceki">
@@ -458,7 +504,7 @@ export default function AnalyzeWorkspace() {
                 <strong>{loading ? "Model calisiyor" : primarySpeciesLabel}</strong>
                 <small>{speciesProfile.latin}</small>
                 <em className={isUncertain ? "fish-confidence-low" : ""}>
-                  {loading ? "Analiz suruyor" : isUncertain ? `${confidenceText} düşük güven` : `${confidenceText} Guven`}
+                  {loading ? "Analiz suruyor" : isUncertain ? `${confidenceText} dusuk guven` : `${confidenceText} Guven`}
                 </em>
               </div>
             </div>
@@ -471,33 +517,38 @@ export default function AnalyzeWorkspace() {
                   : `${speciesProfile.description} Ideal boy: ${result.ideal_size}. Onerilen yem: ${result.recommended_baits.join(", ")}.`
                 : speciesProfile.description}
             </p>
+            <div className="fish-detection-summary">
+              <span>
+                Birincil tur
+                <strong>{loading ? "Bekleniyor" : displaySpecies}</strong>
+              </span>
+              <span>
+                Guven skoru
+                <strong>{loading ? "-" : confidenceText}</strong>
+              </span>
+            </div>
+            <div className={isUncertain ? "fish-confidence-state fish-confidence-state--low" : "fish-confidence-state"}>
+              <span>Karar durumu</span>
+              <strong>{loading ? "Analiz bekleniyor" : isUncertain ? "Emin degilim" : "Yeterli guven"}</strong>
+              <small>
+                {result
+                  ? `Esik %${confidenceThreshold.toFixed(0)} - birincil skor ${confidenceText}`
+                  : "Sonuc geldiginde model karari burada gorunur."}
+              </small>
+            </div>
             <button type="button">Tur Detayina Git <ChevronRight size={17} /></button>
 
-            <h3>Alternatif Eslesmeler</h3>
+            <h3>Top-5 Tahminler</h3>
             <div className="fish-alt-list">
-              {alternatives.map(({ name, latin, score }, index) => (
-                <div className="fish-alt-row" key={name}>
-                  <img src={thumbnails[index + 1]} alt="" />
+              {topPredictionRows.map(({ name, latin, score, isPrimary }, index) => (
+                <div className={isPrimary ? "fish-alt-row fish-alt-row--primary" : "fish-alt-row"} key={`${name}-${index}`}>
+                  <img src={thumbnails[(index + 1) % thumbnails.length]} alt="" />
                   <span><strong>{name}</strong><small>{latin}</small></span>
                   <b>{score}</b>
                 </div>
               ))}
             </div>
             <button type="button">Tum Turleri Gor <ChevronRight size={17} /></button>
-          </article>
-
-          <article className="fish-panel fish-ai-card">
-            <div className="fish-ai-title">
-              <Bot size={22} />
-              <h2>AI Yorum & Oneriler</h2>
-            </div>
-            <p>Bu balik saglikli gorunuyor ve yasadigi ortam uygun.</p>
-            <ul>
-              {reportNotes.map((item) => (
-                <li key={item}><CheckCircle2 size={16} />{item}</li>
-              ))}
-            </ul>
-            <button type="button">Daha Fazla Oneri Gor <ChevronRight size={17} /></button>
           </article>
         </aside>
       </main>
@@ -722,7 +773,7 @@ function formatCm(value: number) {
   return `${value.toFixed(1)} cm`;
 }
 
-function getAlternatives(species: string, confidence: number) {
+function getAlternatives(species: string, confidence: number): PredictionDisplay[] {
   const options = [
     { name: "Levrek", latin: "Dicentrarchus labrax" },
     { name: "Cupra", latin: "Sparus aurata" },
@@ -737,13 +788,22 @@ function getAlternatives(species: string, confidence: number) {
   }));
 }
 
-function getTopPredictionAlternatives(result: AnalyzeResponse) {
-  const primaryKey = normalizeSpeciesKey(result.species);
-  const predictions = result.top_predictions.filter((item) => normalizeSpeciesKey(item.species) !== primaryKey);
-  const source = predictions.length ? predictions : result.top_predictions.slice(1);
-  if (!source.length) return getAlternatives(result.species, normalizeConfidence(result.confidence));
+function getFallbackPredictionRows(species: string, confidence: number): PredictionDisplay[] {
+  const profile = getSpeciesProfile(species);
+  return [
+    {
+      name: profile.commonName || prettifySpeciesName(species),
+      latin: profile.latin,
+      score: `%${normalizeConfidence(confidence).toFixed(1)}`,
+      isPrimary: true,
+    },
+    ...getAlternatives(species, confidence),
+  ].slice(0, 5);
+}
 
-  return source.slice(0, 3).map((prediction) => {
+function getTopPredictionRows(result: AnalyzeResponse): PredictionDisplay[] {
+  const primaryKey = normalizeSpeciesKey(result.species);
+  const rows = result.top_predictions.slice(0, 5).map((prediction) => {
     const profile = getSpeciesProfile(prediction.species);
     const name = prediction.name_tr || prediction.display_name || profile.commonName || prettifySpeciesName(prediction.species);
 
@@ -751,18 +811,11 @@ function getTopPredictionAlternatives(result: AnalyzeResponse) {
       name,
       latin: profile.latin,
       score: `%${normalizeConfidence(prediction.confidence).toFixed(1)}`,
+      isPrimary: normalizeSpeciesKey(prediction.species) === primaryKey,
     };
   });
-}
 
-function getResultNotes(result: AnalyzeResponse, profile: SpeciesProfile) {
-  return [
-    ...result.region_notes,
-    ...(result.is_uncertain ? [`Model guveni %${normalizeConfidence(result.confidence_threshold).toFixed(0)} esiginin altinda; sonuc dogrulanmali.`] : []),
-    `Tespit edilen tur: ${result.species} (${(normalizeConfidence(result.confidence)).toFixed(1)} guven).`,
-    `Habitat degeri: ${profile.environment.habitat} (${profile.environment.habitatScore}/100).`,
-    `Onerilen ekipman: ${result.recommended_gear.join(", ")}.`,
-  ];
+  return rows.length ? rows : getFallbackPredictionRows(result.species, normalizeConfidence(result.confidence));
 }
 
 function Metric({ icon: Icon, label, value }: { icon: ElementType; label: string; value: string }) {
