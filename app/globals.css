@@ -16184,6 +16184,14 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   grid-template-columns: 30px minmax(0, 1fr) 22px;
   align-items: center;
   gap: 10px;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
 }
 
 .aqua-layer-row-head strong {
@@ -16191,6 +16199,10 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   color: #ecf6ff;
   font-size: 0.93rem;
   font-weight: 600;
+}
+
+.aqua-layer-row.is-enabled .aqua-layer-row-head strong {
+  color: #ffffff;
 }
 
 .aqua-layer-icon,
@@ -16331,30 +16343,57 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
     linear-gradient(145deg, #061524 0%, #08223a 40%, #04111d 100%);
 }
 
+.aqua-map-canvas-v2 .maplibregl-map {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  background: #061426;
+}
+
+.aqua-map-canvas-v2 .maplibregl-canvas {
+  filter: saturate(1.08) contrast(1.08);
+}
+
+.aqua-map-canvas-v2 .maplibregl-control-container {
+  display: none;
+}
+
 .aqua-map-canvas-v2::before {
   content: "";
   position: absolute;
   inset: -10%;
+  z-index: 2;
+  pointer-events: none;
   background:
-    radial-gradient(ellipse at 68% 23%, rgba(135, 164, 177, 0.34) 0 6%, transparent 6.5%),
-    radial-gradient(ellipse at 70% 30%, rgba(123, 148, 162, 0.28) 0 14%, transparent 14.5%),
-    radial-gradient(ellipse at 74% 48%, rgba(129, 151, 164, 0.2) 0 8%, transparent 8.5%),
-    radial-gradient(ellipse at 28% 27%, rgba(120, 148, 167, 0.2) 0 12%, transparent 12.4%),
-    radial-gradient(ellipse at 33% 70%, rgba(101, 132, 151, 0.17) 0 10%, transparent 10.6%),
-    linear-gradient(120deg, transparent 0 34%, rgba(98, 122, 140, 0.13) 34% 45%, transparent 45% 100%);
-  filter: contrast(1.15) saturate(0.9);
-  opacity: 0.72;
+    radial-gradient(circle at 42% 38%, rgba(0, 119, 255, 0.18), transparent 28%),
+    radial-gradient(circle at 58% 48%, rgba(0, 212, 255, 0.14), transparent 34%),
+    linear-gradient(90deg, rgba(2, 8, 18, 0.32), transparent 28%, rgba(2, 8, 18, 0.28));
+  opacity: 0.66;
 }
 
 .aqua-map-canvas-v2::after {
   content: "";
   position: absolute;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(74, 130, 174, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(74, 130, 174, 0.08) 1px, transparent 1px);
-  background-size: 60px 60px;
-  mask-image: radial-gradient(circle at 50% 45%, black, transparent 78%);
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 54%, rgba(1, 8, 18, 0.36) 100%),
+    linear-gradient(rgba(74, 130, 174, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74, 130, 174, 0.06) 1px, transparent 1px);
+  background-size: auto, 60px 60px, 60px 60px;
+}
+
+.aqua-map-data-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(2, 8, 18, 0.04), rgba(2, 8, 18, 0.16)),
+    radial-gradient(circle at 50% 34%, transparent 0 40%, rgba(2, 8, 18, 0.14) 78%);
 }
 
 .aqua-map-metric-strip {
@@ -16582,6 +16621,19 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   gap: 8px;
 }
 
+.aqua-map-port-marker {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(115, 215, 255, 0.56);
+  border-radius: 999px;
+  color: #ffffff;
+  background: rgba(21, 121, 217, 0.9);
+  box-shadow: 0 0 0 6px rgba(21, 121, 217, 0.16), 0 10px 22px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(8px);
+}
+
 .aqua-map-zoom button {
   display: grid;
   place-items: center;
@@ -16656,14 +16708,20 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   background: linear-gradient(90deg, rgba(37, 145, 255, 0.2), #1e90ff 60%, rgba(98, 126, 154, 0.28));
 }
 
-.aqua-timeline-track span {
+.aqua-timeline-track button {
   position: relative;
+  height: auto;
+  min-width: 0;
+  border: 0;
+  padding: 0;
   color: #9db2c9;
+  background: transparent;
   font-size: 0.75rem;
   text-align: center;
+  cursor: pointer;
 }
 
-.aqua-timeline-track span::before {
+.aqua-timeline-track button::before {
   content: "";
   position: absolute;
   top: -13px;
@@ -16675,12 +16733,12 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   transform: translateX(-50%);
 }
 
-.aqua-timeline-track span.is-active {
+.aqua-timeline-track button.is-active {
   color: #ffffff;
   font-weight: 700;
 }
 
-.aqua-timeline-track span.is-active::before {
+.aqua-timeline-track button.is-active::before {
   width: 10px;
   height: 10px;
   top: -16px;
