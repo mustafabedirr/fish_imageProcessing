@@ -1,5 +1,6 @@
 "use client";
 
+import type { UIEvent } from "react";
 import { useMemo, useRef, useState } from "react";
 import { useInView } from "framer-motion";
 import {
@@ -138,6 +139,7 @@ type ProfileTab = (typeof tabs)[number]["id"];
 
 export default function UserProfileWorkspace() {
   const [activeTab, setActiveTab] = useState<ProfileTab>("posts");
+  const [isProfileCollapsed, setIsProfileCollapsed] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
     name: "Alicia Vikander",
@@ -178,11 +180,29 @@ export default function UserProfileWorkspace() {
     setIsEditing(false);
   };
 
+  const handleProfileScroll = (event: UIEvent<HTMLDivElement>) => {
+    const scrollTop = event.currentTarget.scrollTop;
+
+    if (scrollTop > 24 && !isProfileCollapsed) {
+      setIsProfileCollapsed(true);
+      return;
+    }
+
+    if (scrollTop <= 4 && isProfileCollapsed) {
+      setIsProfileCollapsed(false);
+    }
+  };
+
+  const selectTab = (tab: ProfileTab) => {
+    setActiveTab(tab);
+    setIsProfileCollapsed(false);
+  };
+
   return (
     <section className="user-profile-page">
       <div className="user-profile-content">
         <main className="user-profile-main">
-          <section className="profile-hero">
+          <section className={cn("profile-hero", isProfileCollapsed && "profile-hero--collapsed")}>
             <div className="profile-cover" />
             <div className="profile-identity">
               <span className="profile-avatar-wrap">
@@ -211,7 +231,7 @@ export default function UserProfileWorkspace() {
 
             <nav className="profile-tabs" aria-label="Profile sections">
               {tabs.map(({ id, label, icon: Icon }) => (
-                <button className={activeTab === id ? "active" : ""} type="button" onClick={() => setActiveTab(id)} key={id}>
+                <button className={activeTab === id ? "active" : ""} type="button" onClick={() => selectTab(id)} key={id}>
                   <Icon size={18} />
                   {label}
                 </button>
@@ -220,7 +240,7 @@ export default function UserProfileWorkspace() {
           </section>
 
           {activeTab === "posts" ? (
-            <div className="profile-feed">
+            <div className="profile-feed" onScroll={handleProfileScroll}>
               {posts.map((post) => (
                 <article className="profile-post-card" key={post.text}>
                   <header>
@@ -274,7 +294,7 @@ export default function UserProfileWorkspace() {
               ))}
             </div>
           ) : (
-            <ProfileTabPanel activeTab={activeTab} />
+            <ProfileTabPanel activeTab={activeTab} onScroll={handleProfileScroll} />
           )}
         </main>
 
@@ -383,10 +403,10 @@ export default function UserProfileWorkspace() {
   );
 }
 
-function ProfileTabPanel({ activeTab }: { activeTab: ProfileTab }) {
+function ProfileTabPanel({ activeTab, onScroll }: { activeTab: ProfileTab; onScroll: (event: UIEvent<HTMLDivElement>) => void }) {
   if (activeTab === "achievements") {
     return (
-      <div className="profile-tab-panel">
+      <div className="profile-tab-panel" onScroll={onScroll}>
         {achievements.map(({ icon: Icon, title, body }) => (
           <article key={title}>
             <span><Icon size={22} /></span>
@@ -401,11 +421,11 @@ function ProfileTabPanel({ activeTab }: { activeTab: ProfileTab }) {
   }
 
   if (activeTab === "photos") {
-    return <ProfileImageGallery />;
+    return <ProfileImageGallery onScroll={onScroll} />;
   }
 
   return (
-    <div className="profile-tab-panel">
+    <div className="profile-tab-panel" onScroll={onScroll}>
       {[
         "Keep your rod tip low when landing larger bass near cover.",
         "Track water temperature changes before choosing bait depth.",
@@ -423,9 +443,9 @@ function ProfileTabPanel({ activeTab }: { activeTab: ProfileTab }) {
   );
 }
 
-function ProfileImageGallery() {
+function ProfileImageGallery({ onScroll }: { onScroll: (event: UIEvent<HTMLDivElement>) => void }) {
   return (
-    <div className="profile-gallery-shell">
+    <div className="profile-gallery-shell" onScroll={onScroll}>
       <div className="profile-gallery-head">
         <div>
           <strong>Catch Gallery</strong>
