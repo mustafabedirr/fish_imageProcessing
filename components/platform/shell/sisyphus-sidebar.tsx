@@ -159,8 +159,19 @@ export default function SisyphusSidebar() {
                 <span className="logout-modal-icon" aria-hidden>
                   <LogOut size={22} />
                 </span>
+                <span className="logout-modal-kicker">Oturum Onayi</span>
                 <h2 id="logout-modal-title">Cikis yapmak istediginize emin misiniz?</h2>
                 <p>Oturumunuz kapatilacak ve giris ekranina yonlendirileceksiniz.</p>
+                <div className="logout-modal-summary" aria-label="Cikis ozeti">
+                  <span>
+                    <strong>Hesap</strong>
+                    Derya Yilmaz
+                  </span>
+                  <span>
+                    <strong>Durum</strong>
+                    Aktif oturum sonlandirilacak
+                  </span>
+                </div>
                 <div className="logout-modal-actions">
                   <button className="logout-stay-button" type="button" onClick={() => setShowLogoutModal(false)}>
                     Sayfada Kal
