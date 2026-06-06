@@ -3,8 +3,10 @@
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import {
+  Award,
   Bell,
   Bookmark,
+  CalendarDays,
   ChevronDown,
   Heart,
   Image as ImageIcon,
@@ -63,6 +65,18 @@ const feedPosts = [
     comments: 8,
     photos: ["https://images.unsplash.com/photo-1560275619-4662e36fa65c?auto=format&fit=crop&w=1200&q=85"],
   },
+  {
+    id: "sophia-morning-catch",
+    author: "Sophia Martinez",
+    handle: "@sophiacatches",
+    time: "6 hours ago",
+    avatar: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80",
+    text: "Early morning session paid off. Clear water, calm wind and a healthy catch before sunrise.",
+    tags: ["#MorningCatch", "#LakeLife"],
+    likes: 42,
+    comments: 10,
+    photos: ["https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=85"],
+  },
 ];
 
 const suggestedFriends = [
@@ -90,6 +104,70 @@ const members = [
 
 const feedTabs = ["For You", "Following", "Popular", "Recent"] as const;
 type FeedTab = (typeof feedTabs)[number];
+type SocialModal = "create" | "media" | "location" | "poll" | "achievement" | "notifications" | "comments" | "share" | "friends" | "topics" | "members" | "events" | null;
+
+const modalCopy: Record<Exclude<SocialModal, null>, { title: string; eyebrow: string; description: string }> = {
+  create: {
+    eyebrow: "Yeni Paylasim",
+    title: "Toplulukla yeni bir av deneyimi paylas",
+    description: "Metin, gorsel, konum ve hedef kitle bilgilerini tek akista duzenleyebilirsiniz.",
+  },
+  media: {
+    eyebrow: "Medya Akisi",
+    title: "Fotograf veya video ekle",
+    description: "Av gorsellerinizi yukleyin, kapak gorselini secin ve paylasima hazir hale getirin.",
+  },
+  location: {
+    eyebrow: "Konum",
+    title: "Av bolgesini paylasima ekle",
+    description: "Gonderiye bolge etiketi ekleyerek diger kullanicilarin gozlem alanini takip etmesini saglayin.",
+  },
+  poll: {
+    eyebrow: "Anket",
+    title: "Topluluga hizli bir soru sor",
+    description: "Secenekler ekleyerek ekipman, tur veya bolge hakkinda geri bildirim toplayin.",
+  },
+  achievement: {
+    eyebrow: "Basari",
+    title: "Yakalama basarisini one cikar",
+    description: "Skor, agirlik veya tur rozeti ekleyerek paylasiminizi daha belirgin hale getirin.",
+  },
+  notifications: {
+    eyebrow: "Bildirimler",
+    title: "Son topluluk hareketleri",
+    description: "Yeni yorumlar, arkadas istekleri ve etkinlik hatirlatmalari burada listelenir.",
+  },
+  comments: {
+    eyebrow: "Yorumlar",
+    title: "Gonderi yorumlarini yonet",
+    description: "Kisa bir yorum ekleyin veya mevcut yorum akisindaki geri bildirimleri inceleyin.",
+  },
+  share: {
+    eyebrow: "Paylas",
+    title: "Gonderiyi paylasim kanalina gonder",
+    description: "AquaScope icinde, profilinizde veya harici baglanti olarak paylasabilirsiniz.",
+  },
+  friends: {
+    eyebrow: "Arkadaslar",
+    title: "Onerilen kullanicilari incele",
+    description: "Ortak ilgi alanlarina gore onerilen balikcilari takip listenize ekleyin.",
+  },
+  topics: {
+    eyebrow: "Trendler",
+    title: "Populer konu etiketleri",
+    description: "Sik kullanilan etiketleri inceleyin ve akis filtrelerinize uygulayin.",
+  },
+  members: {
+    eyebrow: "Liderlik",
+    title: "Topluluk siralamasini gor",
+    description: "Bu haftanin en aktif uyelerini ve puan durumlarini takip edin.",
+  },
+  events: {
+    eyebrow: "Etkinlikler",
+    title: "Yaklasan etkinlik akisina katil",
+    description: "Planlanan saha etkinliklerini goruntuleyin ve katilim durumunuzu yonetin.",
+  },
+};
 
 export default function SocialAreaWorkspace() {
   const [posts, setPosts] = useState(feedPosts);
@@ -106,6 +184,8 @@ export default function SocialAreaWorkspace() {
   const [hiddenFriends, setHiddenFriends] = useState<Record<string, boolean>>({});
   const [joinedEvent, setJoinedEvent] = useState(false);
   const [notice, setNotice] = useState("Topluluk akisiniz hazir.");
+  const [activeModal, setActiveModal] = useState<SocialModal>(null);
+  const [activeFlowPostId, setActiveFlowPostId] = useState<string | null>(null);
 
   const visiblePosts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -157,6 +237,16 @@ export default function SocialAreaWorkspace() {
     setAudience((current) => (current === "Everyone" ? "Followers" : "Everyone"));
   };
 
+  const openModal = (modal: Exclude<SocialModal, null>, postId?: string) => {
+    setActiveFlowPostId(postId ?? null);
+    setActiveModal(modal);
+  };
+
+  const closeModal = () => {
+    setActiveModal(null);
+    setActiveFlowPostId(null);
+  };
+
   return (
     <section className="social-area-page">
       <div className="social-area-content social-area-content--mockup">
@@ -178,11 +268,11 @@ export default function SocialAreaWorkspace() {
                 />
                 <span>Ctrl K</span>
               </label>
-              <button type="button" className="social-bell" aria-label="Notifications" onClick={() => setNotice("Yeni bildiriminiz yok.")}>
+              <button type="button" className="social-bell" aria-label="Notifications" onClick={() => openModal("notifications")}>
                 <Bell size={18} />
                 <b>3</b>
               </button>
-              <button type="button" className="social-create" onClick={createPost}>
+              <button type="button" className="social-create" onClick={() => openModal("create")}>
                 <Plus size={18} />
                 Create Post
                 <ChevronDown size={16} />
@@ -204,19 +294,19 @@ export default function SocialAreaWorkspace() {
               />
             </div>
             <div className="social-composer-tools">
-              <button type="button" onClick={() => setNotice("Fotograf yukleme akisi hazirlandi.")}>
+              <button type="button" onClick={() => openModal("media")}>
                 <ImageIcon size={16} />
                 Photo / Video
               </button>
-              <button type="button" onClick={() => setComposerText((current) => `${current}${current ? " " : ""}Lake Washington`)}>
+              <button type="button" onClick={() => openModal("location")}>
                 <MapPin size={16} />
                 Location
               </button>
-              <button type="button" onClick={() => setNotice("Anket taslagi olusturuldu.")}>
+              <button type="button" onClick={() => openModal("poll")}>
                 <SlidersHorizontal size={16} />
                 Poll
               </button>
-              <button type="button" onClick={() => setComposerText((current) => `${current}${current ? " " : ""}#Achievement`)}>
+              <button type="button" onClick={() => openModal("achievement")}>
                 <Trophy size={16} />
                 Achievement
               </button>
@@ -293,7 +383,7 @@ export default function SocialAreaWorkspace() {
                   <button
                     className="social-post-action"
                     type="button"
-                    onClick={() => setCommentCounts((current) => ({ ...current, [post.id]: (current[post.id] ?? post.comments) + 1 }))}
+                    onClick={() => openModal("comments", post.id)}
                   >
                     <MessageCircle size={18} />
                     {commentCounts[post.id] ?? post.comments}
@@ -301,7 +391,7 @@ export default function SocialAreaWorkspace() {
                   <button
                     className={sharedPosts[post.id] ? "social-post-action is-active" : "social-post-action"}
                     type="button"
-                    onClick={() => setSharedPosts((current) => ({ ...current, [post.id]: !current[post.id] }))}
+                    onClick={() => openModal("share", post.id)}
                   >
                     <Share2 size={18} />
                     {sharedPosts[post.id] ? "Shared" : "Share"}
@@ -321,7 +411,7 @@ export default function SocialAreaWorkspace() {
         </main>
 
         <aside className="social-interactions-panel">
-          <SocialPanel title="Suggested Friends" action="View All" onAction={() => setNotice("Tum onerilen arkadaslar goruntuleniyor.")}>
+          <SocialPanel title="Suggested Friends" action="View All" onAction={() => openModal("friends")}>
             <div className="social-friend-list">
               {suggestedFriends.filter(([name]) => !hiddenFriends[name]).map(([name, detail, image]) => (
                 <article key={name}>
@@ -341,7 +431,7 @@ export default function SocialAreaWorkspace() {
             </div>
           </SocialPanel>
 
-          <SocialPanel title="Trending Topics" action="View All" onAction={() => setSearchQuery("#")}>
+          <SocialPanel title="Trending Topics" action="View All" onAction={() => openModal("topics")}>
             <div className="topic-list">
               {topics.map(([topic, count]) => (
                 <article key={topic} onClick={() => setSearchQuery(topic.replace(" ", ""))}>
@@ -352,7 +442,7 @@ export default function SocialAreaWorkspace() {
             </div>
           </SocialPanel>
 
-          <SocialPanel title="Top Members" action="This Week" onAction={() => setNotice("Haftalik liderlik siralamasi acildi.")}>
+          <SocialPanel title="Top Members" action="This Week" onAction={() => openModal("members")}>
             <div className="social-member-list">
               {members.map(([name, points, image], index) => (
                 <article key={name}>
@@ -365,7 +455,7 @@ export default function SocialAreaWorkspace() {
             </div>
           </SocialPanel>
 
-          <SocialPanel title="Upcoming Events" action="View All" onAction={() => setNotice("Tum etkinlikler listeleniyor.")}>
+          <SocialPanel title="Upcoming Events" action="View All" onAction={() => openModal("events")}>
             <div className="social-event-card">
               <time>
                 <span>MAY</span>
@@ -383,6 +473,36 @@ export default function SocialAreaWorkspace() {
           </SocialPanel>
         </aside>
       </div>
+
+      {activeModal ? (
+        <SocialFlowModal
+          modal={activeModal}
+          audience={audience}
+          composerText={composerText}
+          onClose={closeModal}
+          onCreate={() => {
+            if (!composerText.trim()) {
+              createPost();
+              return;
+            }
+            createPost();
+            closeModal();
+          }}
+          onApply={(modal) => {
+            const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? "local";
+            if (modal === "location") setComposerText((current) => `${current}${current ? " " : ""}Lake Washington`);
+            if (modal === "achievement") setComposerText((current) => `${current}${current ? " " : ""}#Achievement`);
+            if (modal === "poll") setComposerText((current) => `${current}${current ? " " : ""}#CommunityPoll`);
+            if (modal === "comments") {
+              const targetPost = visiblePosts.find((post) => post.id === targetPostId);
+              setCommentCounts((current) => ({ ...current, [targetPostId]: (current[targetPostId] ?? targetPost?.comments ?? 0) + 1 }));
+            }
+            if (modal === "share") setSharedPosts((current) => ({ ...current, [targetPostId]: true }));
+            setNotice(`${modalCopy[modal].eyebrow} akisi uygulandi.`);
+            closeModal();
+          }}
+        />
+      ) : null}
     </section>
   );
 }
@@ -396,5 +516,78 @@ function SocialPanel({ title, action, children, onAction }: { title: string; act
       </header>
       {children}
     </section>
+  );
+}
+
+function SocialFlowModal({
+  modal,
+  audience,
+  composerText,
+  onClose,
+  onCreate,
+  onApply,
+}: {
+  modal: Exclude<SocialModal, null>;
+  audience: string;
+  composerText: string;
+  onClose: () => void;
+  onCreate: () => void;
+  onApply: (modal: Exclude<SocialModal, null>) => void;
+}) {
+  const copy = modalCopy[modal];
+  const isCreate = modal === "create";
+
+  return (
+    <div className="social-flow-backdrop" role="dialog" aria-modal="true" aria-labelledby="social-flow-title">
+      <section className="social-flow-modal">
+        <header>
+          <div>
+            <span>{copy.eyebrow}</span>
+            <h2 id="social-flow-title">{copy.title}</h2>
+            <p>{copy.description}</p>
+          </div>
+          <button type="button" aria-label="Close modal" onClick={onClose}>
+            <X size={18} />
+          </button>
+        </header>
+
+        <div className="social-flow-preview">
+          <div className="social-flow-icon">
+            {modal === "media" ? <ImageIcon size={28} /> : null}
+            {modal === "location" ? <MapPin size={28} /> : null}
+            {modal === "poll" ? <SlidersHorizontal size={28} /> : null}
+            {modal === "achievement" ? <Award size={28} /> : null}
+            {modal === "notifications" ? <Bell size={28} /> : null}
+            {modal === "comments" ? <MessageCircle size={28} /> : null}
+            {modal === "share" ? <Share2 size={28} /> : null}
+            {modal === "friends" ? <Users size={28} /> : null}
+            {modal === "topics" ? <Search size={28} /> : null}
+            {modal === "members" ? <Trophy size={28} /> : null}
+            {modal === "events" ? <CalendarDays size={28} /> : null}
+            {modal === "create" ? <Plus size={28} /> : null}
+          </div>
+          <div>
+            <strong>{isCreate ? "Paylasim taslagi" : "Akis durumu"}</strong>
+            <span>{isCreate ? composerText || "Henuz metin girilmedi." : "Hazir, onay verdiginizde akisa uygulanacak."}</span>
+          </div>
+        </div>
+
+        <div className="social-flow-grid">
+          <article>
+            <span>Hedef Kitle</span>
+            <strong>{audience}</strong>
+          </article>
+          <article>
+            <span>Durum</span>
+            <strong>{isCreate ? "Yayinlanabilir" : "Hazir"}</strong>
+          </article>
+        </div>
+
+        <footer>
+          <button type="button" onClick={onClose}>Vazgec</button>
+          <button type="button" onClick={isCreate ? onCreate : () => onApply(modal)}>{isCreate ? "Paylas" : "Akisi Uygula"}</button>
+        </footer>
+      </section>
+    </div>
   );
 }
