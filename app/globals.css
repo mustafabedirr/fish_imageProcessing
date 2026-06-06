@@ -16110,13 +16110,14 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 .aqua-map-content {
+  position: relative;
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr) 350px;
+  grid-template-columns: minmax(0, 1fr) 350px;
   gap: 18px;
   height: calc(100% - 78px);
   min-height: 0;
   padding-top: 18px;
-  transition: grid-template-columns 260ms ease, gap 260ms ease;
+  transition: gap 260ms ease;
 }
 
 .aqua-map-content.is-layer-panel-closed {
@@ -16136,11 +16137,30 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 .aqua-layer-panel {
+  position: absolute;
+  top: 18px;
+  left: 0;
+  z-index: 7;
   display: flex;
   flex-direction: column;
+  width: 300px;
+  max-height: calc(100% - 18px);
   min-height: 0;
   padding: 18px;
   overflow: hidden;
+  backdrop-filter: blur(18px);
+  animation: aquaLayerPanelIn 220ms ease both;
+}
+
+@keyframes aquaLayerPanelIn {
+  from {
+    opacity: 0;
+    transform: translateX(-12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
 }
 
 .aqua-panel-title,
@@ -16994,7 +17014,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   }
 
   .aqua-map-content {
-    grid-template-columns: 290px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     height: auto;
   }
 
@@ -17029,6 +17049,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   }
 
   .aqua-layer-panel {
+    width: 290px;
     max-height: none;
   }
 }
@@ -17051,6 +17072,13 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   .aqua-map-content {
     gap: 14px;
     padding-top: 14px;
+  }
+
+  .aqua-layer-panel {
+    top: 14px;
+    left: 0;
+    width: min(320px, calc(100% - 28px));
+    max-height: 590px;
   }
 
   .aqua-map-viewport {
