@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { useInView } from "framer-motion";
 import {
   Award,
   Check,
@@ -16,6 +17,7 @@ import {
   Star,
   Trophy,
 } from "lucide-react";
+import { cn } from "../../../lib/utils";
 
 const avatar = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=180&q=80";
 
@@ -60,6 +62,69 @@ const posts = [
     likes: 48,
     comments: 12,
   },
+];
+
+const galleryColumns = [
+  [
+    {
+      src: "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=900&q=86",
+      alt: "Largemouth bass on measuring board",
+      ratio: 4 / 5,
+      label: "Bass Catch",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1000&q=86",
+      alt: "Underwater reef and fish",
+      ratio: 16 / 10,
+      label: "Reef Dive",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=86",
+      alt: "Lake sunset from fishing boat",
+      ratio: 3 / 4,
+      label: "Lake Morning",
+    },
+  ],
+  [
+    {
+      src: "https://images.unsplash.com/photo-1559825481-12a05cc00344?auto=format&fit=crop&w=1000&q=86",
+      alt: "Clear blue water surface",
+      ratio: 16 / 9,
+      label: "Blue Current",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?auto=format&fit=crop&w=900&q=86",
+      alt: "Fresh caught tuna",
+      ratio: 4 / 5,
+      label: "Deep Sea",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=900&q=86",
+      alt: "Colorful aquarium fish",
+      ratio: 1,
+      label: "Species Study",
+    },
+  ],
+  [
+    {
+      src: "https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=900&q=86",
+      alt: "Angler holding catch near shore",
+      ratio: 3 / 4,
+      label: "Shore Catch",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1544943910-4c1dc44aab44?auto=format&fit=crop&w=1000&q=86",
+      alt: "Fresh fish on ice",
+      ratio: 16 / 10,
+      label: "Fresh Record",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1524704796725-9fc3044a58b2?auto=format&fit=crop&w=900&q=86",
+      alt: "Underwater fish school",
+      ratio: 4 / 5,
+      label: "Fish School",
+    },
+  ],
 ];
 
 const tabs = [
@@ -336,16 +401,7 @@ function ProfileTabPanel({ activeTab }: { activeTab: ProfileTab }) {
   }
 
   if (activeTab === "photos") {
-    return (
-      <div className="profile-tab-panel profile-tab-panel--photos">
-        {posts.map((post) => (
-          <figure key={post.id}>
-            <img src={post.image} alt="" />
-            <figcaption>{post.weight ?? post.time}</figcaption>
-          </figure>
-        ))}
-      </div>
-    );
+    return <ProfileImageGallery />;
   }
 
   return (
@@ -364,5 +420,74 @@ function ProfileTabPanel({ activeTab }: { activeTab: ProfileTab }) {
         </article>
       ))}
     </div>
+  );
+}
+
+function ProfileImageGallery() {
+  return (
+    <div className="profile-gallery-shell">
+      <div className="profile-gallery-head">
+        <div>
+          <strong>Catch Gallery</strong>
+          <p>Recent catches, field notes and underwater observations.</p>
+        </div>
+        <span>{galleryColumns.flat().length} photos</span>
+      </div>
+
+      <div className="profile-gallery-grid">
+        {galleryColumns.map((column, columnIndex) => (
+          <div className="profile-gallery-column" key={`gallery-column-${columnIndex}`}>
+            {column.map((image, index) => (
+              <AnimatedGalleryImage
+                alt={image.alt}
+                key={image.src}
+                label={image.label}
+                ratio={image.ratio}
+                src={image.src}
+                staggerIndex={columnIndex * 3 + index}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AnimatedGalleryImage({
+  alt,
+  label,
+  ratio,
+  src,
+  staggerIndex,
+}: {
+  alt: string;
+  label: string;
+  ratio: number;
+  src: string;
+  staggerIndex: number;
+}) {
+  const ref = useRef<HTMLFigureElement | null>(null);
+  const isInView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
+  const [isLoading, setIsLoading] = useState(true);
+  const [imgSrc, setImgSrc] = useState(src);
+
+  return (
+    <figure
+      className={cn("profile-gallery-item", isInView && !isLoading && "profile-gallery-item--visible")}
+      ref={ref}
+      style={{ aspectRatio: `${ratio}` }}
+    >
+      <img
+        alt={alt}
+        loading="lazy"
+        onError={() => setImgSrc("https://placehold.co/900x1200/06182c/5bd6ff?text=AquaScope")}
+        onLoad={() => setTimeout(() => setIsLoading(false), 90 + staggerIndex * 35)}
+        src={imgSrc}
+      />
+      <figcaption>
+        <span>{label}</span>
+      </figcaption>
+    </figure>
   );
 }
