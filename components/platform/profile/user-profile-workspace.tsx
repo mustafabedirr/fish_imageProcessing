@@ -5,6 +5,7 @@ import { useMemo, useRef, useState } from "react";
 import { useInView } from "framer-motion";
 import {
   Award,
+  Camera,
   Check,
   CircleHelp,
   Fish,
@@ -203,14 +204,23 @@ export default function UserProfileWorkspace() {
       <div className="user-profile-content">
         <main className="user-profile-main">
           <section className={cn("profile-hero", isProfileCollapsed && "profile-hero--collapsed")}>
-            <div className="profile-cover" />
+            <button type="button" className="profile-cover" aria-label="Kapak gorselini degistir" onClick={openEditProfile}>
+              <span>
+                <Camera size={16} />
+                Kapak gorselini degistir
+              </span>
+            </button>
             <div className="profile-identity">
-              <span className="profile-avatar-wrap">
+              <button type="button" className="profile-avatar-wrap" aria-label="Profil fotografini degistir" onClick={openEditProfile}>
                 <img src={avatar} alt={profile.name} />
+                <span className="profile-avatar-edit">
+                  <Camera size={15} />
+                  Degistir
+                </span>
                 <i>
                   <Check size={14} />
                 </i>
-              </span>
+              </button>
               <h1>{profile.name}</h1>
               <p>{profile.handle}</p>
               <span>{profile.bio}</span>

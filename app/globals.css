@@ -6260,6 +6260,8 @@ body.profile-dark-theme .profile-following img {
   position: absolute;
   inset: 0;
   height: auto;
+  width: 100%;
+  border: 0;
   background:
     linear-gradient(180deg, rgba(5, 21, 38, 0.06), rgba(5, 21, 38, 0.9)),
     radial-gradient(circle at 50% -10%, rgba(103, 218, 255, 0.54), transparent 28%),
@@ -6268,7 +6270,31 @@ body.profile-dark-theme .profile-following img {
   background-position: center 38%;
   filter: saturate(1.05) brightness(0.74);
   opacity: 1;
+  cursor: pointer;
   transition: opacity 260ms ease, filter 260ms ease, transform 260ms ease;
+}
+
+.profile-cover span {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(112, 193, 255, 0.3);
+  border-radius: 999px;
+  color: #dff5ff;
+  background: rgba(4, 18, 34, 0.64);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+  font-size: 0.78rem;
+  font-weight: 720;
+  opacity: 0;
+  transform: translateY(-6px);
+  backdrop-filter: blur(12px);
+  transition: opacity 180ms ease, transform 180ms ease, border-color 180ms ease;
 }
 
 .profile-cover::after {
@@ -6280,13 +6306,25 @@ body.profile-dark-theme .profile-following img {
     linear-gradient(90deg, rgba(3, 13, 26, 0.64), transparent 34%, rgba(3, 13, 26, 0.56));
 }
 
+.profile-cover:hover,
+.profile-cover:focus-visible {
+  filter: saturate(1.12) brightness(0.86);
+}
+
+.profile-cover:hover span,
+.profile-cover:focus-visible span {
+  opacity: 1;
+  transform: translateY(0);
+  border-color: rgba(112, 215, 255, 0.58);
+}
+
 .profile-identity {
   position: relative;
   z-index: 1;
   display: grid;
   justify-items: center;
   margin: 0;
-  padding: 62px 34px 0;
+  padding: 42px 34px 0;
   text-align: center;
   transition: padding 240ms ease, text-align 240ms ease;
 }
@@ -6294,23 +6332,63 @@ body.profile-dark-theme .profile-following img {
 .profile-avatar-wrap {
   position: relative;
   display: inline-grid;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
   transition: transform 240ms ease;
 }
 
 .profile-avatar-wrap img {
-  width: 112px;
-  height: 112px;
+  width: 90px;
+  height: 90px;
   border: 3px solid rgba(30, 144, 255, 0.92);
   border-radius: 999px;
   object-fit: cover;
   box-shadow: 0 0 0 5px rgba(0, 212, 255, 0.08), 0 20px 42px rgba(0, 0, 0, 0.32);
-  transition: width 240ms ease, height 240ms ease, border-width 240ms ease, box-shadow 240ms ease;
+  transition: width 240ms ease, height 240ms ease, border-width 240ms ease, box-shadow 240ms ease, filter 180ms ease;
+}
+
+.profile-avatar-edit {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: rgba(2, 12, 24, 0.58);
+  font-size: 0.72rem;
+  font-weight: 760;
+  opacity: 0;
+  transform: scale(0.94);
+  backdrop-filter: blur(5px);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.profile-avatar-wrap:hover,
+.profile-avatar-wrap:focus-visible {
+  transform: translateY(-2px);
+}
+
+.profile-avatar-wrap:hover img,
+.profile-avatar-wrap:focus-visible img {
+  filter: brightness(0.78);
+  box-shadow: 0 0 0 6px rgba(0, 212, 255, 0.14), 0 22px 46px rgba(0, 0, 0, 0.34);
+}
+
+.profile-avatar-wrap:hover .profile-avatar-edit,
+.profile-avatar-wrap:focus-visible .profile-avatar-edit {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .profile-avatar-wrap i {
   position: absolute;
   right: 1px;
-  bottom: 14px;
+  bottom: 7px;
   display: grid;
   place-items: center;
   width: 28px;
@@ -6323,9 +6401,9 @@ body.profile-dark-theme .profile-following img {
 }
 
 .profile-identity h1 {
-  margin: 14px 0 0;
+  margin: 10px 0 0;
   color: #ffffff;
-  font-size: clamp(1.45rem, 2vw, 1.8rem);
+  font-size: clamp(1.32rem, 1.7vw, 1.62rem);
   font-weight: 760;
   letter-spacing: 0;
   transition: margin 240ms ease, font-size 240ms ease;
@@ -6352,7 +6430,7 @@ body.profile-dark-theme .profile-following img {
   justify-content: center;
   align-items: center;
   gap: 0;
-  margin: 24px 0 0;
+  margin: 16px 0 0;
   color: #ffffff;
   max-height: 74px;
   overflow: hidden;
@@ -6404,7 +6482,7 @@ body.profile-dark-theme .profile-following img {
   z-index: 1;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-top: 22px;
+  margin-top: 16px;
   border-top: 1px solid rgba(92, 137, 184, 0.18);
   transition: margin 240ms ease;
 }
