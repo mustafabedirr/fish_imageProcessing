@@ -6,11 +6,15 @@ import {
   Award,
   Bell,
   Bookmark,
+  CalendarClock,
   CalendarDays,
   ChevronDown,
+  CircleSlash,
+  Flag,
   Globe2,
   Heart,
   Image as ImageIcon,
+  List,
   MapPin,
   MessageCircle,
   MoreHorizontal,
@@ -18,6 +22,7 @@ import {
   Search,
   Share2,
   SlidersHorizontal,
+  Smile,
   Trophy,
   Users,
   X,
@@ -289,48 +294,6 @@ export default function SocialAreaWorkspace() {
             </div>
           </header>
 
-          <section className="social-composer">
-            <div className="social-composer-row">
-              <img src={avatar} alt="Derya Yilmaz" />
-              <textarea
-                placeholder="Bugun nasil bir av deneyimi yasadin?"
-                aria-label="Share a post"
-                value={composerText}
-                onChange={(event) => setComposerText(event.target.value)}
-                onKeyDown={(event) => {
-                  if ((event.ctrlKey || event.metaKey) && event.key === "Enter") createPost();
-                }}
-                rows={2}
-              />
-            </div>
-            <div className="social-composer-tools">
-              <div className="social-composer-actions" aria-label="Paylasim ekleri">
-                <button type="button" aria-label="Fotograf veya video ekle" title="Fotograf / Video" onClick={() => openModal("media")}>
-                  <ImageIcon size={20} />
-                </button>
-                <button type="button" aria-label="Konum ekle" title="Konum" onClick={() => openModal("location")}>
-                  <MapPin size={20} />
-                </button>
-                <button type="button" aria-label="Anket ekle" title="Anket" onClick={() => openModal("poll")}>
-                  <SlidersHorizontal size={20} />
-                </button>
-                <button type="button" aria-label="Basarim ekle" title="Basarim" onClick={() => openModal("achievement")}>
-                  <Trophy size={20} />
-                </button>
-              </div>
-              <div className="social-composer-submit">
-                <button type="button" className="social-audience" aria-label={`Gorunurluk: ${audienceLabel}`} title={audienceLabel} onClick={toggleAudience}>
-                  <Globe2 size={18} />
-                  <ChevronDown size={15} />
-                </button>
-                <button type="button" className="social-post-button" onClick={createPost}>
-                  Paylas
-                </button>
-              </div>
-            </div>
-            <p className="social-status-line">{notice}</p>
-          </section>
-
           <nav className="social-tabs" aria-label="Social feed tabs">
             {feedTabs.map((tab) => (
               <button type="button" className={activeTab === tab ? "is-active" : ""} onClick={() => setActiveTab(tab)} key={tab}>
@@ -350,6 +313,86 @@ export default function SocialAreaWorkspace() {
               </div>
             ) : null}
           </nav>
+
+          <section className="social-composer" style={{ padding: "16px", display: "flex", flexDirection: "column" }}>
+            <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
+              <img src={avatar} alt="Derya Yilmaz" style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover" }} />
+              <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                <textarea
+                  placeholder="What's happening?"
+                  aria-label="Share a post"
+                  value={composerText}
+                  onChange={(event) => setComposerText(event.target.value)}
+                  onKeyDown={(event) => {
+                    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") createPost();
+                  }}
+                  rows={2}
+                  style={{ 
+                    width: "100%", 
+                    background: "transparent", 
+                    border: "none", 
+                    outline: "none", 
+                    color: "#e2e8f0", 
+                    resize: "none", 
+                    fontSize: "17px",
+                    paddingTop: "8px",
+                    fontFamily: "inherit"
+                  }}
+                />
+                
+                <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.08)", marginTop: "12px", paddingTop: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ display: "flex", gap: "16px", alignItems: "center", color: "#8d98a8" }}>
+                    <button type="button" aria-label="Fotograf veya video ekle" title="Fotograf / Video" onClick={() => openModal("media")} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", display: "flex" }}>
+                      <ImageIcon size={20} />
+                    </button>
+                    <button type="button" aria-label="GIF ekle" title="GIF" style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", display: "flex" }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: "bold", border: "1.5px solid currentColor", borderRadius: "4px", width: "20px", height: "20px" }}>
+                        GIF
+                      </div>
+                    </button>
+                    <button type="button" aria-label="Circle Slash" title="Slash" style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", display: "flex" }}>
+                      <CircleSlash size={20} />
+                    </button>
+                    <button type="button" aria-label="Anket ekle" title="Anket" onClick={() => openModal("poll")} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", display: "flex" }}>
+                      <List size={20} />
+                    </button>
+                    <button type="button" aria-label="Emoji ekle" title="Emoji" style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", display: "flex" }}>
+                      <Smile size={20} />
+                    </button>
+                    <button type="button" aria-label="Zamanla" title="Zamanla" style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", display: "flex" }}>
+                      <CalendarClock size={20} />
+                    </button>
+                    <button type="button" aria-label="Konum ekle" title="Konum" onClick={() => openModal("location")} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", display: "flex" }}>
+                      <MapPin size={20} />
+                    </button>
+                    <button type="button" aria-label="Bayrak" title="Bayrak" style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", display: "flex" }}>
+                      <Flag size={20} />
+                    </button>
+                  </div>
+                  
+                  <div>
+                    <button 
+                      type="button" 
+                      style={{
+                        backgroundColor: composerText.trim() ? "#dcecff" : "#444b56",
+                        color: composerText.trim() ? "#0c233e" : "#8d98a8",
+                        border: "none",
+                        borderRadius: "999px",
+                        padding: "8px 18px",
+                        fontWeight: "600",
+                        fontSize: "14px",
+                        cursor: composerText.trim() ? "pointer" : "default",
+                        transition: "all 0.2s"
+                      }}
+                      onClick={() => composerText.trim() && createPost()}
+                    >
+                      Post
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
 
           <div className="social-post-stack">
             {visiblePosts.length ? visiblePosts.map((post) => (

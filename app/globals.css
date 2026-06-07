@@ -7436,7 +7436,6 @@ body.profile-dark-theme .profile-following img {
 .social-search,
 .social-bell,
 .social-create,
-.social-composer,
 .social-post-card,
 .social-interactions-panel section {
   border: 1px solid rgba(77, 132, 190, 0.26);
@@ -7544,11 +7543,12 @@ body.profile-dark-theme .profile-following img {
   display: grid;
   gap: 10px;
   height: auto;
-  padding: 18px 18px 14px;
-  border-radius: 12px;
-  background:
-    radial-gradient(circle at 16% 0%, rgba(0, 212, 255, 0.07), transparent 32%),
-    linear-gradient(180deg, rgba(5, 20, 38, 0.94), rgba(3, 13, 26, 0.96));
+  padding: 18px 4px 16px;
+  border: none;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(77, 132, 190, 0.2);
+  background: transparent;
+  box-shadow: none;
 }
 
 .social-composer-row {
@@ -13415,7 +13415,6 @@ body:has(.landing-page) {
 .analyze-dashboard-filter,
 .platform-utility-search,
 .home-search,
-.social-composer,
 .landing-newsletter,
 .auth-input-wrap {
   transition:
@@ -13432,7 +13431,6 @@ body:has(.landing-page) {
 .analyze-dashboard-filter:hover,
 .platform-utility-search:hover,
 .home-search:hover,
-.social-composer:hover,
 .landing-newsletter:hover {
   transform: translateY(-1px);
   border-color: rgba(34, 211, 238, 0.36);
@@ -13445,7 +13443,6 @@ body:has(.landing-page) {
 .analyze-dashboard-filter:focus-within,
 .platform-utility-search:focus-within,
 .home-search:focus-within,
-.social-composer:focus-within,
 .landing-newsletter:focus-within {
   transform: translateY(-1px);
   border-color: rgba(34, 211, 238, 0.52);
