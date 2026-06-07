@@ -3,26 +3,57 @@
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Apple, AppWindow, ArrowRight, Chrome, Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Apple, AppWindow, ArrowRight, Chrome, Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { demoCredentials } from "../../lib/auth";
 
-export default function LoginCard() {
+type AuthMode = "login" | "register";
+
+type LoginCardProps = {
+  mode?: AuthMode;
+  onModeChange?: (mode: AuthMode) => void;
+};
+
+export default function LoginCard({ mode = "login", onModeChange }: LoginCardProps) {
   const router = useRouter();
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState(demoCredentials.email);
   const [password, setPassword] = useState(demoCredentials.password);
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showLaunchOverlay, setShowLaunchOverlay] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const isRegister = mode === "register";
 
   useEffect(() => {
     setPortalReady(true);
   }, []);
 
+  function switchMode(nextMode: AuthMode) {
+    setError(null);
+    setShowPassword(false);
+    setShowConfirmPassword(false);
+    onModeChange?.(nextMode);
+  }
+
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+
+    if (isRegister) {
+      if (!fullName.trim()) {
+        setError("Ad soyad alanını doldurun.");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        setError("Şifreler eşleşmiyor.");
+        return;
+      }
+    }
 
     try {
       setLoading(true);
@@ -34,7 +65,7 @@ export default function LoginCard() {
 
       const data = await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error(String(data?.error ?? "Giriş başarısız oldu."));
+        throw new Error(String(data?.error ?? (isRegister ? "Kayıt işlemi başarısız oldu." : "Giriş başarısız oldu.")));
       }
 
       setShowLaunchOverlay(true);
@@ -51,6 +82,25 @@ export default function LoginCard() {
     <>
       <form className="auth-form" onSubmit={onSubmit}>
         <div className="auth-fields">
+          {isRegister ? (
+            <label className="auth-field">
+              <span className="auth-label">
+                Ad Soyad
+              </span>
+              <span className="auth-input-wrap">
+                <User size={16} />
+                <input
+                  className="auth-input"
+                  placeholder="Deniz Arslan"
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  autoComplete="name"
+                />
+              </span>
+            </label>
+          ) : null}
+
           <label className="auth-field">
             <span className="auth-label">
               E-posta
@@ -92,22 +142,51 @@ export default function LoginCard() {
               </button>
             </span>
           </label>
+
+          {isRegister ? (
+            <label className="auth-field">
+              <span className="auth-label">
+                Şifre Tekrar
+              </span>
+              <span className="auth-input-wrap">
+                <Lock size={16} />
+                <input
+                  className="auth-input"
+                  placeholder="••••••••"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  autoComplete="new-password"
+                />
+                <button
+                  aria-label={showConfirmPassword ? "Şifreyi gizle" : "Şifreyi göster"}
+                  className="auth-password-toggle"
+                  type="button"
+                  onClick={() => setShowConfirmPassword((current) => !current)}
+                >
+                  {showConfirmPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              </span>
+            </label>
+          ) : null}
         </div>
 
-        <a className="forgot-link" href="/platform">
-          Şifremi Unuttum?
-        </a>
+        {!isRegister ? (
+          <a className="forgot-link" href="/platform">
+            Şifremi Unuttum?
+          </a>
+        ) : null}
 
         {error ? <div className="auth-error">{error}</div> : null}
 
         <button className="auth-submit" type="submit" disabled={loading || showLaunchOverlay}>
-          <span>{loading || showLaunchOverlay ? "Açılıyor..." : "Giriş Yap"}</span>
+          <span>{loading || showLaunchOverlay ? "Açılıyor..." : isRegister ? "Kayıt Ol" : "Giriş Yap"}</span>
           <ArrowRight size={20} />
         </button>
 
         <div className="social-divider">
           <span />
-          <p>veya şununla devam et</p>
+          <p>{isRegister ? "veya şununla kayıt ol" : "veya şununla devam et"}</p>
           <span />
         </div>
 
@@ -124,7 +203,16 @@ export default function LoginCard() {
         </div>
 
         <p className="signup-copy">
-          Hesabınız yok mu? <a href="/platform">Kayıt Ol</a>
+          {isRegister ? "Zaten hesabınız var mı?" : "Hesabınız yok mu?"}{" "}
+          <a
+            href="#"
+            onClick={(event) => {
+              event.preventDefault();
+              switchMode(isRegister ? "login" : "register");
+            }}
+          >
+            {isRegister ? "Giriş Yap" : "Kayıt Ol"}
+          </a>
         </p>
       </form>
 

@@ -29,6 +29,8 @@ const localeOptions = ["Türkçe", "English", "Deutsch"];
 export default function LoginPage() {
   const [selectedLocale, setSelectedLocale] = useState(localeOptions[0]);
   const [localeOpen, setLocaleOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "register">("login");
+  const isRegister = authMode === "register";
 
   return (
     <main className="auth-stage">
@@ -46,107 +48,111 @@ export default function LoginPage() {
         }}
       >
         <section className="login-frame-inner">
-        <div className="login-left-panel">
-          <div className="login-left-surface">
-            <Link href="/" className="login-brandmark">
-              <span className="login-brandmark-icon" aria-hidden>
-                <img src="/aquascope-logo.svg" alt="" />
-              </span>
-              <span className="login-brandmark-word" aria-label="AquaScope">
-                <span>Aqua</span>
-                <span className="login-brandmark-word-accent">Scope</span>
-              </span>
-            </Link>
+          <div className="login-left-panel">
+            <div className="login-left-surface">
+              <Link href="/" className="login-brandmark">
+                <span className="login-brandmark-icon" aria-hidden>
+                  <img src="/aquascope-logo.svg" alt="" />
+                </span>
+                <span className="login-brandmark-word" aria-label="AquaScope">
+                  <span>Aqua</span>
+                  <span className="login-brandmark-word-accent">Scope</span>
+                </span>
+              </Link>
 
-            <div className="login-left-copy">
-              <span>HOŞ GELDİNİZ</span>
-              <h1>
-                Okyanusu Keşfet,
-                <br />
-                Bilgiyle <em>Derinleş.</em>
-              </h1>
+              <div className="login-left-copy">
+                <span>HOŞ GELDİNİZ</span>
+                <h1>
+                  Okyanusu Keşfet,
+                  <br />
+                  Bilgiyle <em>Derinleş.</em>
+                </h1>
+                <p>
+                  AquaScope ile balık türlerini keşfedin, analiz edin ve su altı dünyasının
+                  sırlarını birlikte çözün.
+                </p>
+              </div>
+
+              <img className="login-left-fish" src="/login-fish-cutout.png" alt="Fish" />
+
+              <div className="login-left-features">
+                {featureList.map((feature) => {
+                  const Icon = feature.icon;
+                  return (
+                    <article key={feature.title} className="login-left-feature">
+                      <span className="login-left-feature-icon">
+                        <Icon size={24} strokeWidth={1.8} />
+                      </span>
+                      <div>
+                        <strong>{feature.title}</strong>
+                        <p>{feature.body}</p>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+
+              <div className="login-left-social-proof">
+                <div className="login-left-avatars">
+                  <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80" alt="User 1" />
+                  <img src="https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=96&q=80" alt="User 2" />
+                  <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=96&q=80" alt="User 3" />
+                  <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80" alt="User 4" />
+                </div>
+                <p>
+                  <strong>+500 kullanıcı</strong>
+                  AquaScope&apos;u keşfediyor
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="login-right-panel">
+            <div className="login-locale-menu">
+              <button
+                aria-expanded={localeOpen}
+                aria-haspopup="listbox"
+                className="login-locale-pill"
+                type="button"
+                onClick={() => setLocaleOpen((current) => !current)}
+              >
+                <Globe2 size={16} />
+                <span>{selectedLocale}</span>
+                <ChevronDown size={16} className={localeOpen ? "login-locale-chevron login-locale-chevron-open" : "login-locale-chevron"} />
+              </button>
+
+              {localeOpen ? (
+                <div className="login-locale-dropdown" role="listbox">
+                  {localeOptions.map((locale) => (
+                    <button
+                      aria-selected={selectedLocale === locale}
+                      key={locale}
+                      role="option"
+                      type="button"
+                      onClick={() => {
+                        setSelectedLocale(locale);
+                        setLocaleOpen(false);
+                      }}
+                    >
+                      <span>{locale}</span>
+                      {selectedLocale === locale ? <Check size={14} /> : null}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+
+            <div className="login-right-copy">
+              <h2>{isRegister ? "Hesap Oluşturun" : "Giriş Yapın"}</h2>
               <p>
-                AquaScope ile balık türlerini keşfedin, analiz edin ve su altı dünyasının
-                sırlarını birlikte çözün.
+                {isRegister
+                  ? "AquaScope hesabınızı oluşturun ve analizlerinizi kaydetmeye başlayın."
+                  : "Hesabınıza giriş yaparak keşfetmeye devam edin."}
               </p>
             </div>
 
-            <img className="login-left-fish" src="/login-fish-cutout.png" alt="Fish" />
-
-            <div className="login-left-features">
-              {featureList.map((feature) => {
-                const Icon = feature.icon;
-                return (
-                  <article key={feature.title} className="login-left-feature">
-                    <span className="login-left-feature-icon">
-                      <Icon size={24} strokeWidth={1.8} />
-                    </span>
-                    <div>
-                      <strong>{feature.title}</strong>
-                      <p>{feature.body}</p>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-
-            <div className="login-left-social-proof">
-              <div className="login-left-avatars">
-                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80" alt="User 1" />
-                <img src="https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=96&q=80" alt="User 2" />
-                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=96&q=80" alt="User 3" />
-                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80" alt="User 4" />
-              </div>
-              <p>
-                <strong>+500 kullanıcı</strong>
-                AquaScope&apos;u keşfediyor
-              </p>
-            </div>
+            <LoginCard mode={authMode} onModeChange={setAuthMode} />
           </div>
-        </div>
-
-        <div className="login-right-panel">
-          <div className="login-locale-menu">
-            <button
-              aria-expanded={localeOpen}
-              aria-haspopup="listbox"
-              className="login-locale-pill"
-              type="button"
-              onClick={() => setLocaleOpen((current) => !current)}
-            >
-              <Globe2 size={16} />
-              <span>{selectedLocale}</span>
-              <ChevronDown size={16} className={localeOpen ? "login-locale-chevron login-locale-chevron-open" : "login-locale-chevron"} />
-            </button>
-
-            {localeOpen ? (
-              <div className="login-locale-dropdown" role="listbox">
-                {localeOptions.map((locale) => (
-                  <button
-                    aria-selected={selectedLocale === locale}
-                    key={locale}
-                    role="option"
-                    type="button"
-                    onClick={() => {
-                      setSelectedLocale(locale);
-                      setLocaleOpen(false);
-                    }}
-                  >
-                    <span>{locale}</span>
-                    {selectedLocale === locale ? <Check size={14} /> : null}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-          </div>
-
-          <div className="login-right-copy">
-            <h2>Giriş Yapın</h2>
-            <p>Hesabınıza giriş yaparak keşfetmeye devam edin.</p>
-          </div>
-
-          <LoginCard />
-        </div>
         </section>
       </ShiningBorder>
 
