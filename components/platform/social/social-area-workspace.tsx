@@ -305,27 +305,22 @@ export default function SocialAreaWorkspace() {
             </div>
             <div className="social-composer-tools">
               <div className="social-composer-actions" aria-label="Paylasim ekleri">
-                <button type="button" onClick={() => openModal("media")}>
-                  <ImageIcon size={16} />
-                  Fotograf / Video
+                <button type="button" aria-label="Fotograf veya video ekle" title="Fotograf / Video" onClick={() => openModal("media")}>
+                  <ImageIcon size={20} />
                 </button>
-                <button type="button" onClick={() => openModal("location")}>
-                  <MapPin size={16} />
-                  Konum
+                <button type="button" aria-label="Konum ekle" title="Konum" onClick={() => openModal("location")}>
+                  <MapPin size={20} />
                 </button>
-                <button type="button" onClick={() => openModal("poll")}>
-                  <SlidersHorizontal size={16} />
-                  Anket
+                <button type="button" aria-label="Anket ekle" title="Anket" onClick={() => openModal("poll")}>
+                  <SlidersHorizontal size={20} />
                 </button>
-                <button type="button" onClick={() => openModal("achievement")}>
-                  <Trophy size={16} />
-                  Basarim
+                <button type="button" aria-label="Basarim ekle" title="Basarim" onClick={() => openModal("achievement")}>
+                  <Trophy size={20} />
                 </button>
               </div>
               <div className="social-composer-submit">
-                <button type="button" className="social-audience" onClick={toggleAudience}>
-                  <Globe2 size={16} />
-                  {audienceLabel}
+                <button type="button" className="social-audience" aria-label={`Gorunurluk: ${audienceLabel}`} title={audienceLabel} onClick={toggleAudience}>
+                  <Globe2 size={18} />
                   <ChevronDown size={15} />
                 </button>
                 <button type="button" className="social-post-button" onClick={createPost}>
