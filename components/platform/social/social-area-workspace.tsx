@@ -292,14 +292,15 @@ export default function SocialAreaWorkspace() {
           <section className="social-composer">
             <div className="social-composer-row">
               <img src={avatar} alt="Derya Yilmaz" />
-              <input
+              <textarea
                 placeholder="Bugun nasil bir av deneyimi yasadin?"
                 aria-label="Share a post"
                 value={composerText}
                 onChange={(event) => setComposerText(event.target.value)}
                 onKeyDown={(event) => {
-                  if (event.key === "Enter") createPost();
+                  if ((event.ctrlKey || event.metaKey) && event.key === "Enter") createPost();
                 }}
+                rows={2}
               />
             </div>
             <div className="social-composer-tools">
@@ -388,6 +389,7 @@ export default function SocialAreaWorkspace() {
                   <button
                     className={likedPosts[post.id] ? "social-post-action is-active" : "social-post-action"}
                     type="button"
+                    aria-pressed={Boolean(likedPosts[post.id])}
                     onClick={() => setLikedPosts((current) => ({ ...current, [post.id]: !current[post.id] }))}
                   >
                     <Heart size={18} />
