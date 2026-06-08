@@ -2192,6 +2192,7 @@ body:has(.auth-stage) {
 
 .login-right-copy {
   margin-top: 38px;
+  min-height: 82px;
 }
 
 .login-right-copy h2 {
@@ -2213,6 +2214,15 @@ body:has(.auth-stage) {
 .auth-fields {
   display: grid;
   gap: 14px;
+}
+
+.login-right-panel .auth-form {
+  min-height: 382px;
+  align-content: start;
+}
+
+.auth-form--register .auth-submit {
+  margin-top: 22px;
 }
 
 .auth-field {

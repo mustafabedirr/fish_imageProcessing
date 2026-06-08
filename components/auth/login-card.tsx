@@ -80,7 +80,7 @@ export default function LoginCard({ mode = "login", onModeChange }: LoginCardPro
 
   return (
     <>
-      <form className="auth-form" onSubmit={onSubmit}>
+      <form className={isRegister ? "auth-form auth-form--register" : "auth-form"} onSubmit={onSubmit}>
         <div className="auth-fields">
           {isRegister ? (
             <label className="auth-field">
@@ -184,23 +184,27 @@ export default function LoginCard({ mode = "login", onModeChange }: LoginCardPro
           <ArrowRight size={20} />
         </button>
 
-        <div className="social-divider">
-          <span />
-          <p>{isRegister ? "veya şununla kayıt ol" : "veya şununla devam et"}</p>
-          <span />
-        </div>
+        {!isRegister ? (
+          <>
+            <div className="social-divider">
+              <span />
+              <p>veya şununla devam et</p>
+              <span />
+            </div>
 
-        <div className="social-login-row">
-          <button type="button" aria-label="Google">
-            <Chrome size={20} />
-          </button>
-          <button type="button" aria-label="Apple">
-            <Apple size={22} />
-          </button>
-          <button type="button" aria-label="Microsoft">
-            <AppWindow size={20} />
-          </button>
-        </div>
+            <div className="social-login-row">
+              <button type="button" aria-label="Google">
+                <Chrome size={20} />
+              </button>
+              <button type="button" aria-label="Apple">
+                <Apple size={22} />
+              </button>
+              <button type="button" aria-label="Microsoft">
+                <AppWindow size={20} />
+              </button>
+            </div>
+          </>
+        ) : null}
 
         <p className="signup-copy">
           {isRegister ? "Zaten hesabınız var mı?" : "Hesabınız yok mu?"}{" "}
