@@ -17255,7 +17255,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 .aqua-map-canvas-v2 .maplibregl-canvas {
-  filter: saturate(1.18) contrast(1.03) brightness(1.18);
+  filter: brightness(0.65) contrast(1.25) saturate(0.75);
 }
 
 .aqua-map-canvas-v2 .maplibregl-control-container {
@@ -17269,10 +17269,11 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   z-index: 2;
   pointer-events: none;
   background:
-    radial-gradient(circle at 42% 38%, rgba(0, 119, 255, 0.13), transparent 30%),
-    radial-gradient(circle at 58% 48%, rgba(0, 212, 255, 0.1), transparent 36%),
-    linear-gradient(90deg, rgba(2, 8, 18, 0.18), transparent 32%, rgba(2, 8, 18, 0.16));
-  opacity: 0.44;
+    radial-gradient(circle at 42% 38%, rgba(0, 119, 255, 0.1), transparent 30%),
+    radial-gradient(circle at 58% 48%, rgba(0, 212, 255, 0.08), transparent 36%),
+    linear-gradient(180deg, rgba(5, 14, 28, 0.15), rgba(5, 14, 28, 0.45)),
+    linear-gradient(90deg, rgba(2, 8, 18, 0.22), transparent 32%, rgba(2, 8, 18, 0.2));
+  opacity: 0.82;
 }
 
 .aqua-map-canvas-v2::after {
@@ -17294,8 +17295,8 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   z-index: 3;
   pointer-events: none;
   background:
-    linear-gradient(180deg, rgba(2, 8, 18, 0.02), rgba(2, 8, 18, 0.08)),
-    radial-gradient(circle at 50% 34%, transparent 0 42%, rgba(2, 8, 18, 0.08) 80%);
+    linear-gradient(180deg, rgba(2, 8, 18, 0.02), rgba(2, 8, 18, 0.16)),
+    radial-gradient(circle at 50% 34%, transparent 0 38%, rgba(2, 8, 18, 0.16) 82%);
 }
 
 .aqua-map-floating-layers {
@@ -17329,53 +17330,94 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   box-shadow: 0 22px 48px rgba(0, 145, 255, 0.2);
 }
 
-.aqua-map-metric-strip {
+.aqua-map-floating-toolbar {
   position: absolute;
   top: 18px;
   left: 18px;
-  z-index: 4;
+  z-index: 6;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  width: max-content;
+  max-width: calc(100% - 120px);
+  min-height: 48px;
+  padding: 7px;
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 18px;
+  background: rgba(7, 26, 51, 0.85);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+  transition:
+    left 260ms ease,
+    max-width 260ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.aqua-map-content:not(.is-layer-panel-closed) .aqua-map-floating-toolbar {
+  left: 318px;
+  max-width: calc(100% - 420px);
+}
+
+.aqua-map-toolbar-layers,
+.aqua-map-floating-toolbar article {
   display: grid;
-  grid-template-columns: repeat(3, minmax(130px, 1fr));
-  gap: 10px;
-  width: min(460px, calc(100% - 116px));
-}
-
-.aqua-map-content:not(.is-layer-panel-closed) .aqua-map-metric-strip {
-  left: 330px;
-  width: min(460px, calc(100% - 430px));
-}
-
-.aqua-map-content.is-layer-panel-closed .aqua-map-metric-strip {
-  left: 188px;
-  width: min(460px, calc(100% - 286px));
-}
-
-.aqua-map-metric-strip article {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  column-gap: 10px;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 9px;
   align-items: center;
-  min-width: 0;
-  padding: 12px 14px;
-  border: 1px solid rgba(65, 132, 194, 0.25);
-  border-radius: 10px;
-  background: rgba(7, 25, 46, 0.84);
-  backdrop-filter: blur(12px);
+  min-width: 122px;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid rgba(84, 145, 208, 0.2);
+  border-radius: 14px;
+  color: #dbeeff;
+  background: rgba(6, 23, 45, 0.76);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
 }
 
-.aqua-map-metric-strip svg {
+.aqua-map-toolbar-layers {
+  grid-template-columns: auto auto;
+  min-width: 156px;
+  border-color: rgba(56, 189, 248, 0.24);
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 680;
+  font-size: 0.86rem;
+}
+
+.aqua-map-toolbar-layers:hover,
+.aqua-map-toolbar-layers.is-active,
+.aqua-map-floating-toolbar article:hover {
+  transform: translateY(-1px);
+  border-color: rgba(56, 189, 248, 0.42);
+  background: rgba(10, 37, 70, 0.9);
+  box-shadow:
+    0 12px 24px rgba(0, 0, 0, 0.2),
+    0 0 18px rgba(34, 211, 238, 0.12);
+}
+
+.aqua-map-floating-toolbar article svg,
+.aqua-map-toolbar-layers svg {
   grid-row: span 2;
   color: #23b8ff;
 }
 
-.aqua-map-metric-strip strong {
+.aqua-map-floating-toolbar article strong {
   color: #ffffff;
-  font-size: 1rem;
+  font-size: 0.94rem;
+  line-height: 1;
 }
 
-.aqua-map-metric-strip span {
+.aqua-map-floating-toolbar article span {
   color: #8fa9c4;
-  font-size: 0.75rem;
+  font-size: 0.68rem;
+  line-height: 1.1;
 }
 
 .aqua-country,
@@ -17561,7 +17603,14 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   right: 18px;
   z-index: 5;
   display: grid;
-  gap: 8px;
+  gap: 0;
+  width: 44px;
+  overflow: hidden;
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 18px;
+  background: rgba(7, 20, 38, 0.8);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
 }
 
 .aqua-map-port-marker {
@@ -17581,15 +17630,63 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   display: grid;
   place-items: center;
   width: 42px;
-  height: 42px;
-  border-radius: 8px;
+  height: 38px;
+  border: 0;
+  border-bottom: 1px solid rgba(91, 147, 205, 0.18);
+  border-radius: 0;
+  background: transparent;
+  color: #c9e7ff;
   cursor: pointer;
+}
+
+.aqua-map-zoom button:last-child {
+  border-bottom: 0;
+}
+
+.aqua-map-zoom button:hover {
+  color: #ffffff;
+  background: rgba(34, 211, 238, 0.14);
+  box-shadow: inset 0 0 18px rgba(34, 211, 238, 0.08);
+}
+
+.aqua-map-context-label {
+  position: absolute;
+  top: 18px;
+  right: 78px;
+  z-index: 5;
+  display: grid;
+  gap: 3px;
+  min-width: 190px;
+  padding: 11px 13px;
+  border: 1px solid rgba(56, 189, 248, 0.16);
+  border-radius: 16px;
+  color: #dbeeff;
+  background: rgba(5, 18, 35, 0.72);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(14px);
+  pointer-events: none;
+}
+
+.aqua-map-context-label strong {
+  color: #ffffff;
+  font-size: 0.86rem;
+  font-weight: 720;
+}
+
+.aqua-map-context-label span,
+.aqua-map-context-label small {
+  color: rgba(202, 225, 246, 0.72);
+  font-size: 0.7rem;
+}
+
+.aqua-map-context-label small {
+  color: rgba(34, 211, 238, 0.84);
 }
 
 .aqua-map-scale-v2 {
   position: absolute;
   left: 18px;
-  bottom: 92px;
+  bottom: 104px;
   z-index: 5;
   color: #b8cadc;
   font-size: 0.78rem;
@@ -17614,12 +17711,14 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   z-index: 6;
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr);
-  gap: 16px;
+  gap: 18px;
   align-items: center;
-  padding: 14px;
-  border: 1px solid rgba(79, 134, 190, 0.22);
-  border-radius: 10px;
-  background: rgba(7, 28, 50, 0.86);
+  height: 72px;
+  padding: 12px 16px;
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 20px;
+  background: rgba(7, 26, 51, 0.82);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(14px);
 }
 
@@ -17628,7 +17727,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   place-items: center;
   width: 38px;
   height: 38px;
-  border-radius: 9px;
+  border-radius: 13px;
   cursor: pointer;
 }
 
@@ -17637,7 +17736,8 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 6px;
-  padding-top: 14px;
+  align-items: start;
+  padding-top: 18px;
 }
 
 .aqua-timeline-track::before {
@@ -17646,9 +17746,9 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   top: 4px;
   left: 0;
   right: 0;
-  height: 3px;
+  height: 2px;
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(37, 145, 255, 0.2), #1e90ff 60%, rgba(98, 126, 154, 0.28));
+  background: linear-gradient(90deg, rgba(37, 145, 255, 0.24), rgba(34, 211, 238, 0.8) 62%, rgba(98, 126, 154, 0.24));
 }
 
 .aqua-timeline-track button {
@@ -17662,12 +17762,15 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   font-size: 0.75rem;
   text-align: center;
   cursor: pointer;
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
 }
 
 .aqua-timeline-track button::before {
   content: "";
   position: absolute;
-  top: -13px;
+  top: -17px;
   left: 50%;
   width: 5px;
   height: 5px;
@@ -17679,14 +17782,28 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 .aqua-timeline-track button.is-active {
   color: #ffffff;
   font-weight: 700;
+  transform: translateY(-5px);
 }
 
 .aqua-timeline-track button.is-active::before {
   width: 10px;
   height: 10px;
-  top: -16px;
+  top: -20px;
   background: #1e90ff;
   box-shadow: 0 0 0 5px rgba(30, 144, 255, 0.16);
+}
+
+.aqua-timeline-track button span,
+.aqua-timeline-track button small {
+  display: block;
+}
+
+.aqua-timeline-track button small {
+  margin-top: 3px;
+  color: rgba(34, 211, 238, 0.86);
+  font-size: 0.62rem;
+  font-weight: 620;
+  white-space: nowrap;
 }
 
 .aqua-region-panel {
@@ -17998,6 +18115,16 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
     width: 290px;
     max-height: none;
   }
+
+  .aqua-map-content:not(.is-layer-panel-closed) .aqua-map-floating-toolbar,
+  .aqua-map-content.is-layer-panel-closed .aqua-map-floating-toolbar {
+    left: 18px;
+    max-width: calc(100% - 96px);
+  }
+
+  .aqua-map-context-label {
+    top: 78px;
+  }
 }
 
 @media (max-width: 760px) {
@@ -18036,20 +18163,30 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
     min-height: 620px;
   }
 
-  .aqua-map-metric-strip {
-    grid-template-columns: 1fr;
+  .aqua-map-floating-toolbar,
+  .aqua-map-content:not(.is-layer-panel-closed) .aqua-map-floating-toolbar,
+  .aqua-map-content.is-layer-panel-closed .aqua-map-floating-toolbar {
+    flex-wrap: wrap;
+    left: 18px;
+    right: 72px;
     width: calc(100% - 82px);
+    max-width: calc(100% - 82px);
   }
 
-  .aqua-map-content:not(.is-layer-panel-closed) .aqua-map-metric-strip,
-  .aqua-map-content.is-layer-panel-closed .aqua-map-metric-strip {
-    top: 72px;
-    left: 18px;
-    width: calc(100% - 82px);
+  .aqua-map-toolbar-layers,
+  .aqua-map-floating-toolbar article {
+    min-width: calc(50% - 4px);
+    flex: 1 1 calc(50% - 4px);
+  }
+
+  .aqua-map-context-label {
+    display: none;
   }
 
   .aqua-map-timeline {
     grid-template-columns: 1fr;
+    height: auto;
+    min-height: 72px;
   }
 
   .aqua-timeline-track {

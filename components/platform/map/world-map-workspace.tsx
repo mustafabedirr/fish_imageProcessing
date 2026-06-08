@@ -205,10 +205,10 @@ export default function WorldMapWorkspace() {
   const activeMapStyle = useMemo(() => {
     const rasterPaint =
       mapView === "Uydu"
-        ? { "raster-opacity": 0.98, "raster-saturation": -0.1, "raster-contrast": 0.14, "raster-brightness-min": 0.12, "raster-brightness-max": 1 }
+        ? { "raster-opacity": 0.92, "raster-saturation": -0.22, "raster-contrast": 0.22, "raster-brightness-min": 0.02, "raster-brightness-max": 0.74 }
         : mapView === "Koyu"
-        ? { "raster-opacity": 0.82, "raster-saturation": -0.5, "raster-contrast": 0.16, "raster-brightness-min": 0.02, "raster-brightness-max": 0.72 }
-        : mapStyle.layers[1].paint;
+        ? { "raster-opacity": 0.86, "raster-saturation": -0.48, "raster-contrast": 0.24, "raster-brightness-min": 0, "raster-brightness-max": 0.62 }
+        : { "raster-opacity": 0.9, "raster-saturation": -0.24, "raster-contrast": 0.2, "raster-brightness-min": 0.02, "raster-brightness-max": 0.72 };
 
     return {
       ...mapStyle,
@@ -435,13 +435,15 @@ export default function WorldMapWorkspace() {
 
           <main className="aqua-map-stage">
             <section className="aqua-map-viewport">
-              {!isLayerPanelOpen ? (
-                <button type="button" className="aqua-map-floating-layers" onClick={() => setIsLayerPanelOpen(true)}>
+              <div className="aqua-map-floating-toolbar">
+                <button
+                  type="button"
+                  className={isLayerPanelOpen ? "aqua-map-toolbar-layers is-active" : "aqua-map-toolbar-layers"}
+                  onClick={() => setIsLayerPanelOpen((current) => !current)}
+                >
                   <Layers size={18} />
                   Veri Katmanlari
                 </button>
-              ) : null}
-              <div className="aqua-map-metric-strip">
                 {mapMetrics.map((metric) => {
                   const Icon = metric.icon;
                   return (
@@ -496,23 +498,25 @@ export default function WorldMapWorkspace() {
                         type="heatmap"
                         paint={{
                           "heatmap-weight": ["interpolate", ["linear"], ["get", "weight"], 0, 0, 100, 1],
-                          "heatmap-intensity": 1.65,
-                          "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 4, 18, 8, 42],
-                          "heatmap-opacity": 0.88,
+                          "heatmap-intensity": ["interpolate", ["linear"], ["zoom"], 4, 1.15, 8, 1.9],
+                          "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 4, 34, 8, 68],
+                          "heatmap-opacity": ["interpolate", ["linear"], ["zoom"], 4, 0.66, 8, 0.78],
                           "heatmap-color": [
                             "interpolate",
                             ["linear"],
                             ["heatmap-density"],
                             0,
                             "rgba(0,0,0,0)",
-                            0.18,
-                            "rgba(30,144,255,0.35)",
-                            0.38,
-                            "rgba(0,201,150,0.55)",
-                            0.62,
-                            "rgba(255,209,82,0.78)",
-                            0.86,
-                            "rgba(255,82,73,0.88)",
+                            0.16,
+                            "rgba(34,211,238,0.18)",
+                            0.34,
+                            "rgba(34,211,238,0.48)",
+                            0.56,
+                            "rgba(0,201,150,0.62)",
+                            0.74,
+                            "rgba(255,161,62,0.72)",
+                            0.94,
+                            "rgba(255,72,60,0.78)",
                           ],
                         }}
                       />
@@ -520,10 +524,20 @@ export default function WorldMapWorkspace() {
                         id="aqua-fish-density-points"
                         type="circle"
                         paint={{
-                          "circle-radius": ["interpolate", ["linear"], ["get", "weight"], 50, 3, 100, 7],
-                          "circle-color": "#73e7ff",
-                          "circle-opacity": 0.72,
-                          "circle-blur": 0.28,
+                          "circle-radius": ["interpolate", ["linear"], ["get", "weight"], 50, 10, 100, 22],
+                          "circle-color": [
+                            "interpolate",
+                            ["linear"],
+                            ["get", "weight"],
+                            52,
+                            "rgba(34,211,238,0.28)",
+                            76,
+                            "rgba(0,201,150,0.36)",
+                            92,
+                            "rgba(255,88,72,0.44)",
+                          ],
+                          "circle-opacity": 0.34,
+                          "circle-blur": 0.86,
                         }}
                       />
                     </Source>
@@ -535,11 +549,15 @@ export default function WorldMapWorkspace() {
                         <Layer
                           id="aqua-current-path-line"
                           type="line"
+                          layout={{
+                            "line-cap": "round",
+                            "line-join": "round",
+                          }}
                           paint={{
-                            "line-color": "#1e90ff",
-                            "line-width": ["interpolate", ["linear"], ["get", "speed"], 0.5, 1.4, 1, 3],
-                            "line-opacity": 0.55,
-                            "line-blur": 0.35,
+                            "line-color": "#22d3ee",
+                            "line-width": ["interpolate", ["linear"], ["get", "speed"], 0.5, 1.35, 1, 2.2],
+                            "line-opacity": 0.65,
+                            "line-blur": 0.18,
                           }}
                         />
                       </Source>
@@ -548,10 +566,10 @@ export default function WorldMapWorkspace() {
                           id="aqua-current-particle-dots"
                           type="circle"
                           paint={{
-                            "circle-radius": 2.2,
+                            "circle-radius": 2,
                             "circle-color": "#22d3ee",
-                            "circle-opacity": 0.82,
-                            "circle-blur": 0.12,
+                            "circle-opacity": 0.56,
+                            "circle-blur": 0.22,
                           }}
                         />
                       </Source>
@@ -563,12 +581,12 @@ export default function WorldMapWorkspace() {
                       <Layer
                         id="aqua-protected-fill"
                         type="fill"
-                        paint={{ "fill-color": "#00c996", "fill-opacity": 0.13 }}
+                        paint={{ "fill-color": "#00c996", "fill-opacity": 0.1 }}
                       />
                       <Layer
                         id="aqua-protected-outline"
                         type="line"
-                        paint={{ "line-color": "#00e0a7", "line-width": 1.5, "line-opacity": 0.74 }}
+                        paint={{ "line-color": "#00c996", "line-width": 1.35, "line-opacity": 0.85, "line-dasharray": [6, 4] }}
                       />
                     </Source>
                   ) : null}
@@ -585,6 +603,12 @@ export default function WorldMapWorkspace() {
                 </Map>
 
                 <div className="aqua-map-data-overlay" aria-hidden />
+              </div>
+
+              <div className="aqua-map-context-label">
+                <strong>{selectedRegion.name}</strong>
+                <span>{selectedRegion.coordinatesText}</span>
+                <small>Canli veri simulasyonu</small>
               </div>
 
               <div className="aqua-map-zoom">
@@ -622,7 +646,8 @@ export default function WorldMapWorkspace() {
                 <div className="aqua-timeline-track">
                   {days.map((day) => (
                     <button type="button" className={day === selectedDay ? "is-active" : ""} onClick={() => setSelectedDay(day)} key={day}>
-                      {day}
+                      <span>{day}</span>
+                      {day === selectedDay ? <small>Yogunluk yuksek</small> : null}
                     </button>
                   ))}
                 </div>
