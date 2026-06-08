@@ -80,7 +80,11 @@ export default function LoginCard({ mode = "login", onModeChange }: LoginCardPro
 
   return (
     <>
-      <form className={isRegister ? "auth-form auth-form--register" : "auth-form"} onSubmit={onSubmit}>
+      <form
+        key={mode}
+        className={isRegister ? "auth-form auth-form--register" : "auth-form auth-form--login"}
+        onSubmit={onSubmit}
+      >
         <div className="auth-fields">
           {isRegister ? (
             <label className="auth-field">

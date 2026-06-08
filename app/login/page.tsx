@@ -142,7 +142,14 @@ export default function LoginPage() {
               ) : null}
             </div>
 
-            <div className="login-right-copy">
+            <div
+              key={authMode}
+              className={
+                isRegister
+                  ? "login-right-copy login-right-copy--register"
+                  : "login-right-copy login-right-copy--login"
+              }
+            >
               <h2>{isRegister ? "Hesap Oluşturun" : "Giriş Yapın"}</h2>
               <p>
                 {isRegister
