@@ -127,6 +127,48 @@ const initialSpeciesCards: FishSpecies[] = [
   },
   {
     id: "turna",
+    name: "Barbun",
+    latin: "Mullus barbatus",
+    group: "Etcil",
+    habitat: "Deniz",
+    region: "Ege",
+    protection: "Guvenli",
+    tags: ["Deniz", "Etcil"],
+    score: 88.1,
+    records: 574,
+    image: "https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=900&q=80",
+    favorite: false,
+  },
+  {
+    id: "mersin",
+    name: "Lufer",
+    latin: "Pomatomus saltatrix",
+    group: "Etcil",
+    habitat: "Deniz",
+    region: "Karadeniz",
+    protection: "Guvenli",
+    tags: ["Deniz", "Etcil", "Pelajik"],
+    score: 87.6,
+    records: 543,
+    image: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?auto=format&fit=crop&w=900&q=80",
+    favorite: false,
+  },
+  {
+    id: "istavrit",
+    name: "Istavrit",
+    latin: "Trachurus trachurus",
+    group: "Etcil",
+    habitat: "Deniz",
+    region: "Karadeniz",
+    protection: "Guvenli",
+    tags: ["Deniz", "Pelajik"],
+    score: 86.9,
+    records: 498,
+    image: "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=900&q=80",
+    favorite: false,
+  },
+  {
+    id: "turna",
     name: "Turna",
     latin: "Esox lucius",
     group: "Etcil",
@@ -134,13 +176,13 @@ const initialSpeciesCards: FishSpecies[] = [
     region: "Ic Anadolu",
     protection: "Guvenli",
     tags: ["Tatli Su", "Etcil"],
-    score: 87.9,
-    records: 531,
+    score: 84.8,
+    records: 421,
     image: "https://images.unsplash.com/photo-1573925788206-7f8f0df1987e?auto=format&fit=crop&w=900&q=80",
     favorite: false,
   },
   {
-    id: "mersin",
+    id: "mersin-baligi",
     name: "Mersin Baligi",
     latin: "Acipenser sturio",
     group: "Dip Baligi",
@@ -148,15 +190,99 @@ const initialSpeciesCards: FishSpecies[] = [
     region: "Karadeniz",
     protection: "Nesli Tehlikede",
     tags: ["Acisu", "Dip Baligi", "Nesli Tehlikede"],
-    score: 84.2,
+    score: 83.4,
     records: 288,
+    image: "https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=900&q=80",
+    favorite: false,
+  },
+  {
+    id: "minekop",
+    name: "Minekop",
+    latin: "Umbrina cirrosa",
+    group: "Dip Baligi",
+    habitat: "Deniz",
+    region: "Akdeniz",
+    protection: "Guvenli",
+    tags: ["Deniz", "Dip Baligi"],
+    score: 82.6,
+    records: 251,
+    image: "https://images.unsplash.com/photo-1559825481-12a05cc00344?auto=format&fit=crop&w=900&q=80",
+    favorite: false,
+  },
+  {
+    id: "uskumru",
+    name: "Uskumru",
+    latin: "Scomber scombrus",
+    group: "Etcil",
+    habitat: "Deniz",
+    region: "Karadeniz",
+    protection: "Guvenli",
+    tags: ["Deniz", "Pelajik"],
+    score: 81.8,
+    records: 238,
+    image: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?auto=format&fit=crop&w=900&q=80",
+    favorite: false,
+  },
+  {
+    id: "sazan",
+    name: "Sazan",
+    latin: "Cyprinus carpio",
+    group: "Otcul",
+    habitat: "Tatli Su",
+    region: "Ic Anadolu",
+    protection: "Guvenli",
+    tags: ["Tatli Su", "Otcul"],
+    score: 80.9,
+    records: 214,
+    image: "https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=900&q=80",
+    favorite: false,
+  },
+  {
+    id: "hamsi",
+    name: "Hamsi",
+    latin: "Engraulis encrasicolus",
+    group: "Otcul",
+    habitat: "Deniz",
+    region: "Karadeniz",
+    protection: "Guvenli",
+    tags: ["Deniz", "Pelajik"],
+    score: 80.1,
+    records: 196,
+    image: "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=900&q=80",
+    favorite: false,
+  },
+  {
+    id: "alabalik",
+    name: "Alabalik",
+    latin: "Oncorhynchus mykiss",
+    group: "Etcil",
+    habitat: "Tatli Su",
+    region: "Ic Anadolu",
+    protection: "Guvenli",
+    tags: ["Tatli Su", "Etcil"],
+    score: 79.6,
+    records: 183,
+    image: "https://images.unsplash.com/photo-1573925788206-7f8f0df1987e?auto=format&fit=crop&w=900&q=80",
+    favorite: false,
+  },
+  {
+    id: "orkinos",
+    name: "Orkinos",
+    latin: "Thunnus thynnus",
+    group: "Etcil",
+    habitat: "Deniz",
+    region: "Akdeniz",
+    protection: "Koruma Altinda",
+    tags: ["Deniz", "Etcil", "Pelajik"],
+    score: 78.8,
+    records: 162,
     image: "https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=900&q=80",
     favorite: false,
   },
 ];
 
 const tags = ["Deniz", "Tatli Su", "Aci Su", "Etcil", "Otcul", "Dip Baligi", "Pelajik", "Nesli Tehlikede", "Koruma Altinda"];
-const pageSize = 6;
+const pageSize = 9;
 
 export default function SpeciesLibraryWorkspace() {
   const [speciesList, setSpeciesList] = useState<FishSpecies[]>(initialSpeciesCards);
@@ -412,7 +538,7 @@ export default function SpeciesLibraryWorkspace() {
             <section className="fish-library-panel">
               <div className="fish-library-panel-head">
                 <h2>Kutuphane Ozeti</h2>
-                <a href="/platform/analyze">Detayli Rapor</a>
+                <a href="/platform/analyze">Detayli Rapor <ChevronRight size={14} /></a>
               </div>
               <div className="fish-library-summary">
                 {summaryItems.map(({ icon: Icon, label, value, tone }) => (
@@ -432,7 +558,7 @@ export default function SpeciesLibraryWorkspace() {
             <section className="fish-library-panel">
               <div className="fish-library-panel-head">
                 <h2>Populer Turler</h2>
-                <a href="/platform/library" onClick={(event) => event.preventDefault()}>Tumunu Gor</a>
+                <a href="/platform/library" onClick={(event) => event.preventDefault()}>Tumunu Gor <ChevronRight size={14} /></a>
               </div>
               <div className="fish-library-popular">
                 {popularSpecies.map((item, index) => (
