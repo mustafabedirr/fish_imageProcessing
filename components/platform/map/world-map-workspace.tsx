@@ -648,26 +648,33 @@ export default function WorldMapWorkspace() {
                   className="aqua-timeline-slider"
                   style={{ "--timeline-progress": `${(selectedDayIndex / (days.length - 1)) * 100}%` } as CSSProperties}
                 >
-                  <span className="aqua-timeline-range-label">Zaman Araligi (12 - 18 May 2024)</span>
+                  <span className="aqua-timeline-wave" aria-hidden />
                   <div className="aqua-timeline-track">
                     {days.map((day) => (
                       <button type="button" className={day === selectedDay ? "is-active" : ""} onClick={() => setSelectedDay(day)} key={day}>
-                        <span>{day}</span>
-                        <small>00:00</small>
+                        {day === selectedDay ? <em>{day}</em> : null}
+                        <span>
+                          <strong>{day.split(" ")[0]}</strong>
+                          <small>{day.split(" ")[1]}</small>
+                        </span>
                       </button>
                     ))}
                   </div>
                 </div>
                 <button
                   type="button"
-                  className="aqua-timeline-calendar"
-                  aria-label="Tarih araligini degistir"
+                  className="aqua-timeline-live"
+                  aria-label="Canli veriyi yenile"
                   onClick={() => {
                     const nextIndex = (days.indexOf(selectedDay) + 1) % days.length;
                     setSelectedDay(days[nextIndex]);
                   }}
                 >
-                  <CalendarDays size={18} />
+                  <Waves size={17} />
+                  <span>
+                    <strong>Canli</strong>
+                    <small>Guncel Veri</small>
+                  </span>
                 </button>
               </div>
             </section>
