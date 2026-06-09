@@ -17,6 +17,7 @@ import {
   Leaf,
   MapPin,
   Minus,
+  Pause,
   Play,
   Plus,
   Search,
@@ -189,7 +190,7 @@ export default function WorldMapWorkspace() {
   );
   const [selectedDay, setSelectedDay] = useState("16 May");
   const [mapView, setMapView] = useState("Standart");
-  const [isLayerPanelOpen, setIsLayerPanelOpen] = useState(true);
+  const [isLayerPanelOpen, setIsLayerPanelOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -428,7 +429,7 @@ export default function WorldMapWorkspace() {
               </label>
 
               <button type="button" className="aqua-manage-layers" onClick={enableAllLayers}>
-                Katmanlari Yonet
+                Tumunu Isaretle
               </button>
             </div>
           </aside>
@@ -639,10 +640,15 @@ export default function WorldMapWorkspace() {
                 <button
                   type="button"
                   className={isPlaying ? "aqua-timeline-play is-active" : "aqua-timeline-play"}
-                  aria-label="Zaman cizelgesini oynat"
+                  aria-label={isPlaying ? "Zaman cizelgesini duraklat" : "Zaman cizelgesini oynat"}
                   onClick={() => setIsPlaying((current) => !current)}
                 >
-                  <Play size={18} />
+                  <span className="aqua-timeline-play-icon aqua-timeline-play-icon--play" aria-hidden>
+                    <Play size={18} />
+                  </span>
+                  <span className="aqua-timeline-play-icon aqua-timeline-play-icon--pause" aria-hidden>
+                    <Pause size={18} />
+                  </span>
                 </button>
                 <div
                   className="aqua-timeline-slider"
