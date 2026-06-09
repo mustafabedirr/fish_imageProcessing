@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import Map, { Layer, Marker, Source, type MapRef } from "react-map-gl/maplibre";
 import { circle, featureCollection, lineString, point, polygon as turfPolygon } from "@turf/turf";
 import {
@@ -201,14 +201,15 @@ export default function WorldMapWorkspace() {
 
   const selectedRegion = mapRegions[activeRegionIndex];
   const selectedObservation = observations[selectedObservationIndex];
+  const selectedDayIndex = Math.max(days.indexOf(selectedDay), 0);
 
   const activeMapStyle = useMemo(() => {
     const rasterPaint =
       mapView === "Uydu"
-        ? { "raster-opacity": 0.92, "raster-saturation": -0.22, "raster-contrast": 0.22, "raster-brightness-min": 0.02, "raster-brightness-max": 0.74 }
+        ? { "raster-opacity": 0.98, "raster-saturation": -0.1, "raster-contrast": 0.14, "raster-brightness-min": 0.12, "raster-brightness-max": 1 }
         : mapView === "Koyu"
-        ? { "raster-opacity": 0.86, "raster-saturation": -0.48, "raster-contrast": 0.24, "raster-brightness-min": 0, "raster-brightness-max": 0.62 }
-        : { "raster-opacity": 0.9, "raster-saturation": -0.24, "raster-contrast": 0.2, "raster-brightness-min": 0.02, "raster-brightness-max": 0.72 };
+        ? { "raster-opacity": 0.82, "raster-saturation": -0.5, "raster-contrast": 0.16, "raster-brightness-min": 0.02, "raster-brightness-max": 0.72 }
+        : mapStyle.layers[1].paint;
 
     return {
       ...mapStyle,
@@ -637,20 +638,37 @@ export default function WorldMapWorkspace() {
               <div className="aqua-map-timeline">
                 <button
                   type="button"
-                  className={isPlaying ? "is-active" : ""}
+                  className={isPlaying ? "aqua-timeline-play is-active" : "aqua-timeline-play"}
                   aria-label="Zaman cizelgesini oynat"
                   onClick={() => setIsPlaying((current) => !current)}
                 >
                   <Play size={18} />
                 </button>
-                <div className="aqua-timeline-track">
-                  {days.map((day) => (
-                    <button type="button" className={day === selectedDay ? "is-active" : ""} onClick={() => setSelectedDay(day)} key={day}>
-                      <span>{day}</span>
-                      {day === selectedDay ? <small>Yogunluk yuksek</small> : null}
-                    </button>
-                  ))}
+                <div
+                  className="aqua-timeline-slider"
+                  style={{ "--timeline-progress": `${(selectedDayIndex / (days.length - 1)) * 100}%` } as CSSProperties}
+                >
+                  <span className="aqua-timeline-range-label">Zaman Araligi (12 - 18 May 2024)</span>
+                  <div className="aqua-timeline-track">
+                    {days.map((day) => (
+                      <button type="button" className={day === selectedDay ? "is-active" : ""} onClick={() => setSelectedDay(day)} key={day}>
+                        <span>{day}</span>
+                        <small>00:00</small>
+                      </button>
+                    ))}
+                  </div>
                 </div>
+                <button
+                  type="button"
+                  className="aqua-timeline-calendar"
+                  aria-label="Tarih araligini degistir"
+                  onClick={() => {
+                    const nextIndex = (days.indexOf(selectedDay) + 1) % days.length;
+                    setSelectedDay(days[nextIndex]);
+                  }}
+                >
+                  <CalendarDays size={18} />
+                </button>
               </div>
             </section>
           </main>
