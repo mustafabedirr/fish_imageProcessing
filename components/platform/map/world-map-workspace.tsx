@@ -651,7 +651,7 @@ export default function WorldMapWorkspace() {
                   </span>
                 </button>
                 <div
-                  className="aqua-timeline-slider"
+                  className={isPlaying ? "aqua-timeline-slider is-playing" : "aqua-timeline-slider"}
                   style={{ "--timeline-progress": `${(selectedDayIndex / (days.length - 1)) * 100}%` } as CSSProperties}
                 >
                   <span className="aqua-timeline-wave" aria-hidden />
