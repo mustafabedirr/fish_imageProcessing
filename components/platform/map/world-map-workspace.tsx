@@ -140,21 +140,6 @@ const regionMarkers = [
   { name: "Kiklad Gecisi", label: "%58", regionIndex: 0, coordinates: [25.25, 37.35] },
 ] as const;
 
-const globalPorts = [
-  { name: "Izmir", coordinates: [27.14, 38.42] },
-  { name: "Kusadasi", coordinates: [27.26, 37.86] },
-  { name: "Bodrum", coordinates: [27.43, 37.03] },
-  { name: "Rhodes", coordinates: [28.22, 36.43] },
-  { name: "Tokyo Bay", coordinates: [139.78, 35.55] },
-  { name: "Yokohama", coordinates: [139.64, 35.45] },
-  { name: "Osaka Bay", coordinates: [135.18, 34.45] },
-  { name: "Busan", coordinates: [129.07, 35.1] },
-  { name: "Singapore Strait", coordinates: [103.85, 1.25] },
-  { name: "San Francisco Bay", coordinates: [-122.42, 37.78] },
-  { name: "Sydney Harbour", coordinates: [151.22, -33.85] },
-  { name: "Cape Town", coordinates: [18.42, -33.92] },
-] as const;
-
 const days = ["12 May", "13 May", "14 May", "15 May", "16 May", "17 May", "18 May"];
 
 const regionTabs = ["Ozet", "Canli Veriler", "Analiz", "Notlar"] as const;
@@ -223,6 +208,7 @@ type MarineMapMarker = {
 };
 
 type MarineMapData = {
+  source?: "open-meteo" | "fallback" | "static";
   densityPoints: unknown;
   temperaturePoints: unknown;
   currents: unknown;
@@ -260,6 +246,7 @@ const toPolygonCollection = (items: Array<{ name: string; polygon: readonly (rea
 });
 
 const staticMarineMapData: MarineMapData = {
+  source: "static",
   densityPoints: toPointCollection(fishDensityData),
   temperaturePoints: toPointCollection(fishDensityData),
   currents: toLineCollection(currentPaths),
@@ -276,130 +263,8 @@ const staticMarineMapData: MarineMapData = {
 
 const MIN_DYNAMIC_MAP_ZOOM = 5.15;
 
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
-
-const formatCoordinates = ([longitude, latitude]: [number, number]) =>
+const formatMapCoordinates = ([longitude, latitude]: [number, number]) =>
   `${Math.abs(latitude).toFixed(4)} ${latitude >= 0 ? "N" : "S"}, ${Math.abs(longitude).toFixed(4)} ${longitude >= 0 ? "E" : "W"}`;
-
-const seededValue = (longitude: number, latitude: number, salt: number) => {
-  const seed = Math.sin(longitude * 12.9898 + latitude * 78.233 + salt * 37.719) * 43758.5453;
-  return seed - Math.floor(seed);
-};
-
-const getViewportName = (center: [number, number]) => {
-  const [longitude, latitude] = center;
-  if (longitude > 126 && longitude < 147 && latitude > 28 && latitude < 46) return "Japonya Deniz Alani";
-  if (longitude > 120 && longitude < 132 && latitude > 30 && latitude < 42) return "Kore Bogazi";
-  if (longitude > 100 && longitude < 112 && latitude > -2 && latitude < 8) return "Singapur Deniz Koridoru";
-  if (longitude > -126 && longitude < -116 && latitude > 32 && latitude < 42) return "Kaliforniya Kiyi Alani";
-  if (longitude > 145 && longitude < 156 && latitude > -38 && latitude < -28) return "Dogu Avustralya Kiyi Alani";
-  if (longitude > 20 && longitude < 31 && latitude > 34 && latitude < 42) return "Ege Denizi";
-  return "Secili Deniz Alani";
-};
-
-const createDynamicMarineMapData = (bounds: { west: number; south: number; east: number; north: number }, zoom: number): MarineMapData => {
-  const west = clamp(bounds.west, -179, 179);
-  const east = clamp(bounds.east, -179, 179);
-  const south = clamp(bounds.south, -70, 78);
-  const north = clamp(bounds.north, -70, 78);
-  const minLon = Math.min(west, east);
-  const maxLon = Math.max(west, east);
-  const minLat = Math.min(south, north);
-  const maxLat = Math.max(south, north);
-  const lonSpan = Math.max(maxLon - minLon, 0.3);
-  const latSpan = Math.max(maxLat - minLat, 0.3);
-  const center: [number, number] = [minLon + lonSpan / 2, minLat + latSpan / 2];
-  const columns = zoom > 7 ? 7 : 5;
-  const rows = zoom > 7 ? 5 : 4;
-  const densityItems: Array<{ position: [number, number]; weight: number }> = [];
-
-  for (let row = 1; row <= rows; row += 1) {
-    for (let column = 1; column <= columns; column += 1) {
-      const longitude = minLon + (lonSpan * column) / (columns + 1);
-      const latitude = minLat + (latSpan * row) / (rows + 1);
-      const noise = seededValue(longitude, latitude, row + column);
-      const coastalBias = 1 - Math.abs(latitude) / 92;
-      const weight = Math.round(clamp(38 + noise * 48 + coastalBias * 12, 28, 96));
-      densityItems.push({ position: [Number(longitude.toFixed(4)), Number(latitude.toFixed(4))], weight });
-    }
-  }
-
-  const currentItems = Array.from({ length: 4 }).map((_, index) => {
-    const y = minLat + (latSpan * (index + 1)) / 5;
-    const bend = (seededValue(center[0], y, index) - 0.5) * latSpan * 0.24;
-    return {
-      path: [
-        [Number((minLon + lonSpan * 0.12).toFixed(4)), Number(y.toFixed(4))],
-        [Number((minLon + lonSpan * 0.36).toFixed(4)), Number((y + bend).toFixed(4))],
-        [Number((minLon + lonSpan * 0.62).toFixed(4)), Number((y - bend * 0.65).toFixed(4))],
-        [Number((minLon + lonSpan * 0.88).toFixed(4)), Number((y + bend * 0.35).toFixed(4))],
-      ],
-      speed: Number((0.45 + seededValue(y, center[0], index + 10) * 0.75).toFixed(2)),
-    };
-  });
-
-  const polygonSizeLon = lonSpan * 0.16;
-  const polygonSizeLat = latSpan * 0.16;
-  const polygonCenters = [
-    [center[0] - lonSpan * 0.18, center[1] + latSpan * 0.12],
-    [center[0] + lonSpan * 0.2, center[1] - latSpan * 0.16],
-  ] as const;
-  const protectedItems = polygonCenters.map(([longitude, latitude], index) => ({
-    name: `${getViewportName(center)} Koruma ${index + 1}`,
-    polygon: [
-      [Number((longitude - polygonSizeLon).toFixed(4)), Number((latitude - polygonSizeLat * 0.35).toFixed(4))],
-      [Number((longitude + polygonSizeLon * 0.8).toFixed(4)), Number((latitude - polygonSizeLat * 0.55).toFixed(4))],
-      [Number((longitude + polygonSizeLon).toFixed(4)), Number((latitude + polygonSizeLat * 0.55).toFixed(4))],
-      [Number((longitude - polygonSizeLon * 0.72).toFixed(4)), Number((latitude + polygonSizeLat).toFixed(4))],
-      [Number((longitude - polygonSizeLon).toFixed(4)), Number((latitude - polygonSizeLat * 0.35).toFixed(4))],
-    ],
-  }));
-
-  const ports = globalPorts
-    .filter((port) => {
-      const [longitude, latitude] = port.coordinates;
-      return longitude >= minLon && longitude <= maxLon && latitude >= minLat && latitude <= maxLat;
-    })
-    .map((port) => ({ name: port.name, coordinates: port.coordinates as [number, number] }));
-
-  const topDensityItems = [...densityItems].sort((a, b) => b.weight - a.weight).slice(0, 4);
-  const regions = topDensityItems.map((item, index) => {
-    const waterTemp = 8 + (1 - Math.abs(item.position[1]) / 90) * 18 + seededValue(item.position[0], item.position[1], 22) * 3;
-    const wind = 5 + seededValue(item.position[0], item.position[1], 33) * 22;
-    const wave = 0.2 + seededValue(item.position[0], item.position[1], 44) * 1.8;
-    const current = 0.25 + seededValue(item.position[0], item.position[1], 55) * 1.15;
-    const densityLabel = item.weight > 74 ? "Yuksek" : item.weight > 55 ? "Orta" : "Dusuk";
-
-    return {
-      name: `${getViewportName(item.position)} ${index + 1}`,
-      label: `%${item.weight}`,
-      coordinates: item.position,
-      region: {
-        id: `viewport-${index}-${item.position[0]}-${item.position[1]}`,
-        name: `${getViewportName(item.position)} ${index + 1}`,
-        coordinatesText: formatCoordinates(item.position),
-        center: item.position,
-        density: densityLabel,
-        densityScore: `%${item.weight}`,
-        temperature: `${waterTemp.toFixed(1)} C`,
-        chlorophyll: item.weight > 70 ? "Orta" : "Dusuk",
-        current: `${current.toFixed(1)} m/s`,
-        wave: `${wave.toFixed(1)} m`,
-        wind: `${wind.toFixed(0)} kn`,
-      },
-    };
-  });
-
-  return {
-    densityPoints: toPointCollection(densityItems),
-    temperaturePoints: toPointCollection(densityItems),
-    currents: toLineCollection(currentItems),
-    protectedPolygons: toPolygonCollection(protectedItems),
-    ports,
-    regions,
-    isDynamic: true,
-  };
-};
 
 type MarineConditions = {
   source: "open-meteo" | "fallback";
@@ -415,6 +280,7 @@ type MarineConditions = {
 
 export default function WorldMapWorkspace() {
   const mapRef = useRef<MapRef | null>(null);
+  const mapDataControllerRef = useRef<AbortController | null>(null);
   const [activeLayers, setActiveLayers] = useState<Record<string, boolean>>(
     Object.fromEntries(layerItems.map((layer) => [layer.id, layer.active]))
   );
@@ -443,8 +309,10 @@ export default function WorldMapWorkspace() {
       ? "Veri aliniyor"
       : marineConditions?.source === "open-meteo"
       ? "Open-Meteo Marine"
+      : marineMapData.source === "fallback"
+      ? "Deniz maskeli fallback"
       : marineMapData.isDynamic
-      ? "Viewport demo verisi"
+      ? "Viewport marine verisi"
       : "Demo fallback";
   const floatingMetrics = [
     { icon: Thermometer, label: "Su Sicakligi", value: marineConditions?.waterTemperature ?? selectedRegion.temperature },
@@ -495,6 +363,7 @@ export default function WorldMapWorkspace() {
     const mapInstance = map.getMap();
     const zoom = mapInstance.getZoom();
     setViewportZoom(zoom);
+    mapDataControllerRef.current?.abort();
 
     if (zoom < MIN_DYNAMIC_MAP_ZOOM) {
       setMarineMapData(staticMarineMapData);
@@ -509,22 +378,57 @@ export default function WorldMapWorkspace() {
       east: bounds.getEast(),
       north: bounds.getNorth(),
     };
-    const nextData = createDynamicMarineMapData(viewportBounds, zoom);
-    setMarineMapData(nextData);
-    setViewportRegion((current) => {
-      if (current) {
-        const [longitude, latitude] = current.center;
-        const isStillVisible =
-          longitude >= Math.min(viewportBounds.west, viewportBounds.east) &&
-          longitude <= Math.max(viewportBounds.west, viewportBounds.east) &&
-          latitude >= Math.min(viewportBounds.south, viewportBounds.north) &&
-          latitude <= Math.max(viewportBounds.south, viewportBounds.north);
 
-        if (isStillVisible) return current;
-      }
+    const controller = new AbortController();
+    mapDataControllerRef.current = controller;
+    const bbox = [viewportBounds.west, viewportBounds.south, viewportBounds.east, viewportBounds.north].map((value) => value.toFixed(4)).join(",");
 
-      return nextData.regions[0]?.region ?? current;
-    });
+    fetch(`/api/marine-map-data?bbox=${bbox}&zoom=${zoom.toFixed(2)}`, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error("Marine map data request failed");
+        return response.json();
+      })
+      .then((nextData: MarineMapData) => {
+        setMarineMapData(nextData);
+        setViewportRegion((current) => {
+          if (!nextData.regions.length) {
+            const center: [number, number] = [
+              (viewportBounds.west + viewportBounds.east) / 2,
+              (viewportBounds.south + viewportBounds.north) / 2,
+            ];
+
+            return {
+              id: "no-marine-data",
+              name: "Deniz verisi bulunamadi",
+              coordinatesText: formatMapCoordinates(center),
+              center,
+              density: "Yok",
+              densityScore: "%0",
+              temperature: "-",
+              chlorophyll: "-",
+              current: "-",
+              wave: "-",
+              wind: "-",
+            };
+          }
+
+          if (current) {
+            const [longitude, latitude] = current.center;
+            const isStillVisible =
+              longitude >= Math.min(viewportBounds.west, viewportBounds.east) &&
+              longitude <= Math.max(viewportBounds.west, viewportBounds.east) &&
+              latitude >= Math.min(viewportBounds.south, viewportBounds.north) &&
+              latitude <= Math.max(viewportBounds.south, viewportBounds.north);
+
+            if (isStillVisible) return current;
+          }
+
+          return nextData.regions[0]?.region ?? current;
+        });
+      })
+      .catch((error) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      });
   };
 
   const runSearch = () => {
@@ -612,6 +516,8 @@ export default function WorldMapWorkspace() {
 
     return () => controller.abort();
   }, [selectedRegion]);
+
+  useEffect(() => () => mapDataControllerRef.current?.abort(), []);
 
   return (
     <section className={isExpanded ? "aqua-map-workspace is-expanded" : "aqua-map-workspace"}>
