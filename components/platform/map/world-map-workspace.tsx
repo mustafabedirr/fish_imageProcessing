@@ -1,8 +1,7 @@
 "use client";
 
 import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
-import Map, { Layer, Marker, Source, type MapRef } from "react-map-gl/maplibre";
-import { circle, featureCollection, lineString, point, polygon as turfPolygon } from "@turf/turf";
+import Map, { type MapRef } from "react-map-gl/maplibre";
 import {
   Anchor,
   Bell,
@@ -63,12 +62,6 @@ const observations = [
   },
 ];
 
-const mapMetrics = [
-  { icon: Thermometer, label: "Su Sicakligi", value: "18.6 C" },
-  { icon: Wind, label: "Ruzgar", value: "12 kn" },
-  { icon: Waves, label: "Dalga Yuksekligi", value: "0.3 m" },
-];
-
 const mapStyle = {
   version: 8,
   sources: {
@@ -100,44 +93,25 @@ const mapStyle = {
   ],
 };
 
-const fishDensityData = [
-  { position: [26.4142, 39.2326], weight: 78 },
-  { position: [27.1428, 38.4237], weight: 52 },
-  { position: [25.8947, 37.9838], weight: 61 },
-  { position: [26.72, 38.18], weight: 86 },
-  { position: [25.42, 38.62], weight: 68 },
-  { position: [27.55, 36.91], weight: 74 },
-  { position: [24.92, 37.55], weight: 58 },
-  { position: [26.02, 40.02], weight: 92 },
+const demoHeatmapAreas = [
+  { id: "north-aegean", className: "aqua-demo-heat aqua-demo-heat--north", label: "Kuzey Ege yogunlugu" },
+  { id: "izmir", className: "aqua-demo-heat aqua-demo-heat--izmir", label: "Izmir Korfezi yogunlugu" },
+  { id: "cyclades", className: "aqua-demo-heat aqua-demo-heat--cyclades", label: "Kiklad gecis yogunlugu" },
+  { id: "bodrum", className: "aqua-demo-heat aqua-demo-heat--bodrum", label: "Bodrum resif yogunlugu" },
 ] as const;
 
-const currentPaths = [
-  { path: [[24.2, 38.9], [24.9, 39.1], [25.7, 39.08], [26.25, 39.28]], speed: 0.8 },
-  { path: [[25.1, 37.85], [25.9, 38.0], [26.8, 37.82], [27.44, 38.12]], speed: 0.7 },
-  { path: [[24.7, 36.72], [25.6, 37.05], [26.58, 37.0], [27.6, 37.28]], speed: 0.9 },
-  { path: [[23.9, 37.32], [24.65, 37.58], [25.3, 37.52], [26.05, 37.76]], speed: 0.6 },
+const demoMarkers = [
+  { name: "Kuzey Ege", label: "%78", regionIndex: 0, style: { left: "46%", top: "28%" } },
+  { name: "Izmir Korfezi", label: "%62", regionIndex: 1, style: { left: "63%", top: "43%" } },
+  { name: "Bodrum Resifi", label: "%74", regionIndex: 2, style: { left: "70%", top: "64%" } },
+  { name: "Kiklad Gecisi", label: "%58", regionIndex: 0, style: { left: "38%", top: "58%" } },
 ] as const;
 
-const protectedAreas = [
-  {
-    name: "Kuzey Ege Koruma Alani",
-    polygon: [[25.86, 39.12], [26.62, 39.04], [26.72, 39.42], [26.12, 39.62], [25.86, 39.12]],
-  },
-  {
-    name: "Bodrum Resif Bolgesi",
-    polygon: [[27.18, 37.1], [27.82, 37.0], [27.74, 37.42], [27.24, 37.5], [27.18, 37.1]],
-  },
-  {
-    name: "Kiklad Gecis Alani",
-    polygon: [[24.2, 37.0], [24.82, 36.86], [25.02, 37.22], [24.36, 37.44], [24.2, 37.0]],
-  },
-] as const;
-
-const portMarkers = [
-  { name: "Izmir", coordinates: [27.14, 38.42] },
-  { name: "Kusadasi", coordinates: [27.26, 37.86] },
-  { name: "Bodrum", coordinates: [27.43, 37.03] },
-  { name: "Rhodes", coordinates: [28.22, 36.43] },
+const demoPorts = [
+  { name: "Izmir", style: { left: "68%", top: "39%" } },
+  { name: "Kusadasi", style: { left: "66%", top: "50%" } },
+  { name: "Bodrum", style: { left: "70%", top: "61%" } },
+  { name: "Rhodes", style: { left: "77%", top: "73%" } },
 ] as const;
 
 const days = ["12 May", "13 May", "14 May", "15 May", "16 May", "17 May", "18 May"];
@@ -146,6 +120,7 @@ const regionTabs = ["Ozet", "Canli Veriler", "Analiz", "Notlar"] as const;
 
 const mapRegions = [
   {
+    id: "north",
     name: "Kuzey Ege Bolgesi",
     coordinatesText: "39.2326 N, 26.4412 E",
     center: [26.4412, 39.2326],
@@ -158,6 +133,7 @@ const mapRegions = [
     wind: "12 kn",
   },
   {
+    id: "izmir",
     name: "Izmir Korfezi",
     coordinatesText: "38.4237 N, 27.1428 E",
     center: [27.1428, 38.4237],
@@ -170,6 +146,7 @@ const mapRegions = [
     wind: "9 kn",
   },
   {
+    id: "bodrum",
     name: "Bodrum Resif Bolgesi",
     coordinatesText: "37.0344 N, 27.4305 E",
     center: [27.4305, 37.0344],
@@ -182,6 +159,18 @@ const mapRegions = [
     wind: "14 kn",
   },
 ] as const;
+
+type MarineConditions = {
+  source: "open-meteo" | "fallback";
+  updatedAt: string;
+  waveHeight: string;
+  waveDirection: string;
+  wavePeriod: string;
+  windSpeed: string;
+  windDirection: string;
+  airTemperature: string;
+  waterTemperature: string;
+};
 
 export default function WorldMapWorkspace() {
   const mapRef = useRef<MapRef | null>(null);
@@ -199,10 +188,18 @@ export default function WorldMapWorkspace() {
   const [activeRegionTab, setActiveRegionTab] = useState<(typeof regionTabs)[number]>("Ozet");
   const [favoriteRegion, setFavoriteRegion] = useState(false);
   const [selectedObservationIndex, setSelectedObservationIndex] = useState(0);
+  const [marineConditions, setMarineConditions] = useState<MarineConditions | null>(null);
+  const [marineStatus, setMarineStatus] = useState<"loading" | "ready" | "fallback">("loading");
 
   const selectedRegion = mapRegions[activeRegionIndex];
   const selectedObservation = observations[selectedObservationIndex];
   const selectedDayIndex = Math.max(days.indexOf(selectedDay), 0);
+  const liveSourceLabel = marineStatus === "loading" ? "Veri aliniyor" : marineConditions?.source === "open-meteo" ? "Open-Meteo Marine" : "Demo fallback";
+  const floatingMetrics = [
+    { icon: Thermometer, label: "Su Sicakligi", value: marineConditions?.waterTemperature ?? selectedRegion.temperature },
+    { icon: Wind, label: "Ruzgar", value: marineConditions?.windSpeed ?? selectedRegion.wind },
+    { icon: Waves, label: "Dalga Yuksekligi", value: marineConditions?.waveHeight ?? selectedRegion.wave },
+  ];
 
   const activeMapStyle = useMemo(() => {
     const rasterPaint =
@@ -223,38 +220,6 @@ export default function WorldMapWorkspace() {
       ],
     };
   }, [mapView]);
-
-  const mapData = useMemo(() => {
-    const densityPoints = featureCollection(
-      fishDensityData.map((item) => point([item.position[0], item.position[1]], { weight: item.weight }))
-    );
-
-    const temperatureZones = featureCollection(
-      fishDensityData.map((item) =>
-        circle([item.position[0], item.position[1]], 18 + item.weight / 7, {
-          steps: 48,
-          units: "kilometers",
-          properties: { weight: item.weight },
-        })
-      )
-    );
-
-    const currents = featureCollection(
-      currentPaths.map((item) => lineString(item.path.map(([longitude, latitude]) => [longitude, latitude]), { speed: item.speed }))
-    );
-
-    const currentParticles = featureCollection(
-      currentPaths.flatMap((item) =>
-        item.path.map(([longitude, latitude], index) => point([longitude, latitude], { speed: item.speed, index }))
-      )
-    );
-
-    const protectedPolygons = featureCollection(
-      protectedAreas.map((item) => turfPolygon([item.polygon.map(([longitude, latitude]) => [longitude, latitude])], { name: item.name }))
-    );
-
-    return { densityPoints, temperatureZones, currents, currentParticles, protectedPolygons };
-  }, []);
 
   const toggleLayer = (id: string) => {
     setActiveLayers((current) => ({ ...current, [id]: !current[id] }));
@@ -312,6 +277,28 @@ export default function WorldMapWorkspace() {
 
     return () => window.clearInterval(timer);
   }, [isPlaying]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const [longitude, latitude] = selectedRegion.center;
+
+    setMarineStatus("loading");
+    fetch(`/api/marine-conditions?lat=${latitude}&lon=${longitude}&region=${selectedRegion.id}`, {
+      signal: controller.signal,
+    })
+      .then((response) => response.json())
+      .then((data: MarineConditions) => {
+        setMarineConditions(data);
+        setMarineStatus(data.source === "open-meteo" ? "ready" : "fallback");
+      })
+      .catch((error) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        setMarineConditions(null);
+        setMarineStatus("fallback");
+      });
+
+    return () => controller.abort();
+  }, [selectedRegion]);
 
   return (
     <section className={isExpanded ? "aqua-map-workspace is-expanded" : "aqua-map-workspace"}>
@@ -446,7 +433,7 @@ export default function WorldMapWorkspace() {
                   <Layers size={18} />
                   Veri Katmanlari
                 </button>
-                {mapMetrics.map((metric) => {
+                {floatingMetrics.map((metric) => {
                   const Icon = metric.icon;
                   return (
                     <article key={metric.label}>
@@ -467,142 +454,52 @@ export default function WorldMapWorkspace() {
                   style={{ width: "100%", height: "100%" }}
                   minZoom={4.4}
                   maxZoom={10}
-                >
-                  {activeLayers["water-temperature"] ? (
-                    <Source id="aqua-temperature-zones" type="geojson" data={mapData.temperatureZones}>
-                      <Layer
-                        id="aqua-temperature-fill"
-                        type="fill"
-                        paint={{
-                          "fill-color": [
-                            "interpolate",
-                            ["linear"],
-                            ["get", "weight"],
-                            50,
-                            "#1e90ff",
-                            70,
-                            "#00c996",
-                            84,
-                            "#ffd152",
-                            94,
-                            "#ff553e",
-                          ],
-                          "fill-opacity": 0.2,
-                        }}
-                      />
-                    </Source>
-                  ) : null}
+                />
 
-                  {activeLayers["fish-density"] ? (
-                    <Source id="aqua-fish-density" type="geojson" data={mapData.densityPoints}>
-                      <Layer
-                        id="aqua-fish-density-heat"
-                        type="heatmap"
-                        paint={{
-                          "heatmap-weight": ["interpolate", ["linear"], ["get", "weight"], 0, 0, 100, 1],
-                          "heatmap-intensity": ["interpolate", ["linear"], ["zoom"], 4, 1.15, 8, 1.9],
-                          "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 4, 34, 8, 68],
-                          "heatmap-opacity": ["interpolate", ["linear"], ["zoom"], 4, 0.66, 8, 0.78],
-                          "heatmap-color": [
-                            "interpolate",
-                            ["linear"],
-                            ["heatmap-density"],
-                            0,
-                            "rgba(0,0,0,0)",
-                            0.16,
-                            "rgba(34,211,238,0.18)",
-                            0.34,
-                            "rgba(34,211,238,0.48)",
-                            0.56,
-                            "rgba(0,201,150,0.62)",
-                            0.74,
-                            "rgba(255,161,62,0.72)",
-                            0.94,
-                            "rgba(255,72,60,0.78)",
-                          ],
-                        }}
-                      />
-                      <Layer
-                        id="aqua-fish-density-points"
-                        type="circle"
-                        paint={{
-                          "circle-radius": ["interpolate", ["linear"], ["get", "weight"], 50, 10, 100, 22],
-                          "circle-color": [
-                            "interpolate",
-                            ["linear"],
-                            ["get", "weight"],
-                            52,
-                            "rgba(34,211,238,0.28)",
-                            76,
-                            "rgba(0,201,150,0.36)",
-                            92,
-                            "rgba(255,88,72,0.44)",
-                          ],
-                          "circle-opacity": 0.34,
-                          "circle-blur": 0.86,
-                        }}
-                      />
-                    </Source>
+                <div className="aqua-demo-map-overlay" aria-label="Demo Ege deniz veri katmanlari">
+                  {activeLayers["fish-density"] || activeLayers["water-temperature"]
+                    ? demoHeatmapAreas.map((area) => <span className={area.className} aria-label={area.label} key={area.id} />)
+                    : null}
+
+                  {activeLayers["protected-areas"] ? (
+                    <svg className="aqua-demo-protected" viewBox="0 0 1000 620" aria-hidden>
+                      <polygon points="310,105 395,88 428,158 366,202 292,170" />
+                      <polygon points="642,352 728,338 758,410 681,448 618,410" />
+                      <polygon points="410,420 494,392 540,448 486,504 396,482" />
+                    </svg>
                   ) : null}
 
                   {activeLayers["current-direction"] ? (
-                    <>
-                      <Source id="aqua-current-paths" type="geojson" data={mapData.currents}>
-                        <Layer
-                          id="aqua-current-path-line"
-                          type="line"
-                          layout={{
-                            "line-cap": "round",
-                            "line-join": "round",
-                          }}
-                          paint={{
-                            "line-color": "#22d3ee",
-                            "line-width": ["interpolate", ["linear"], ["get", "speed"], 0.5, 1.35, 1, 2.2],
-                            "line-opacity": 0.65,
-                            "line-blur": 0.18,
-                          }}
-                        />
-                      </Source>
-                      <Source id="aqua-current-particles" type="geojson" data={mapData.currentParticles}>
-                        <Layer
-                          id="aqua-current-particle-dots"
-                          type="circle"
-                          paint={{
-                            "circle-radius": 2,
-                            "circle-color": "#22d3ee",
-                            "circle-opacity": 0.56,
-                            "circle-blur": 0.22,
-                          }}
-                        />
-                      </Source>
-                    </>
-                  ) : null}
-
-                  {activeLayers["protected-areas"] ? (
-                    <Source id="aqua-protected-areas" type="geojson" data={mapData.protectedPolygons}>
-                      <Layer
-                        id="aqua-protected-fill"
-                        type="fill"
-                        paint={{ "fill-color": "#00c996", "fill-opacity": 0.1 }}
-                      />
-                      <Layer
-                        id="aqua-protected-outline"
-                        type="line"
-                        paint={{ "line-color": "#00c996", "line-width": 1.35, "line-opacity": 0.85, "line-dasharray": [6, 4] }}
-                      />
-                    </Source>
+                    <svg className="aqua-demo-currents" viewBox="0 0 1000 620" aria-hidden>
+                      <path d="M150 245 C250 190 352 244 454 201 S640 187 742 126" />
+                      <path d="M164 338 C274 286 382 360 506 308 S676 292 824 230" />
+                      <path d="M228 455 C338 410 452 462 580 402 S744 388 870 326" />
+                      <path d="M126 516 C246 482 354 528 476 490 S626 474 764 434" />
+                    </svg>
                   ) : null}
 
                   {activeLayers.ports
-                    ? portMarkers.map((marker) => (
-                        <Marker longitude={marker.coordinates[0]} latitude={marker.coordinates[1]} anchor="center" key={marker.name}>
-                          <span className="aqua-map-port-marker" title={marker.name}>
-                            <Anchor size={14} />
-                          </span>
-                        </Marker>
+                    ? demoPorts.map((port) => (
+                        <span className="aqua-demo-port" style={port.style as CSSProperties} title={port.name} key={port.name}>
+                          <Anchor size={13} />
+                        </span>
                       ))
                     : null}
-                </Map>
+
+                  {demoMarkers.map((marker) => (
+                    <button
+                      type="button"
+                      className={activeRegionIndex === marker.regionIndex ? "aqua-demo-marker is-selected" : "aqua-demo-marker"}
+                      style={marker.style as CSSProperties}
+                      onClick={() => focusRegion(marker.regionIndex)}
+                      key={marker.name}
+                    >
+                      <span />
+                      <strong>{marker.name}</strong>
+                      <small>{marker.label}</small>
+                    </button>
+                  ))}
+                </div>
 
                 <div className="aqua-map-data-overlay" aria-hidden />
               </div>
@@ -610,7 +507,7 @@ export default function WorldMapWorkspace() {
               <div className="aqua-map-context-label">
                 <strong>{selectedRegion.name}</strong>
                 <span>{selectedRegion.coordinatesText}</span>
-                <small>Canli veri simulasyonu</small>
+                <small>{liveSourceLabel}</small>
               </div>
 
               <div className="aqua-map-zoom">
@@ -679,7 +576,7 @@ export default function WorldMapWorkspace() {
                   <Waves size={17} />
                   <span>
                     <strong>Canli</strong>
-                    <small>Guncel Veri</small>
+                    <small>{marineStatus === "loading" ? "Yukleniyor" : liveSourceLabel}</small>
                   </span>
                 </button>
               </div>
@@ -721,7 +618,7 @@ export default function WorldMapWorkspace() {
                 </article>
                 <article>
                   <span>Su Sicakligi</span>
-                  <strong>{selectedRegion.temperature}</strong>
+                  <strong>{marineConditions?.waterTemperature ?? selectedRegion.temperature}</strong>
                 </article>
                 <article>
                   <span>Klorofil Seviyesi</span>
@@ -734,20 +631,20 @@ export default function WorldMapWorkspace() {
                 </article>
                 <article>
                   <span>Dalga Yuksekligi</span>
-                  <strong>{selectedRegion.wave}</strong>
+                  <strong>{marineConditions?.waveHeight ?? selectedRegion.wave}</strong>
                 </article>
                 <article>
                   <span>Ruzgar Hizi</span>
-                  <strong>{selectedRegion.wind}</strong>
+                  <strong>{marineConditions?.windSpeed ?? selectedRegion.wind}</strong>
                 </article>
               </div>
               <div className="aqua-region-tab-detail">
                 <strong>{activeRegionTab}</strong>
                 <span>
                   {activeRegionTab === "Ozet"
-                    ? `${selectedRegion.name} icin ${selectedDay} verileri guncel olarak izleniyor.`
+                    ? `${selectedRegion.name} icin ${selectedDay} verileri ${liveSourceLabel} kaynagi ile izleniyor.`
                     : activeRegionTab === "Canli Veriler"
-                    ? `Anlik sicaklik ${selectedRegion.temperature}, akinti ${selectedRegion.current}, ruzgar ${selectedRegion.wind}.`
+                    ? `Dalga ${marineConditions?.waveHeight ?? selectedRegion.wave}, yon ${marineConditions?.waveDirection ?? "-"}, periyot ${marineConditions?.wavePeriod ?? "-"}, ruzgar ${marineConditions?.windSpeed ?? selectedRegion.wind}.`
                     : activeRegionTab === "Analiz"
                     ? `${selectedRegion.density} balik yogunlugu ve ${selectedRegion.chlorophyll.toLocaleLowerCase("tr-TR")} klorofil seviyesi raporlandi.`
                     : "Bu bolge icin saha notu eklenmedi."}
