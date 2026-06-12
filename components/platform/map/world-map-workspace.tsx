@@ -1,7 +1,7 @@
 "use client";
 
 import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
-import Map, { type MapRef } from "react-map-gl/maplibre";
+import Map, { Layer, Marker, Source, type MapRef } from "react-map-gl/maplibre";
 import {
   Anchor,
   Bell,
@@ -93,25 +93,51 @@ const mapStyle = {
   ],
 };
 
-const demoHeatmapAreas = [
-  { id: "north-aegean", className: "aqua-demo-heat aqua-demo-heat--north", label: "Kuzey Ege yogunlugu" },
-  { id: "izmir", className: "aqua-demo-heat aqua-demo-heat--izmir", label: "Izmir Korfezi yogunlugu" },
-  { id: "cyclades", className: "aqua-demo-heat aqua-demo-heat--cyclades", label: "Kiklad gecis yogunlugu" },
-  { id: "bodrum", className: "aqua-demo-heat aqua-demo-heat--bodrum", label: "Bodrum resif yogunlugu" },
+const fishDensityData = [
+  { position: [26.4142, 39.2326], weight: 78 },
+  { position: [27.1428, 38.4237], weight: 62 },
+  { position: [25.8947, 37.9838], weight: 58 },
+  { position: [26.72, 38.18], weight: 73 },
+  { position: [25.42, 38.62], weight: 66 },
+  { position: [27.55, 36.91], weight: 74 },
+  { position: [24.92, 37.55], weight: 54 },
+  { position: [26.02, 40.02], weight: 88 },
 ] as const;
 
-const demoMarkers = [
-  { name: "Kuzey Ege", label: "%78", regionIndex: 0, style: { left: "46%", top: "28%" } },
-  { name: "Izmir Korfezi", label: "%62", regionIndex: 1, style: { left: "63%", top: "43%" } },
-  { name: "Bodrum Resifi", label: "%74", regionIndex: 2, style: { left: "70%", top: "64%" } },
-  { name: "Kiklad Gecisi", label: "%58", regionIndex: 0, style: { left: "38%", top: "58%" } },
+const currentPaths = [
+  { path: [[24.2, 38.9], [24.9, 39.1], [25.7, 39.08], [26.25, 39.28]], speed: 0.8 },
+  { path: [[25.1, 37.85], [25.9, 38.0], [26.8, 37.82], [27.44, 38.12]], speed: 0.7 },
+  { path: [[24.7, 36.72], [25.6, 37.05], [26.58, 37.0], [27.6, 37.28]], speed: 0.9 },
+  { path: [[23.9, 37.32], [24.65, 37.58], [25.3, 37.52], [26.05, 37.76]], speed: 0.6 },
 ] as const;
 
-const demoPorts = [
-  { name: "Izmir", style: { left: "68%", top: "39%" } },
-  { name: "Kusadasi", style: { left: "66%", top: "50%" } },
-  { name: "Bodrum", style: { left: "70%", top: "61%" } },
-  { name: "Rhodes", style: { left: "77%", top: "73%" } },
+const protectedAreas = [
+  {
+    name: "Kuzey Ege Koruma Alani",
+    polygon: [[25.86, 39.12], [26.62, 39.04], [26.72, 39.42], [26.12, 39.62], [25.86, 39.12]],
+  },
+  {
+    name: "Bodrum Resif Bolgesi",
+    polygon: [[27.18, 37.1], [27.82, 37.0], [27.74, 37.42], [27.24, 37.5], [27.18, 37.1]],
+  },
+  {
+    name: "Kiklad Gecis Alani",
+    polygon: [[24.2, 37.0], [24.82, 36.86], [25.02, 37.22], [24.36, 37.44], [24.2, 37.0]],
+  },
+] as const;
+
+const portMarkers = [
+  { name: "Izmir", coordinates: [27.14, 38.42] },
+  { name: "Kusadasi", coordinates: [27.26, 37.86] },
+  { name: "Bodrum", coordinates: [27.43, 37.03] },
+  { name: "Rhodes", coordinates: [28.22, 36.43] },
+] as const;
+
+const regionMarkers = [
+  { name: "Kuzey Ege", label: "%78", regionIndex: 0, coordinates: [26.4412, 39.2326] },
+  { name: "Izmir Korfezi", label: "%62", regionIndex: 1, coordinates: [27.1428, 38.4237] },
+  { name: "Bodrum Resifi", label: "%74", regionIndex: 2, coordinates: [27.4305, 37.0344] },
+  { name: "Kiklad Gecisi", label: "%58", regionIndex: 0, coordinates: [25.25, 37.35] },
 ] as const;
 
 const days = ["12 May", "13 May", "14 May", "15 May", "16 May", "17 May", "18 May"];
@@ -200,6 +226,42 @@ export default function WorldMapWorkspace() {
     { icon: Wind, label: "Ruzgar", value: marineConditions?.windSpeed ?? selectedRegion.wind },
     { icon: Waves, label: "Dalga Yuksekligi", value: marineConditions?.waveHeight ?? selectedRegion.wave },
   ];
+  const coordinateLayerData = useMemo(() => {
+    const densityPoints = {
+      type: "FeatureCollection",
+      features: fishDensityData.map((item) => ({
+        type: "Feature",
+        properties: { weight: item.weight },
+        geometry: { type: "Point", coordinates: item.position },
+      })),
+    };
+    const temperaturePoints = {
+      type: "FeatureCollection",
+      features: fishDensityData.map((item) => ({
+        type: "Feature",
+        properties: { weight: item.weight },
+        geometry: { type: "Point", coordinates: item.position },
+      })),
+    };
+    const currents = {
+      type: "FeatureCollection",
+      features: currentPaths.map((item) => ({
+        type: "Feature",
+        properties: { speed: item.speed },
+        geometry: { type: "LineString", coordinates: item.path },
+      })),
+    };
+    const protectedPolygons = {
+      type: "FeatureCollection",
+      features: protectedAreas.map((item) => ({
+        type: "Feature",
+        properties: { name: item.name },
+        geometry: { type: "Polygon", coordinates: [item.polygon] },
+      })),
+    };
+
+    return { densityPoints, temperaturePoints, currents, protectedPolygons };
+  }, []);
 
   const activeMapStyle = useMemo(() => {
     const rasterPaint =
@@ -454,52 +516,118 @@ export default function WorldMapWorkspace() {
                   style={{ width: "100%", height: "100%" }}
                   minZoom={4.4}
                   maxZoom={10}
-                />
+                >
+                  {activeLayers["water-temperature"] ? (
+                    <Source id="aqua-temperature-points" type="geojson" data={coordinateLayerData.temperaturePoints as any}>
+                      <Layer
+                        id="aqua-temperature-circles"
+                        type="circle"
+                        paint={{
+                          "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 22, 8, 70],
+                          "circle-color": [
+                            "interpolate",
+                            ["linear"],
+                            ["get", "weight"],
+                            52,
+                            "rgba(34,211,238,0.22)",
+                            72,
+                            "rgba(0,201,150,0.28)",
+                            88,
+                            "rgba(255,161,62,0.34)",
+                          ],
+                          "circle-opacity": 0.58,
+                          "circle-blur": 0.82,
+                        }}
+                      />
+                    </Source>
+                  ) : null}
 
-                <div className="aqua-demo-map-overlay" aria-label="Demo Ege deniz veri katmanlari">
-                  {activeLayers["fish-density"] || activeLayers["water-temperature"]
-                    ? demoHeatmapAreas.map((area) => <span className={area.className} aria-label={area.label} key={area.id} />)
-                    : null}
-
-                  {activeLayers["protected-areas"] ? (
-                    <svg className="aqua-demo-protected" viewBox="0 0 1000 620" aria-hidden>
-                      <polygon points="310,105 395,88 428,158 366,202 292,170" />
-                      <polygon points="642,352 728,338 758,410 681,448 618,410" />
-                      <polygon points="410,420 494,392 540,448 486,504 396,482" />
-                    </svg>
+                  {activeLayers["fish-density"] ? (
+                    <Source id="aqua-fish-density" type="geojson" data={coordinateLayerData.densityPoints as any}>
+                      <Layer
+                        id="aqua-fish-density-heat"
+                        type="heatmap"
+                        paint={{
+                          "heatmap-weight": ["interpolate", ["linear"], ["get", "weight"], 0, 0, 100, 1],
+                          "heatmap-intensity": ["interpolate", ["linear"], ["zoom"], 4, 1.1, 8, 1.75],
+                          "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 4, 28, 8, 62],
+                          "heatmap-opacity": 0.72,
+                          "heatmap-color": [
+                            "interpolate",
+                            ["linear"],
+                            ["heatmap-density"],
+                            0,
+                            "rgba(0,0,0,0)",
+                            0.18,
+                            "rgba(34,211,238,0.22)",
+                            0.42,
+                            "rgba(0,201,150,0.48)",
+                            0.68,
+                            "rgba(255,161,62,0.64)",
+                            0.94,
+                            "rgba(255,72,60,0.74)",
+                          ],
+                        }}
+                      />
+                    </Source>
                   ) : null}
 
                   {activeLayers["current-direction"] ? (
-                    <svg className="aqua-demo-currents" viewBox="0 0 1000 620" aria-hidden>
-                      <path d="M150 245 C250 190 352 244 454 201 S640 187 742 126" />
-                      <path d="M164 338 C274 286 382 360 506 308 S676 292 824 230" />
-                      <path d="M228 455 C338 410 452 462 580 402 S744 388 870 326" />
-                      <path d="M126 516 C246 482 354 528 476 490 S626 474 764 434" />
-                    </svg>
+                    <Source id="aqua-current-paths" type="geojson" data={coordinateLayerData.currents as any}>
+                      <Layer
+                        id="aqua-current-path-line"
+                        type="line"
+                        layout={{ "line-cap": "round", "line-join": "round" }}
+                        paint={{
+                          "line-color": "#22d3ee",
+                          "line-width": ["interpolate", ["linear"], ["get", "speed"], 0.5, 1.4, 1, 2.4],
+                          "line-opacity": 0.66,
+                          "line-blur": 0.15,
+                          "line-dasharray": [2.5, 2],
+                        }}
+                      />
+                    </Source>
+                  ) : null}
+
+                  {activeLayers["protected-areas"] ? (
+                    <Source id="aqua-protected-areas" type="geojson" data={coordinateLayerData.protectedPolygons as any}>
+                      <Layer
+                        id="aqua-protected-fill"
+                        type="fill"
+                        paint={{ "fill-color": "#00c996", "fill-opacity": 0.1 }}
+                      />
+                      <Layer
+                        id="aqua-protected-outline"
+                        type="line"
+                        paint={{ "line-color": "#00c996", "line-width": 1.4, "line-opacity": 0.82, "line-dasharray": [6, 4] }}
+                      />
+                    </Source>
                   ) : null}
 
                   {activeLayers.ports
-                    ? demoPorts.map((port) => (
-                        <span className="aqua-demo-port" style={port.style as CSSProperties} title={port.name} key={port.name}>
-                          <Anchor size={13} />
-                        </span>
+                    ? portMarkers.map((port) => (
+                        <Marker longitude={port.coordinates[0]} latitude={port.coordinates[1]} anchor="center" key={port.name}>
+                          <span className="aqua-map-port-marker" title={port.name}>
+                            <Anchor size={13} />
+                          </span>
+                        </Marker>
                       ))
                     : null}
 
-                  {demoMarkers.map((marker) => (
-                    <button
-                      type="button"
-                      className={activeRegionIndex === marker.regionIndex ? "aqua-demo-marker is-selected" : "aqua-demo-marker"}
-                      style={marker.style as CSSProperties}
-                      onClick={() => focusRegion(marker.regionIndex)}
-                      key={marker.name}
-                    >
-                      <span />
-                      <strong>{marker.name}</strong>
-                      <small>{marker.label}</small>
-                    </button>
+                  {regionMarkers.map((marker) => (
+                    <Marker longitude={marker.coordinates[0]} latitude={marker.coordinates[1]} anchor="bottom" key={marker.name}>
+                      <button
+                        type="button"
+                        className={activeRegionIndex === marker.regionIndex ? "aqua-map-region-marker is-selected" : "aqua-map-region-marker"}
+                        onClick={() => focusRegion(marker.regionIndex)}
+                      >
+                        <span />
+                        <strong>{marker.name}</strong>
+                        <small>{marker.label}</small>
+                      </button>
+                    </Marker>
                   ))}
-                </div>
+                </Map>
 
                 <div className="aqua-map-data-overlay" aria-hidden />
               </div>
