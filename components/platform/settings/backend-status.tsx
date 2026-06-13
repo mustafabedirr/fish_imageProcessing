@@ -1,4 +1,4 @@
-import { Clock3, Code2, Server, Zap } from "lucide-react";
+import { Clock3, Code2, Copy, Server, Zap } from "lucide-react";
 
 export default function BackendStatus() {
   return (
@@ -37,9 +37,14 @@ export default function BackendStatus() {
         </article>
       </div>
 
-      <p className="settings-backend-copy">
-        Next.js API, varsayilan olarak FastAPI analiz servisine <code>http://127.0.0.1:8000/api/v1/analyze-fish</code> uzerinden baglanir.
-      </p>
+      <div className="settings-endpoint-row">
+        <span>API Endpoint</span>
+        <code>http://127.0.0.1:8000/api/v1/analyze-fish</code>
+        <button type="button">
+          <Copy size={15} />
+          Kopyala
+        </button>
+      </div>
 
       <button type="button" className="settings-env-button">
         <Code2 size={18} />
