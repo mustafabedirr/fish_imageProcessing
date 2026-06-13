@@ -22,6 +22,7 @@ import {
   Video,
   X,
 } from "lucide-react";
+import AnimatedTabBar from "../../ui/animated-tab-bar";
 
 const avatar = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80";
 
@@ -290,25 +291,32 @@ export default function SocialAreaWorkspace() {
             </div>
           </header>
 
-          <nav className="social-tabs" aria-label="Social feed tabs">
-            {feedTabs.map((tab) => (
-              <button type="button" className={activeTab === tab ? "is-active" : ""} onClick={() => setActiveTab(tab)} key={tab}>
-                {feedTabLabels[tab]}
-              </button>
-            ))}
-            <button type="button" className={filtersOpen ? "social-filter is-open" : "social-filter"} onClick={() => setFiltersOpen((open) => !open)}>
-              <SlidersHorizontal size={15} />
-              Filtreler
-              <ChevronDown size={15} />
-            </button>
-            {filtersOpen ? (
-              <div className="social-filter-menu">
-                <button type="button" onClick={() => setActiveTab("Popular")}>High engagement</button>
-                <button type="button" onClick={() => setSearchQuery("#Fishing")}>#Fishing</button>
-                <button type="button" onClick={() => setSearchQuery("")}>Clear filters</button>
-              </div>
-            ) : null}
-          </nav>
+          <AnimatedTabBar
+            ariaLabel="Social feed tabs"
+            activeButtonClassName="is-active"
+            activeValue={activeTab}
+            buttonClassName="social-tab-button"
+            className="social-tabs"
+            layoutId="social-feed-active-tab"
+            onChange={setActiveTab}
+            tabs={feedTabs.map((tab) => ({ title: feedTabLabels[tab], value: tab }))}
+            trailingContent={
+              <>
+                <button type="button" className={filtersOpen ? "social-filter is-open" : "social-filter"} onClick={() => setFiltersOpen((open) => !open)}>
+                  <SlidersHorizontal size={15} />
+                  Filtreler
+                  <ChevronDown size={15} />
+                </button>
+                {filtersOpen ? (
+                  <div className="social-filter-menu">
+                    <button type="button" onClick={() => setActiveTab("Popular")}>High engagement</button>
+                    <button type="button" onClick={() => setSearchQuery("#Fishing")}>#Fishing</button>
+                    <button type="button" onClick={() => setSearchQuery("")}>Clear filters</button>
+                  </div>
+                ) : null}
+              </>
+            }
+          />
 
           <section className="social-composer">
             <div className="social-composer-row">
@@ -356,7 +364,7 @@ export default function SocialAreaWorkspace() {
             </div>
           </section>
 
-          <div className="social-post-stack">
+          <div className="social-post-stack" key={activeTab}>
             {visiblePosts.length ? visiblePosts.map((post) => (
               <article className="social-post-card" key={post.id}>
                 <header>

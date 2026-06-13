@@ -26,6 +26,7 @@ import {
   Waves,
 } from "lucide-react";
 import { cn } from "../../../lib/utils";
+import AnimatedTabBar from "../../ui/animated-tab-bar";
 
 const avatar = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=180&q=80";
 
@@ -300,14 +301,16 @@ export default function UserProfileWorkspace() {
               </div>
             </div>
 
-            <nav className="profile-tabs" aria-label="Profile sections">
-              {tabs.map(({ id, label, icon: Icon }) => (
-                <button className={activeTab === id ? "active" : ""} type="button" onClick={() => selectTab(id)} key={id}>
-                  <Icon size={18} />
-                  {label}
-                </button>
-              ))}
-            </nav>
+            <AnimatedTabBar
+              ariaLabel="Profile sections"
+              activeButtonClassName="active"
+              activeValue={activeTab}
+              buttonClassName="profile-tab-button"
+              className="profile-tabs"
+              layoutId="profile-active-tab"
+              onChange={selectTab}
+              tabs={tabs.map(({ id, label, icon }) => ({ title: label, value: id, icon }))}
+            />
           </section>
 
           <div className="profile-lower-grid">

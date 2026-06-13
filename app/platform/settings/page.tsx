@@ -1,11 +1,18 @@
+"use client";
+
+import { useState } from "react";
 import AccountSettings from "../../../components/platform/settings/account-settings";
 import BackendStatus from "../../../components/platform/settings/backend-status";
 import SettingsPanels from "../../../components/platform/settings/settings-panels";
+import AnimatedTabBar from "../../../components/ui/animated-tab-bar";
 import { Check, Search, Trash2 } from "lucide-react";
 
-const tabs = ["Genel", "Bildirimler", "Gorunum", "Guvenlik", "Entegrasyonlar", "Veri & Gizlilik"];
+const tabs = ["Genel", "Bildirimler", "Gorunum", "Guvenlik", "Entegrasyonlar", "Veri & Gizlilik"] as const;
+type SettingsTab = (typeof tabs)[number];
 
 export default function SettingsPage() {
+  const [activeTab, setActiveTab] = useState<SettingsTab>("Genel");
+
   return (
     <section className="settings-workspace">
       <header className="settings-header">
@@ -26,15 +33,18 @@ export default function SettingsPage() {
         </div>
       </header>
 
-      <nav className="settings-tabs" aria-label="Ayar sekmeleri">
-        {tabs.map((tab, index) => (
-          <button type="button" className={index === 0 ? "is-active" : ""} key={tab}>
-            {tab}
-          </button>
-        ))}
-      </nav>
+      <AnimatedTabBar
+        ariaLabel="Ayar sekmeleri"
+        activeButtonClassName="is-active"
+        activeValue={activeTab}
+        buttonClassName="settings-tab-button"
+        className="settings-tabs"
+        layoutId="settings-active-tab"
+        onChange={setActiveTab}
+        tabs={tabs.map((tab) => ({ title: tab, value: tab }))}
+      />
 
-      <div className="settings-stack">
+      <div className="settings-stack" data-active-tab={activeTab}>
         <AccountSettings />
         <SettingsPanels />
         <BackendStatus />
