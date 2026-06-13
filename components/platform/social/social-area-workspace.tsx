@@ -6,18 +6,12 @@ import {
   Award,
   Bell,
   Bookmark,
-  CalendarClock,
   CalendarDays,
   ChevronDown,
-  CircleSlash,
-  Flag,
-  Globe2,
   Heart,
   Image as ImageIcon,
-  List,
   MapPin,
   MessageCircle,
-  MoreHorizontal,
   Plus,
   Search,
   Share2,
@@ -25,6 +19,7 @@ import {
   Smile,
   Trophy,
   Users,
+  Video,
   X,
 } from "lucide-react";
 
@@ -86,18 +81,18 @@ const feedPosts = [
 ];
 
 const suggestedFriends = [
-  ["Kevin Hart", "8 mutual friends", avatar],
-  ["Sarah Johnson", "12 mutual friends", "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=96&q=80"],
-  ["Alex Rodriguez", "6 mutual friends", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=96&q=80"],
-  ["Emma Davis", "9 mutual friends", "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80"],
+  ["Kevin Hart", "12 mutual friends", avatar],
+  ["Sarah Johnson", "8 mutual friends", "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=96&q=80"],
+  ["Alex Rodriguez", "15 mutual friends", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=96&q=80"],
+  ["Emma Davis", "6 mutual friends", "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80"],
 ];
 
 const topics = [
-  ["# BassFishing", "1.2k posts"],
-  ["# TroutFishing", "907 posts"],
-  ["# FishingTips", "747 posts"],
-  ["# TackleBox", "671 posts"],
-  ["# CatchandRelease", "654 posts"],
+  ["# BassFishing", "12.3k posts"],
+  ["# TroutFishing", "9.1k posts"],
+  ["# FishingTips", "7.4k posts"],
+  ["# TackleBox", "6.8k posts"],
+  ["# CatchAndRelease", "6.1k posts"],
 ];
 
 const members = [
@@ -108,13 +103,14 @@ const members = [
   ["Sophia Martinez", "980 pts", "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80"],
 ];
 
-const feedTabs = ["For You", "Following", "Popular", "Recent"] as const;
+const feedTabs = ["For You", "Following", "Popular", "Groups", "New Posts"] as const;
 type FeedTab = (typeof feedTabs)[number];
 const feedTabLabels: Record<FeedTab, string> = {
-  "For You": "Senin icin",
-  Following: "Takip Ettiklerin",
-  Popular: "Populer",
-  Recent: "Yeni Gonderiler",
+  "For You": "For You",
+  Following: "Following",
+  Popular: "Popular",
+  Groups: "Groups",
+  "New Posts": "New Posts",
 };
 type SocialModal = "create" | "media" | "location" | "poll" | "achievement" | "notifications" | "comments" | "share" | "friends" | "topics" | "members" | "events" | null;
 
@@ -241,7 +237,7 @@ export default function SocialAreaWorkspace() {
       ...current,
     ]);
     setComposerText("");
-    setActiveTab("Recent");
+    setActiveTab("New Posts");
     setNotice(`${audience} icin yeni paylasim yayinlandi.`);
   };
 
@@ -314,12 +310,12 @@ export default function SocialAreaWorkspace() {
             ) : null}
           </nav>
 
-          <section className="social-composer" style={{ padding: "16px", display: "flex", flexDirection: "column" }}>
-            <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
-              <img src={avatar} alt="Derya Yilmaz" style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover" }} />
-              <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <section className="social-composer">
+            <div className="social-composer-row">
+              <img src={avatar} alt="Derya Yilmaz" />
+              <div className="social-composer-body">
                 <textarea
-                  placeholder="What's happening?"
+                  placeholder="What's happening, Derya?"
                   aria-label="Share a post"
                   value={composerText}
                   onChange={(event) => setComposerText(event.target.value)}
@@ -327,68 +323,34 @@ export default function SocialAreaWorkspace() {
                     if ((event.ctrlKey || event.metaKey) && event.key === "Enter") createPost();
                   }}
                   rows={2}
-                  style={{ 
-                    width: "100%", 
-                    background: "transparent", 
-                    border: "none", 
-                    outline: "none", 
-                    color: "#e2e8f0", 
-                    resize: "none", 
-                    fontSize: "17px",
-                    paddingTop: "8px",
-                    fontFamily: "inherit"
-                  }}
                 />
-                
-                <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.08)", marginTop: "12px", paddingTop: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div style={{ display: "flex", gap: "16px", alignItems: "center", color: "#8d98a8" }}>
-                    <button type="button" aria-label="Fotograf veya video ekle" title="Fotograf / Video" onClick={() => openModal("media")} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", display: "flex" }}>
-                      <ImageIcon size={20} />
+
+                <div className="social-composer-tools">
+                  <div className="social-composer-actions">
+                    <button type="button" aria-label="Add photo" title="Photo" onClick={() => openModal("media")}>
+                      <ImageIcon size={17} />
+                      <span>Photo</span>
                     </button>
-                    <button type="button" aria-label="GIF ekle" title="GIF" style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", display: "flex" }}>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: "bold", border: "1.5px solid currentColor", borderRadius: "4px", width: "20px", height: "20px" }}>
-                        GIF
-                      </div>
+                    <button type="button" aria-label="Add video" title="Video" onClick={() => openModal("media")}>
+                      <Video size={17} />
+                      <span>Video</span>
                     </button>
-                    <button type="button" aria-label="Circle Slash" title="Slash" style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", display: "flex" }}>
-                      <CircleSlash size={20} />
+                    <button type="button" aria-label="Add location" title="Location" onClick={() => openModal("location")}>
+                      <MapPin size={17} />
+                      <span>Location</span>
                     </button>
-                    <button type="button" aria-label="Anket ekle" title="Anket" onClick={() => openModal("poll")} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", display: "flex" }}>
-                      <List size={20} />
+                    <button type="button" aria-label="Add poll" title="Poll" onClick={() => openModal("poll")}>
+                      <SlidersHorizontal size={17} />
+                      <span>Poll</span>
                     </button>
-                    <button type="button" aria-label="Emoji ekle" title="Emoji" style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", display: "flex" }}>
-                      <Smile size={20} />
-                    </button>
-                    <button type="button" aria-label="Zamanla" title="Zamanla" style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", display: "flex" }}>
-                      <CalendarClock size={20} />
-                    </button>
-                    <button type="button" aria-label="Konum ekle" title="Konum" onClick={() => openModal("location")} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", display: "flex" }}>
-                      <MapPin size={20} />
-                    </button>
-                    <button type="button" aria-label="Bayrak" title="Bayrak" style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", display: "flex" }}>
-                      <Flag size={20} />
+                    <button type="button" aria-label="Add feeling" title="Feeling">
+                      <Smile size={17} />
+                      <span>Feeling</span>
                     </button>
                   </div>
-                  
-                  <div>
-                    <button 
-                      type="button" 
-                      style={{
-                        backgroundColor: composerText.trim() ? "#dcecff" : "#444b56",
-                        color: composerText.trim() ? "#0c233e" : "#8d98a8",
-                        border: "none",
-                        borderRadius: "999px",
-                        padding: "8px 18px",
-                        fontWeight: "600",
-                        fontSize: "14px",
-                        cursor: composerText.trim() ? "pointer" : "default",
-                        transition: "all 0.2s"
-                      }}
-                      onClick={() => composerText.trim() && createPost()}
-                    >
+                  <button type="button" className="social-post-button" onClick={createPost}>
                       Post
-                    </button>
-                  </div>
+                  </button>
                 </div>
               </div>
             </div>
@@ -404,7 +366,14 @@ export default function SocialAreaWorkspace() {
                     <span>{post.handle}</span>
                     <small>{post.time}</small>
                   </div>
-                  <MoreHorizontal size={19} />
+                  <button
+                    className={bookmarkedPosts[post.id] ? "social-bookmark is-active" : "social-bookmark"}
+                    type="button"
+                    aria-label="Bookmark post"
+                    onClick={() => setBookmarkedPosts((current) => ({ ...current, [post.id]: !current[post.id] }))}
+                  >
+                    <Bookmark size={18} />
+                  </button>
                 </header>
 
                 <p>{post.text}</p>
@@ -431,6 +400,11 @@ export default function SocialAreaWorkspace() {
                     onClick={() => setLikedPosts((current) => ({ ...current, [post.id]: !current[post.id] }))}
                   >
                     <Heart size={18} />
+                    <span className="social-reaction-stack" aria-hidden>
+                      <img src={avatar} alt="" />
+                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=48&q=80" alt="" />
+                      <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=48&q=80" alt="" />
+                    </span>
                     {post.likes + (likedPosts[post.id] ? 1 : 0)}
                   </button>
                   <button
@@ -439,7 +413,7 @@ export default function SocialAreaWorkspace() {
                     onClick={() => openModal("comments", post.id)}
                   >
                     <MessageCircle size={18} />
-                    {commentCounts[post.id] ?? post.comments}
+                    {commentCounts[post.id] ?? post.comments} Comments
                   </button>
                   <button
                     className={sharedPosts[post.id] ? "social-post-action is-active" : "social-post-action"}
@@ -448,14 +422,6 @@ export default function SocialAreaWorkspace() {
                   >
                     <Share2 size={18} />
                     {sharedPosts[post.id] ? "Paylasildi" : "Paylas"}
-                  </button>
-                  <button
-                    className={bookmarkedPosts[post.id] ? "social-bookmark is-active" : "social-bookmark"}
-                    type="button"
-                    aria-label="Bookmark post"
-                    onClick={() => setBookmarkedPosts((current) => ({ ...current, [post.id]: !current[post.id] }))}
-                  >
-                    <Bookmark size={18} />
                   </button>
                 </footer>
               </article>
