@@ -20907,7 +20907,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 .user-profile-content--reference .profile-hero {
-  min-height: 314px;
+  min-height: 380px;
   border: 1px solid rgba(70, 139, 210, 0.26);
   border-radius: 10px;
   background:
@@ -20978,12 +20978,15 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 .user-profile-content--reference .profile-avatar-wrap {
+  position: relative;
+  z-index: 4;
   width: 132px;
   height: 132px;
   border: 0;
   border-radius: 999px;
   background: transparent;
   cursor: pointer;
+  overflow: visible;
 }
 
 .user-profile-content--reference .profile-avatar-wrap img {
@@ -20994,6 +20997,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 .user-profile-content--reference .profile-avatar-wrap i {
+  z-index: 4;
   right: -1px;
   bottom: 5px;
   width: 32px;
@@ -21005,18 +21009,57 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 
 .user-profile-content--reference .profile-avatar-edit {
   position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
+  top: auto;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 34px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid rgba(113, 211, 255, 0.36);
   border-radius: 999px;
   color: #e7f9ff;
-  background: rgba(3, 13, 25, 0.58);
+  background: rgba(4, 17, 31, 0.76);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   opacity: 0;
-  transition: opacity 180ms ease;
-  backdrop-filter: blur(5px);
+  transform: translateY(8px) scale(0.96);
+  transition: opacity 190ms ease, transform 190ms ease, background 190ms ease;
+  font-size: 0.72rem;
+  font-weight: 760;
+  letter-spacing: 0;
+  backdrop-filter: blur(12px);
+}
+
+.user-profile-content--reference .profile-avatar-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  z-index: 2;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 28%, transparent 42%, rgba(2, 10, 20, 0.52) 100%),
+    linear-gradient(180deg, transparent 42%, rgba(4, 17, 31, 0.66) 100%);
+  opacity: 0;
+  transition: opacity 190ms ease;
+  pointer-events: none;
 }
 
 .user-profile-content--reference .profile-avatar-wrap:hover .profile-avatar-edit {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.user-profile-content--reference .profile-avatar-wrap:focus-visible .profile-avatar-edit {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.user-profile-content--reference .profile-avatar-wrap:hover::after {
   opacity: 1;
 }
 
@@ -21073,7 +21116,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 
 .user-profile-content--reference .profile-stats-row {
   position: relative;
-  z-index: 2;
+  z-index: 5;
   display: grid;
   grid-template-columns: repeat(4, auto) minmax(210px, 1fr);
   justify-content: start;
@@ -21106,6 +21149,8 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 .user-profile-content--reference .profile-hero-actions {
+  position: relative;
+  z-index: 6;
   justify-self: end;
   display: flex;
   align-items: center;
@@ -21149,7 +21194,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 3;
+  z-index: 4;
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   margin: 0;
@@ -21443,7 +21488,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 .user-profile-content--reference .profile-hero--collapsed {
-  min-height: 128px;
+  min-height: 152px;
 }
 
 .user-profile-content--reference .profile-hero--collapsed .profile-identity {
@@ -21456,6 +21501,30 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 .user-profile-content--reference .profile-hero--collapsed .profile-avatar-wrap img {
   width: 58px;
   height: 58px;
+}
+
+.user-profile-content--reference .profile-hero--collapsed .profile-avatar-wrap {
+  overflow: visible;
+}
+
+.user-profile-content--reference .profile-hero--collapsed .profile-avatar-edit,
+.user-profile-content--reference .profile-hero--collapsed .profile-avatar-wrap::after,
+.user-profile-content--reference .profile-hero--collapsed .profile-cover span {
+  display: none;
+}
+
+.user-profile-content--reference .profile-hero--collapsed .profile-copy h1 {
+  font-size: 1.12rem;
+  line-height: 1.1;
+}
+
+.user-profile-content--reference .profile-hero--collapsed .profile-copy p {
+  margin-top: 3px;
+  font-size: 0.82rem;
+}
+
+.user-profile-content--reference .profile-hero--collapsed .profile-tabs {
+  height: 54px;
 }
 
 .user-profile-content--reference .profile-hero--collapsed .profile-copy > span,
@@ -21606,46 +21675,29 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   animation: aqua-tab-panel-in 320ms ease both;
 }
 
-.user-profile-content--reference .profile-tabs .animated-tab-indicator {
-  inset: 7px 10px;
-  border: 1px solid rgba(77, 209, 255, 0.24);
-  border-radius: 12px;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(54, 209, 255, 0.2), transparent 65%),
-    linear-gradient(180deg, rgba(16, 91, 170, 0.48), rgba(8, 30, 56, 0.62));
-  box-shadow: inset 0 -2px 0 rgba(30, 144, 255, 0.86), 0 12px 26px rgba(0, 116, 255, 0.16);
-}
-
-.user-profile-content--reference .profile-tabs button.active {
-  background: transparent;
-  box-shadow: none;
-}
-
-.user-profile-content--reference .profile-tabs button.active .animated-tab-label {
-  color: #5de1ff;
-}
-
+.user-profile-content--reference .profile-tabs .animated-tab-indicator,
 .settings-tabs .animated-tab-indicator {
-  inset: 6px;
-  border: 1px solid rgba(87, 190, 255, 0.24);
-  border-radius: 12px;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.16), transparent 62%),
-    linear-gradient(180deg, rgba(17, 72, 130, 0.72), rgba(8, 30, 55, 0.58));
-  box-shadow: inset 0 -2px 0 #1e90ff, 0 14px 28px rgba(0, 116, 255, 0.13);
+  inset: auto 10px 0;
+  height: 2px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(0, 212, 255, 0.18), #22c7ff 42%, #2f6cff 100%);
+  box-shadow: 0 0 18px rgba(34, 199, 255, 0.62);
 }
 
-.settings-tabs .settings-tab-button {
-  min-width: 132px;
-}
-
+.user-profile-content--reference .profile-tabs button.active,
 .settings-tabs button.is-active {
   background: transparent;
   box-shadow: none;
 }
 
+.user-profile-content--reference .profile-tabs button.active .animated-tab-label,
 .settings-tabs button.is-active .animated-tab-label {
-  color: #4fd1ff;
+  color: #5de1ff;
+}
+
+.settings-tabs .settings-tab-button {
+  min-width: 132px;
 }
 
 .settings-stack {
