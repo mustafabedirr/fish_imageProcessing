@@ -56,34 +56,152 @@ const seededValue = (longitude: number, latitude: number, salt: number) => {
 const isInBox = (longitude: number, latitude: number, west: number, south: number, east: number, north: number) =>
   longitude >= west && longitude <= east && latitude >= south && latitude <= north;
 
+const pointInPolygon = ([longitude, latitude]: [number, number], polygon: Array<[number, number]>) => {
+  let inside = false;
+
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i, i += 1) {
+    const [xi, yi] = polygon[i];
+    const [xj, yj] = polygon[j];
+    const intersects = yi > latitude !== yj > latitude && longitude < ((xj - xi) * (latitude - yi)) / (yj - yi) + xi;
+
+    if (intersects) inside = !inside;
+  }
+
+  return inside;
+};
+
+const landPolygons: Array<Array<[number, number]>> = [
+  // North America
+  [
+    [-168, 14],
+    [-153, 58],
+    [-126, 72],
+    [-62, 58],
+    [-52, 8],
+    [-82, 7],
+    [-98, 15],
+    [-125, 25],
+    [-168, 14],
+  ],
+  // South America
+  [
+    [-82, 12],
+    [-52, 10],
+    [-35, -8],
+    [-50, -56],
+    [-72, -54],
+    [-82, -18],
+    [-82, 12],
+  ],
+  // Europe mainland
+  [
+    [-11, 35],
+    [5, 58],
+    [31, 72],
+    [48, 58],
+    [42, 40],
+    [28, 36],
+    [14, 38],
+    [-11, 35],
+  ],
+  // Africa
+  [
+    [-18, 37],
+    [34, 34],
+    [52, 10],
+    [43, -34],
+    [18, -35],
+    [-15, -20],
+    [-18, 37],
+  ],
+  // Asia mainland, shaped to avoid covering Japan seas.
+  [
+    [25, 5],
+    [95, 5],
+    [112, 18],
+    [124, 32],
+    [132, 43],
+    [168, 62],
+    [170, 72],
+    [25, 72],
+    [25, 5],
+  ],
+  // Australia
+  [
+    [112, -11],
+    [154, -10],
+    [155, -39],
+    [114, -44],
+    [112, -11],
+  ],
+  // Greenland
+  [
+    [-74, 59],
+    [-12, 60],
+    [-18, 84],
+    [-60, 84],
+    [-74, 59],
+  ],
+  // Japan main islands
+  [
+    [130.2, 31.4],
+    [135.4, 33.0],
+    [141.8, 39.0],
+    [141.0, 41.6],
+    [135.8, 37.4],
+    [130.2, 31.4],
+  ],
+  [
+    [141.0, 41.2],
+    [145.8, 42.2],
+    [145.5, 45.8],
+    [140.8, 45.4],
+    [141.0, 41.2],
+  ],
+  [
+    [129.6, 31.0],
+    [131.4, 31.4],
+    [131.1, 33.6],
+    [129.4, 33.2],
+    [129.6, 31.0],
+  ],
+  // Korean peninsula
+  [
+    [125.0, 34.0],
+    [129.8, 34.4],
+    [130.2, 42.4],
+    [126.0, 43.0],
+    [125.0, 34.0],
+  ],
+  // UK and Ireland
+  [
+    [-10.8, 49.8],
+    [2.2, 50.0],
+    [1.0, 59.2],
+    [-9.6, 58.8],
+    [-10.8, 49.8],
+  ],
+];
+
 const isLikelyMarinePoint = (longitude: number, latitude: number) => {
   if (latitude > 78 || latitude < -70) return false;
 
-  const oceanExceptions = [
+  const trustedSeaBoxes = [
     [20, 34, 31, 42], // Aegean
-    [126, 28, 147, 46], // Japan seas
-    [120, 30, 132, 42], // Korea Strait
+    [139.45, 35.1, 140.25, 35.85], // Tokyo Bay
+    [134.7, 33.9, 135.65, 34.85], // Osaka Bay
+    [128.2, 33.2, 130.1, 35.6], // Korea Strait
     [100, -2, 112, 8], // Singapore / Malacca
-    [-126, 32, -116, 42], // California coast
-    [145, -38, 156, -28], // East Australia
+    [-123.2, 37.1, -121.6, 38.4], // San Francisco Bay
+    [150.8, -34.4, 151.6, -33.3], // Sydney coast
     [17, -36, 21, -32], // Cape Town coast
   ] as const;
 
-  if (oceanExceptions.some(([west, south, east, north]) => isInBox(longitude, latitude, west, south, east, north))) {
+  if (trustedSeaBoxes.some(([west, south, east, north]) => isInBox(longitude, latitude, west, south, east, north))) {
     return true;
   }
 
-  const broadLandBoxes = [
-    [-170, 8, -52, 72], // North America
-    [-82, -56, -34, 13], // South America
-    [-11, 35, 45, 72], // Europe
-    [-18, -35, 52, 37], // Africa
-    [25, 5, 150, 72], // Asia
-    [110, -45, 155, -10], // Australia
-    [-74, 59, -12, 84], // Greenland
-  ] as const;
-
-  return !broadLandBoxes.some(([west, south, east, north]) => isInBox(longitude, latitude, west, south, east, north));
+  return !landPolygons.some((polygon) => pointInPolygon([longitude, latitude], polygon));
 };
 
 const getViewportName = ([longitude, latitude]: [number, number]) => {
@@ -300,16 +418,15 @@ export async function GET(request: NextRequest) {
   }
 
   const candidatePoints = buildCandidateGrid(bounds, Number.isFinite(zoom) ? zoom : 5);
-  const fallbackPoints = candidatePoints
-    .filter(([longitude, latitude]) => isLikelyMarinePoint(longitude, latitude))
-    .map(([longitude, latitude]) => buildFallbackPoint(longitude, latitude));
+  const marineCandidatePoints = candidatePoints.filter(([longitude, latitude]) => isLikelyMarinePoint(longitude, latitude));
+  const fallbackPoints = marineCandidatePoints.map(([longitude, latitude]) => buildFallbackPoint(longitude, latitude));
 
-  if (candidatePoints.length === 0) {
+  if (marineCandidatePoints.length === 0) {
     return NextResponse.json(buildResponse([], bounds, "fallback"));
   }
 
   try {
-    const sampled = await Promise.all(candidatePoints.map(([longitude, latitude]) => sampleOpenMeteoPoint(longitude, latitude)));
+    const sampled = await Promise.all(marineCandidatePoints.map(([longitude, latitude]) => sampleOpenMeteoPoint(longitude, latitude)));
     const realPoints = sampled.filter((point): point is MarinePoint => Boolean(point));
 
     return NextResponse.json(buildResponse(realPoints.length ? realPoints : fallbackPoints, bounds, realPoints.length ? "open-meteo" : "fallback"));
