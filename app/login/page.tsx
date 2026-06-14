@@ -38,8 +38,8 @@ export default function LoginPage() {
   const pointerY = useMotionValue(0);
   const springX = useSpring(pointerX, { stiffness: 170, damping: 24, mass: 0.35 });
   const springY = useSpring(pointerY, { stiffness: 170, damping: 24, mass: 0.35 });
-  const rotateX = useTransform(springY, [-0.5, 0.5], [2.8, -2.8]);
-  const rotateY = useTransform(springX, [-0.5, 0.5], [-3.2, 3.2]);
+  const rotateX = useTransform(springY, [-0.5, 0.5], [4.2, -4.2]);
+  const rotateY = useTransform(springX, [-0.5, 0.5], [-4.8, 4.8]);
 
   function handleFramePointerMove(event: PointerEvent<HTMLDivElement>) {
     if (reduceMotion) return;
