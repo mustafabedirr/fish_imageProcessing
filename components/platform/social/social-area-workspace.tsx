@@ -4,20 +4,31 @@ import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import {
   Award,
+  BarChart3,
   Bell,
   Bookmark,
   CalendarDays,
   ChevronDown,
+  Clock3,
+  Film,
+  Globe2,
+  GripVertical,
   Heart,
+  Info,
   Image as ImageIcon,
+  Lock,
   MapPin,
   MessageCircle,
+  Navigation,
   Plus,
   Search,
+  ShieldCheck,
   Share2,
   SlidersHorizontal,
   Smile,
+  Tag,
   Trophy,
+  Upload,
   Users,
   Video,
   X,
@@ -113,7 +124,7 @@ const feedTabLabels: Record<FeedTab, string> = {
   Groups: "Groups",
   "New Posts": "New Posts",
 };
-type SocialModal = "create" | "media" | "location" | "poll" | "achievement" | "notifications" | "comments" | "share" | "friends" | "topics" | "members" | "events" | null;
+type SocialModal = "create" | "media" | "video" | "location" | "poll" | "achievement" | "notifications" | "comments" | "share" | "friends" | "topics" | "members" | "events" | null;
 
 const modalCopy: Record<Exclude<SocialModal, null>, { title: string; eyebrow: string; description: string }> = {
   create: {
@@ -123,18 +134,23 @@ const modalCopy: Record<Exclude<SocialModal, null>, { title: string; eyebrow: st
   },
   media: {
     eyebrow: "Medya Akisi",
-    title: "Fotograf veya video ekle",
-    description: "Av gorsellerinizi yukleyin, kapak gorselini secin ve paylasima hazir hale getirin.",
+    title: "Share Your Catch",
+    description: "Add a photo or video from your fishing adventure.",
+  },
+  video: {
+    eyebrow: "Video Akisi",
+    title: "Share a Video",
+    description: "Upload your fishing moments and share with the community.",
   },
   location: {
     eyebrow: "Konum",
-    title: "Av bolgesini paylasima ekle",
-    description: "Gonderiye bolge etiketi ekleyerek diger kullanicilarin gozlem alanini takip etmesini saglayin.",
+    title: "Share Your Location",
+    description: "Let others know where you are fishing.",
   },
   poll: {
     eyebrow: "Anket",
-    title: "Topluluga hizli bir soru sor",
-    description: "Secenekler ekleyerek ekipman, tur veya bolge hakkinda geri bildirim toplayin.",
+    title: "Create a Poll",
+    description: "Ask a question to the community and see what they think.",
   },
   achievement: {
     eyebrow: "Basari",
@@ -298,7 +314,7 @@ export default function SocialAreaWorkspace() {
             buttonClassName="social-tab-button"
             className="social-tabs"
             layoutId="social-feed-active-tab"
-            onChange={setActiveTab}
+            onChange={(value) => setActiveTab(value as FeedTab)}
             tabs={feedTabs.map((tab) => ({ title: feedTabLabels[tab], value: tab }))}
             trailingContent={
               <>
@@ -339,7 +355,7 @@ export default function SocialAreaWorkspace() {
                       <ImageIcon size={17} />
                       <span>Photo</span>
                     </button>
-                    <button type="button" aria-label="Add video" title="Video" onClick={() => openModal("media")}>
+                    <button type="button" aria-label="Add video" title="Video" onClick={() => openModal("video")}>
                       <Video size={17} />
                       <span>Video</span>
                     </button>
@@ -563,13 +579,28 @@ function SocialFlowModal({
 }) {
   const copy = modalCopy[modal];
   const isCreate = modal === "create";
+  const isRichComposer = modal === "media" || modal === "video" || modal === "location" || modal === "poll";
 
   return (
     <div className="social-flow-backdrop" role="dialog" aria-modal="true" aria-labelledby="social-flow-title">
-      <section className="social-flow-modal">
+      <section className={isRichComposer ? `social-flow-modal social-flow-modal--${modal}` : "social-flow-modal"}>
         <header>
+          <div className="social-flow-heading-icon">
+            {modal === "media" ? <ImageIcon size={28} /> : null}
+            {modal === "video" ? <Video size={28} /> : null}
+            {modal === "location" ? <MapPin size={28} /> : null}
+            {modal === "poll" ? <BarChart3 size={28} /> : null}
+            {!isRichComposer && modal === "achievement" ? <Award size={28} /> : null}
+            {!isRichComposer && modal === "notifications" ? <Bell size={28} /> : null}
+            {!isRichComposer && modal === "comments" ? <MessageCircle size={28} /> : null}
+            {!isRichComposer && modal === "share" ? <Share2 size={28} /> : null}
+            {!isRichComposer && modal === "friends" ? <Users size={28} /> : null}
+            {!isRichComposer && modal === "topics" ? <Search size={28} /> : null}
+            {!isRichComposer && modal === "members" ? <Trophy size={28} /> : null}
+            {!isRichComposer && modal === "events" ? <CalendarDays size={28} /> : null}
+            {!isRichComposer && modal === "create" ? <Plus size={28} /> : null}
+          </div>
           <div>
-            <span>{copy.eyebrow}</span>
             <h2 id="social-flow-title">{copy.title}</h2>
             <p>{copy.description}</p>
           </div>
@@ -578,43 +609,393 @@ function SocialFlowModal({
           </button>
         </header>
 
-        <div className="social-flow-preview">
-          <div className="social-flow-icon">
-            {modal === "media" ? <ImageIcon size={28} /> : null}
-            {modal === "location" ? <MapPin size={28} /> : null}
-            {modal === "poll" ? <SlidersHorizontal size={28} /> : null}
-            {modal === "achievement" ? <Award size={28} /> : null}
-            {modal === "notifications" ? <Bell size={28} /> : null}
-            {modal === "comments" ? <MessageCircle size={28} /> : null}
-            {modal === "share" ? <Share2 size={28} /> : null}
-            {modal === "friends" ? <Users size={28} /> : null}
-            {modal === "topics" ? <Search size={28} /> : null}
-            {modal === "members" ? <Trophy size={28} /> : null}
-            {modal === "events" ? <CalendarDays size={28} /> : null}
-            {modal === "create" ? <Plus size={28} /> : null}
-          </div>
-          <div>
-            <strong>{isCreate ? "Paylasim taslagi" : "Akis durumu"}</strong>
-            <span>{isCreate ? composerText || "Henuz metin girilmedi." : "Hazir, onay verdiginizde akisa uygulanacak."}</span>
-          </div>
-        </div>
+        {modal === "media" ? <PhotoShareModalContent /> : null}
+        {modal === "video" ? <VideoShareModalContent /> : null}
+        {modal === "location" ? <LocationShareModalContent /> : null}
+        {modal === "poll" ? <PollShareModalContent /> : null}
 
-        <div className="social-flow-grid">
-          <article>
-            <span>Hedef Kitle</span>
-            <strong>{audience}</strong>
-          </article>
-          <article>
-            <span>Durum</span>
-            <strong>{isCreate ? "Yayinlanabilir" : "Hazir"}</strong>
-          </article>
-        </div>
+        {!isRichComposer ? (
+          <>
+            <div className="social-flow-preview">
+              <div className="social-flow-icon">
+                {modal === "achievement" ? <Award size={28} /> : null}
+                {modal === "notifications" ? <Bell size={28} /> : null}
+                {modal === "comments" ? <MessageCircle size={28} /> : null}
+                {modal === "share" ? <Share2 size={28} /> : null}
+                {modal === "friends" ? <Users size={28} /> : null}
+                {modal === "topics" ? <Search size={28} /> : null}
+                {modal === "members" ? <Trophy size={28} /> : null}
+                {modal === "events" ? <CalendarDays size={28} /> : null}
+                {modal === "create" ? <Plus size={28} /> : null}
+              </div>
+              <div>
+                <strong>{isCreate ? "Paylasim taslagi" : "Akis durumu"}</strong>
+                <span>{isCreate ? composerText || "Henuz metin girilmedi." : "Hazir, onay verdiginizde akisa uygulanacak."}</span>
+              </div>
+            </div>
+
+            <div className="social-flow-grid">
+              <article>
+                <span>Hedef Kitle</span>
+                <strong>{audience}</strong>
+              </article>
+              <article>
+                <span>Durum</span>
+                <strong>{isCreate ? "Yayinlanabilir" : "Hazir"}</strong>
+              </article>
+            </div>
+          </>
+        ) : null}
 
         <footer>
-          <button type="button" onClick={onClose}>Vazgec</button>
-          <button type="button" onClick={isCreate ? onCreate : () => onApply(modal)}>{isCreate ? "Paylas" : "Akisi Uygula"}</button>
+          {isRichComposer ? (
+            <button type="button" className="social-save-draft">
+              <Bookmark size={18} />
+              Save as draft
+            </button>
+          ) : null}
+          <div className="social-flow-footer-actions">
+            <button type="button" onClick={onClose}>{isRichComposer ? "Cancel" : "Vazgec"}</button>
+            <button type="button" onClick={isCreate ? onCreate : () => onApply(modal)}>
+              {modal === "media" ? <><Upload size={18} /> Share Post</> : null}
+              {modal === "video" ? <><Upload size={18} /> Share Video</> : null}
+              {modal === "location" ? <><Navigation size={18} /> Share Location</> : null}
+              {modal === "poll" ? <><BarChart3 size={18} /> Publish Poll</> : null}
+              {!isRichComposer ? (isCreate ? "Paylas" : "Akisi Uygula") : null}
+            </button>
+          </div>
         </footer>
+
+        {modal === "media" || modal === "video" ? (
+          <div className="social-guidelines">
+            <ShieldCheck size={16} />
+            <strong>Community Guidelines</strong>
+            <span>Be respectful and follow our community rules.</span>
+          </div>
+        ) : null}
       </section>
     </div>
   );
+}
+
+function AudiencePills({ stacked = false }: { stacked?: boolean }) {
+  const options = [
+    { label: "Everyone", detail: "Anyone on AquaScope", icon: Globe2 },
+    { label: "Friends", detail: "Only your friends", icon: Users },
+    { label: "Only me", detail: "Only you (private)", icon: Lock },
+  ];
+
+  return (
+    <div className={stacked ? "social-audience-list" : "social-audience-pills"}>
+      {options.map(({ label, detail, icon: Icon }, index) => (
+        <button className={index === 0 ? "is-selected" : ""} type="button" key={label}>
+          <Icon size={18} />
+          <span>
+            <strong>{label}</strong>
+            {stacked ? <small>{detail}</small> : null}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function TagChips({ items = ["Big Catch", "Sea Bass", "Aegean Sea"] }: { items?: string[] }) {
+  return (
+    <div className="social-modal-chip-row">
+      {items.map((item) => (
+        <span key={item}>
+          {item}
+          <X size={14} />
+        </span>
+      ))}
+      <ChevronDown size={17} />
+    </div>
+  );
+}
+
+function MiniAegeanMap({ large = false }: { large?: boolean }) {
+  return (
+    <div className={large ? "social-mini-map social-mini-map--large" : "social-mini-map"}>
+      <span className="map-label map-label--greece">GREECE</span>
+      <span className="map-label map-label--turkey">TURKIYE</span>
+      <span className="map-label map-label--sea">Aegean Sea</span>
+      <span className="map-label map-label--athens">Athens</span>
+      <span className="map-label map-label--izmir">Izmir</span>
+      <i className="map-pin-pulse" />
+      {large ? (
+        <>
+          <div className="map-search">
+            <Search size={20} />
+            Search location...
+          </div>
+          <div className="map-zoom">
+            <button type="button"><SlidersHorizontal size={18} /></button>
+            <button type="button"><Plus size={20} /></button>
+            <button type="button">-</button>
+          </div>
+          <div className="map-selected-card">
+            <MapPin size={20} />
+            <small>Selected location</small>
+            <strong>North Aegean Region</strong>
+            <span>39.2326° N, 26.4412° E</span>
+            <button type="button">Edit</button>
+          </div>
+          <b>50 km</b>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+function CaptionBox({ placeholder = "Write a caption...", max = 500 }: { placeholder?: string; max?: number }) {
+  return (
+    <label className="social-caption-box">
+      <textarea placeholder={placeholder} />
+      <span>0 / {max}</span>
+      <Smile size={18} />
+    </label>
+  );
+}
+
+function PhotoShareModalContent() {
+  const recent = [
+    "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=360&q=80",
+    "https://images.unsplash.com/photo-1544943910-4c1dc44aab44?auto=format&fit=crop&w=360&q=80",
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=360&q=80",
+    "https://images.unsplash.com/photo-1516685018646-5499d0a7d42f?auto=format&fit=crop&w=360&q=80",
+  ];
+
+  return (
+    <div className="social-rich-modal-grid">
+      <section className="social-upload-panel">
+        <div className="social-dropzone">
+          <div className="social-upload-art">
+            <ImageIcon size={62} />
+            <Upload size={24} />
+          </div>
+          <h3>Drag & drop your photo or video</h3>
+          <p>or <button type="button">browse your files</button></p>
+          <small>JPG, PNG, MP4, MOV up to 200MB</small>
+        </div>
+        <div className="social-recent-upload-head">
+          <strong>Recent uploads</strong>
+          <button type="button">View all</button>
+        </div>
+        <div className="social-recent-uploads">
+          {recent.map((src) => (
+            <figure key={src}>
+              <img src={src} alt="Recent upload" />
+              <button type="button"><X size={15} /></button>
+            </figure>
+          ))}
+        </div>
+        <p className="social-upload-note"><Info size={16} /> You can add up to 5 photos or 1 video per post.</p>
+      </section>
+
+      <section className="social-modal-side">
+        <CaptionBox />
+        <div className="social-modal-card">
+          <strong><Globe2 size={18} /> Who can see this?</strong>
+          <AudiencePills />
+        </div>
+        <div className="social-modal-card">
+          <strong><Tag size={18} /> Add tags</strong>
+          <TagChips />
+        </div>
+        <div className="social-modal-card">
+          <strong><MapPin size={18} /> Location (optional)</strong>
+          <div className="social-location-input">North Aegean Region <X size={17} /></div>
+          <MiniAegeanMap />
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function VideoShareModalContent() {
+  const thumbs = [
+    "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=360&q=80",
+    "https://images.unsplash.com/photo-1524704796725-9fc3044a58b2?auto=format&fit=crop&w=360&q=80",
+    "https://images.unsplash.com/photo-1559825481-12a05cc00344?auto=format&fit=crop&w=360&q=80",
+    "https://images.unsplash.com/photo-1544552866-d3ed42536cfd?auto=format&fit=crop&w=360&q=80",
+  ];
+
+  return (
+    <div className="social-rich-modal-grid">
+      <section className="social-upload-panel">
+        <div className="social-dropzone social-dropzone--video">
+          <div className="social-upload-art">
+            <Film size={66} />
+            <Upload size={24} />
+          </div>
+          <h3>Drag & drop your video here</h3>
+          <p>or <button type="button">browse files</button></p>
+          <small>MP4, MOV, WebM up to 500MB · Max 2 minutes</small>
+        </div>
+        <article className="social-video-file">
+          <figure>
+            <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=420&q=80" alt="Video preview" />
+            <Video size={28} />
+          </figure>
+          <div>
+            <strong>deep_sea_fishing.mp4</strong>
+            <span>128 MB · 01:24</span>
+            <i><b /></i>
+          </div>
+          <em>100%</em>
+          <CheckIcon />
+          <button type="button"><X size={20} /></button>
+        </article>
+        <section className="social-video-thumbs">
+          <header>
+            <div>
+              <strong>Video thumbnail</strong>
+              <Info size={16} />
+              <small>Select a cover image for your video.</small>
+            </div>
+            <button type="button">Auto select</button>
+          </header>
+          <div>
+            {thumbs.map((src, index) => (
+              <figure className={index === 0 ? "is-selected" : ""} key={src}>
+                <img src={src} alt="Video thumbnail" />
+                {index === 0 ? <span><CheckIcon /></span> : null}
+              </figure>
+            ))}
+          </div>
+        </section>
+      </section>
+
+      <section className="social-modal-side">
+        <CaptionBox />
+        <div className="social-modal-card">
+          <strong><Globe2 size={18} /> Who can see this?</strong>
+          <AudiencePills />
+        </div>
+        <div className="social-modal-card">
+          <strong><Tag size={18} /> Add tags</strong>
+          <TagChips items={["Big Catch", "Offshore", "Aegean Sea"]} />
+        </div>
+        <div className="social-modal-card">
+          <strong><MapPin size={18} /> Location (optional)</strong>
+          <div className="social-location-input">North Aegean Region <X size={17} /></div>
+          <MiniAegeanMap />
+        </div>
+        <div className="social-modal-card social-video-options">
+          <strong><SlidersHorizontal size={18} /> Video options</strong>
+          <label><input type="checkbox" defaultChecked /> Allow people to comment</label>
+          <label><input type="checkbox" defaultChecked /> Show video in feed</label>
+          <button type="button">HD (720p) <ChevronDown size={16} /></button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function LocationShareModalContent() {
+  return (
+    <div className="social-location-layout">
+      <section className="social-location-map-panel">
+        <MiniAegeanMap large />
+      </section>
+      <section className="social-location-settings">
+        <div className="social-modal-card">
+          <strong><Globe2 size={18} /> Who can see this?</strong>
+          <AudiencePills stacked />
+        </div>
+        <div className="social-modal-card">
+          <strong><Clock3 size={18} /> Share for</strong>
+          <div className="social-select-row"><CalendarDays size={18} /> 1 Hour <ChevronDown size={17} /></div>
+          <p>Automatically stops sharing after 1 hour.</p>
+        </div>
+        <div className="social-modal-card">
+          <strong><MessageCircle size={18} /> Add a message (optional)</strong>
+          <CaptionBox placeholder="Great fishing spot today!" max={200} />
+        </div>
+        <div className="social-location-alert">
+          <ShieldCheck size={22} />
+          <strong>Your location will be shared in real time.</strong>
+          <span>You can stop sharing anytime from your profile.</span>
+        </div>
+      </section>
+      <div className="social-location-ready">
+        <span />
+        <strong>Location ready</strong>
+        <small>Accuracy: 25 m</small>
+      </div>
+    </div>
+  );
+}
+
+function PollShareModalContent() {
+  return (
+    <div className="social-poll-layout">
+      <section className="social-poll-builder">
+        <div className="social-poll-question">
+          <strong>Your question</strong>
+          <CaptionBox placeholder="Write your question..." max={200} />
+        </div>
+        <div className="social-poll-options">
+          <strong>Options</strong>
+          {["Option 1", "Option 2", "Option 3"].map((option, index) => (
+            <div className="social-poll-option" key={option}>
+              <GripVertical size={18} />
+              <span>{index + 1}</span>
+              <input value={option} readOnly />
+              <X size={19} />
+            </div>
+          ))}
+          <button type="button"><Plus size={19} /> Add option</button>
+        </div>
+        <label className="social-toggle-row">
+          <input type="checkbox" defaultChecked />
+          <span>
+            <strong>Allow multiple answers</strong>
+            <small>Users can select more than one option.</small>
+          </span>
+          <Info size={17} />
+        </label>
+        <div className="social-poll-media">
+          <strong>Add media <span>(optional)</span></strong>
+          <div>
+            <button type="button"><ImageIcon size={30} /> Photo</button>
+            <button type="button"><Video size={30} /> Video</button>
+            <button type="button">GIF</button>
+          </div>
+        </div>
+      </section>
+
+      <section className="social-poll-side">
+        <div className="social-modal-card">
+          <strong>Audience</strong>
+          <AudiencePills />
+        </div>
+        <div className="social-modal-card social-poll-settings">
+          <strong>Poll settings</strong>
+          <div className="social-select-row"><Clock3 size={18} /> Poll duration <span>24 hours</span><ChevronDown size={17} /></div>
+          <div className="social-select-row"><Lock size={18} /> Who can see results <span>After voting</span><ChevronDown size={17} /></div>
+          <label><input type="checkbox" defaultChecked /> <span><strong>Show vote counts</strong><small>Display number of votes for each option.</small></span></label>
+        </div>
+        <div className="social-poll-preview">
+          <strong>Live preview</strong>
+          <article>
+            <header>
+              <span><BarChart3 size={20} /></span>
+              <div><strong>AquaScope</strong><small>Just now · Everyone</small></div>
+            </header>
+            <p>Your poll question will appear here...</p>
+            {["Option 1", "Option 2", "Option 3"].map((option) => (
+              <label key={option}><input type="radio" name="poll-preview" /> {option}</label>
+            ))}
+            <footer><span>Like 0</span><span>Comment 0</span><span>Share 0</span></footer>
+          </article>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function CheckIcon() {
+  return <span className="social-check-icon">✓</span>;
 }
