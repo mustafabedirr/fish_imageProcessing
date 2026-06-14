@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   Award,
   BarChart3,
@@ -533,6 +533,27 @@ export default function SocialAreaWorkspace() {
           }}
           onApply={(modal) => {
             const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? "local";
+            if (modal === "media" || modal === "video") {
+              const current: SocialPost = {
+                id: `${modal}-${Date.now()}`,
+                author: "Derya Yilmaz",
+                handle: "@derya",
+                time: "Az once",
+                avatar,
+                text: composerText.trim() || (modal === "video" ? "Yeni bir av videosu paylasti." : "Yeni bir av gorseli paylasti."),
+                tags: modal === "video" ? ["#FishingVideo", "#AegeanSea"] : ["#Catch", "#Fishing"],
+                likes: 0,
+                comments: 0,
+                photos: [
+                  modal === "video"
+                    ? "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=85"
+                    : "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=1200&q=85",
+                ],
+              };
+              setPosts((currentPosts) => [current, ...currentPosts]);
+              setComposerText("");
+              setActiveTab("New Posts");
+            }
             if (modal === "location") setComposerText((current) => `${current}${current ? " " : ""}Lake Washington`);
             if (modal === "achievement") setComposerText((current) => `${current}${current ? " " : ""}#Achievement`);
             if (modal === "poll") setComposerText((current) => `${current}${current ? " " : ""}#CommunityPoll`);
@@ -542,6 +563,10 @@ export default function SocialAreaWorkspace() {
             }
             if (modal === "share") setSharedPosts((current) => ({ ...current, [targetPostId]: true }));
             setNotice(`${modalCopy[modal].eyebrow} akisi uygulandi.`);
+            closeModal();
+          }}
+          onSaveDraft={() => {
+            setNotice("Taslak kaydedildi.");
             closeModal();
           }}
         />
@@ -569,6 +594,7 @@ function SocialFlowModal({
   onClose,
   onCreate,
   onApply,
+  onSaveDraft,
 }: {
   modal: Exclude<SocialModal, null>;
   audience: string;
@@ -576,6 +602,7 @@ function SocialFlowModal({
   onClose: () => void;
   onCreate: () => void;
   onApply: (modal: Exclude<SocialModal, null>) => void;
+  onSaveDraft: () => void;
 }) {
   const copy = modalCopy[modal];
   const isCreate = modal === "create";
@@ -649,7 +676,7 @@ function SocialFlowModal({
 
         <footer>
           {isRichComposer ? (
-            <button type="button" className="social-save-draft">
+            <button type="button" className="social-save-draft" onClick={onSaveDraft}>
               <Bookmark size={18} />
               Save as draft
             </button>
@@ -679,6 +706,7 @@ function SocialFlowModal({
 }
 
 function AudiencePills({ stacked = false }: { stacked?: boolean }) {
+  const [selectedAudience, setSelectedAudience] = useState("Everyone");
   const options = [
     { label: "Everyone", detail: "Anyone on AquaScope", icon: Globe2 },
     { label: "Friends", detail: "Only your friends", icon: Users },
@@ -687,8 +715,8 @@ function AudiencePills({ stacked = false }: { stacked?: boolean }) {
 
   return (
     <div className={stacked ? "social-audience-list" : "social-audience-pills"}>
-      {options.map(({ label, detail, icon: Icon }, index) => (
-        <button className={index === 0 ? "is-selected" : ""} type="button" key={label}>
+      {options.map(({ label, detail, icon: Icon }) => (
+        <button className={selectedAudience === label ? "is-selected" : ""} type="button" key={label} onClick={() => setSelectedAudience(label)}>
           <Icon size={18} />
           <span>
             <strong>{label}</strong>
@@ -701,12 +729,16 @@ function AudiencePills({ stacked = false }: { stacked?: boolean }) {
 }
 
 function TagChips({ items = ["Big Catch", "Sea Bass", "Aegean Sea"] }: { items?: string[] }) {
+  const [chips, setChips] = useState(items);
+
   return (
     <div className="social-modal-chip-row">
-      {items.map((item) => (
+      {chips.map((item) => (
         <span key={item}>
           {item}
-          <X size={14} />
+          <button type="button" aria-label={`Remove ${item}`} onClick={() => setChips((current) => current.filter((chip) => chip !== item))}>
+            <X size={14} />
+          </button>
         </span>
       ))}
       <ChevronDown size={17} />
@@ -749,16 +781,20 @@ function MiniAegeanMap({ large = false }: { large?: boolean }) {
 }
 
 function CaptionBox({ placeholder = "Write a caption...", max = 500 }: { placeholder?: string; max?: number }) {
+  const [value, setValue] = useState("");
+
   return (
     <label className="social-caption-box">
-      <textarea placeholder={placeholder} />
-      <span>0 / {max}</span>
+      <textarea placeholder={placeholder} value={value} maxLength={max} onChange={(event) => setValue(event.target.value)} />
+      <span>{value.length} / {max}</span>
       <Smile size={18} />
     </label>
   );
 }
 
 function PhotoShareModalContent() {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const recent = [
     "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=360&q=80",
     "https://images.unsplash.com/photo-1544943910-4c1dc44aab44?auto=format&fit=crop&w=360&q=80",
@@ -775,9 +811,17 @@ function PhotoShareModalContent() {
             <Upload size={24} />
           </div>
           <h3>Drag & drop your photo or video</h3>
-          <p>or <button type="button">browse your files</button></p>
+          <p>or <button type="button" onClick={() => fileInputRef.current?.click()}>browse your files</button></p>
           <small>JPG, PNG, MP4, MOV up to 200MB</small>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime"
+            hidden
+            onChange={(event) => setSelectedFile(event.target.files?.[0]?.name ?? null)}
+          />
         </div>
+        {selectedFile ? <p className="social-selected-file"><CheckIcon /> {selectedFile}</p> : null}
         <div className="social-recent-upload-head">
           <strong>Recent uploads</strong>
           <button type="button">View all</button>
@@ -814,6 +858,8 @@ function PhotoShareModalContent() {
 }
 
 function VideoShareModalContent() {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [selectedFile, setSelectedFile] = useState("deep_sea_fishing.mp4");
   const thumbs = [
     "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=360&q=80",
     "https://images.unsplash.com/photo-1524704796725-9fc3044a58b2?auto=format&fit=crop&w=360&q=80",
@@ -830,8 +876,15 @@ function VideoShareModalContent() {
             <Upload size={24} />
           </div>
           <h3>Drag & drop your video here</h3>
-          <p>or <button type="button">browse files</button></p>
+          <p>or <button type="button" onClick={() => fileInputRef.current?.click()}>browse files</button></p>
           <small>MP4, MOV, WebM up to 500MB · Max 2 minutes</small>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="video/mp4,video/quicktime,video/webm"
+            hidden
+            onChange={(event) => setSelectedFile(event.target.files?.[0]?.name ?? "deep_sea_fishing.mp4")}
+          />
         </div>
         <article className="social-video-file">
           <figure>
@@ -839,7 +892,7 @@ function VideoShareModalContent() {
             <Video size={28} />
           </figure>
           <div>
-            <strong>deep_sea_fishing.mp4</strong>
+            <strong>{selectedFile}</strong>
             <span>128 MB · 01:24</span>
             <i><b /></i>
           </div>
@@ -894,6 +947,9 @@ function VideoShareModalContent() {
 }
 
 function LocationShareModalContent() {
+  const locationName = "North Aegean Region";
+  const [duration, setDuration] = useState("1 Hour");
+
   return (
     <div className="social-location-layout">
       <section className="social-location-map-panel">
@@ -906,8 +962,10 @@ function LocationShareModalContent() {
         </div>
         <div className="social-modal-card">
           <strong><Clock3 size={18} /> Share for</strong>
-          <div className="social-select-row"><CalendarDays size={18} /> 1 Hour <ChevronDown size={17} /></div>
-          <p>Automatically stops sharing after 1 hour.</p>
+          <button type="button" className="social-select-row" onClick={() => setDuration((current) => (current === "1 Hour" ? "24 Hours" : "1 Hour"))}>
+            <CalendarDays size={18} /> {duration} <ChevronDown size={17} />
+          </button>
+          <p>Automatically stops sharing after {duration.toLowerCase()}.</p>
         </div>
         <div className="social-modal-card">
           <strong><MessageCircle size={18} /> Add a message (optional)</strong>
@@ -922,34 +980,44 @@ function LocationShareModalContent() {
       <div className="social-location-ready">
         <span />
         <strong>Location ready</strong>
-        <small>Accuracy: 25 m</small>
+        <small>{locationName} · Accuracy: 25 m</small>
       </div>
     </div>
   );
 }
 
 function PollShareModalContent() {
+  const [question, setQuestion] = useState("");
+  const [options, setOptions] = useState(["Option 1", "Option 2", "Option 3"]);
+  const [allowMultiple, setAllowMultiple] = useState(true);
+
   return (
     <div className="social-poll-layout">
       <section className="social-poll-builder">
         <div className="social-poll-question">
           <strong>Your question</strong>
-          <CaptionBox placeholder="Write your question..." max={200} />
+          <label className="social-caption-box">
+            <textarea placeholder="Write your question..." value={question} maxLength={200} onChange={(event) => setQuestion(event.target.value)} />
+            <span>{question.length} / 200</span>
+            <Smile size={18} />
+          </label>
         </div>
         <div className="social-poll-options">
           <strong>Options</strong>
-          {["Option 1", "Option 2", "Option 3"].map((option, index) => (
-            <div className="social-poll-option" key={option}>
+          {options.map((option, index) => (
+            <div className="social-poll-option" key={`${index}-${option}`}>
               <GripVertical size={18} />
               <span>{index + 1}</span>
-              <input value={option} readOnly />
-              <X size={19} />
+              <input value={option} onChange={(event) => setOptions((current) => current.map((item, optionIndex) => (optionIndex === index ? event.target.value : item)))} />
+              <button type="button" aria-label={`Remove option ${index + 1}`} onClick={() => setOptions((current) => current.length > 2 ? current.filter((_, optionIndex) => optionIndex !== index) : current)}>
+                <X size={19} />
+              </button>
             </div>
           ))}
-          <button type="button"><Plus size={19} /> Add option</button>
+          <button type="button" onClick={() => setOptions((current) => [...current, `Option ${current.length + 1}`])}><Plus size={19} /> Add option</button>
         </div>
         <label className="social-toggle-row">
-          <input type="checkbox" defaultChecked />
+          <input type="checkbox" checked={allowMultiple} onChange={(event) => setAllowMultiple(event.target.checked)} />
           <span>
             <strong>Allow multiple answers</strong>
             <small>Users can select more than one option.</small>
@@ -984,8 +1052,8 @@ function PollShareModalContent() {
               <span><BarChart3 size={20} /></span>
               <div><strong>AquaScope</strong><small>Just now · Everyone</small></div>
             </header>
-            <p>Your poll question will appear here...</p>
-            {["Option 1", "Option 2", "Option 3"].map((option) => (
+            <p>{question || "Your poll question will appear here..."}</p>
+            {options.map((option) => (
               <label key={option}><input type="radio" name="poll-preview" /> {option}</label>
             ))}
             <footer><span>Like 0</span><span>Comment 0</span><span>Share 0</span></footer>
