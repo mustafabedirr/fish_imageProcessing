@@ -22793,7 +22793,13 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   width: 100%;
   max-width: none;
   grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
-  align-items: stretch;
+  grid-template-rows: minmax(0, 0.92fr) minmax(0, 1fr);
+  align-items: start;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  gap: 14px;
+  margin-top: 14px;
   transition: opacity 220ms ease, transform 220ms ease;
 }
 
@@ -22802,8 +22808,8 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   align-items: center;
   gap: 10px;
   width: 100%;
-  margin-top: 18px;
-  padding: 12px 16px;
+  margin-top: 12px;
+  padding: 9px 14px;
   border: 1px solid rgba(77, 132, 190, 0.22);
   border-radius: 10px;
   color: #b8cbe4;
@@ -22831,7 +22837,13 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 .settings-stack[data-active-tab="Genel"] .settings-card--backend {
-  grid-column: 1 / -1;
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.settings-stack[data-active-tab="Genel"] .settings-card--sync {
+  grid-column: 1;
+  grid-row: 2;
 }
 
 .settings-stack[data-active-tab="Entegrasyonlar"] .settings-card--backend,
@@ -22869,6 +22881,150 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   width: 100%;
 }
 
+.settings-workspace {
+  min-height: 100dvh;
+  height: 100dvh;
+  padding: clamp(16px, 2vw, 24px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.settings-workspace .settings-header {
+  gap: 18px;
+}
+
+.settings-workspace .settings-header h1 {
+  font-size: clamp(1.55rem, 1.8vw, 2rem);
+}
+
+.settings-workspace .settings-header p {
+  margin-top: 5px;
+}
+
+.settings-workspace .settings-tabs {
+  margin-top: 16px;
+}
+
+.settings-workspace .settings-tabs button {
+  height: 42px;
+}
+
+.settings-workspace .settings-card {
+  min-height: 0;
+  height: 100%;
+  padding: clamp(18px, 1.6vw, 24px);
+  overflow: auto;
+  scrollbar-width: none;
+}
+
+.settings-workspace .settings-card::-webkit-scrollbar {
+  display: none;
+}
+
+.settings-workspace .settings-card--backend,
+.settings-workspace .settings-card--sync {
+  min-height: 0;
+}
+
+.settings-workspace .settings-card-head {
+  gap: 12px;
+}
+
+.settings-workspace .settings-card-head > span,
+.settings-workspace .settings-preference-icon {
+  width: 42px;
+  height: 42px;
+}
+
+.settings-workspace .settings-account-layout {
+  margin-top: 18px;
+  grid-template-columns: 118px minmax(0, 1fr);
+  gap: 20px;
+}
+
+.settings-workspace .settings-avatar-field {
+  gap: 10px;
+}
+
+.settings-workspace .settings-avatar-field button {
+  width: 96px;
+  height: 96px;
+}
+
+.settings-workspace .settings-form-grid,
+.settings-workspace .settings-preference-grid,
+.settings-workspace .settings-backend-grid,
+.settings-workspace .settings-sync-list {
+  margin-top: 18px;
+  gap: 12px;
+}
+
+.settings-workspace .settings-input-shell {
+  min-height: 48px;
+}
+
+.settings-workspace .settings-preference-item,
+.settings-workspace .settings-sync-list article {
+  min-height: 64px;
+  padding: 12px;
+}
+
+.settings-stack[data-active-tab="Genel"] .settings-card--sync .settings-sync-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.settings-stack[data-active-tab="Genel"] .settings-card--sync .settings-sync-list article {
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-content: start;
+  gap: 10px;
+}
+
+.settings-stack[data-active-tab="Genel"] .settings-card--sync .settings-sync-list article button {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+.settings-stack[data-active-tab="Genel"] .settings-card--sync .settings-sync-list small {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.settings-stack[data-active-tab="Genel"] .settings-card--backend .settings-backend-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.settings-stack[data-active-tab="Genel"] .settings-card--backend .settings-backend-grid article {
+  border-right: 1px solid rgba(105, 145, 190, 0.16);
+  border-bottom: 0;
+}
+
+.settings-stack[data-active-tab="Genel"] .settings-card--backend .settings-backend-grid article:last-child {
+  border-right: 0;
+}
+
+.settings-workspace .settings-backend-grid article {
+  min-height: 70px;
+  padding: 14px;
+}
+
+.settings-workspace .settings-endpoint-row {
+  margin-top: 14px;
+  padding: 12px;
+}
+
+.settings-workspace .settings-env-button {
+  height: 38px;
+  margin-top: 12px;
+}
+
+.settings-workspace .settings-danger-zone {
+  margin-top: 14px;
+  padding: 16px 20px;
+}
+
 .settings-workspace .settings-form-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -22881,6 +23037,111 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 .settings-stack[data-active-tab="Gorunum"] .settings-field--wide,
 .settings-stack[data-active-tab="Guvenlik"] .settings-field--wide {
   grid-column: auto;
+}
+
+@media (max-width: 1180px) {
+  .settings-stack,
+  .settings-stack[data-active-tab="Genel"] {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    overflow: auto;
+    scrollbar-width: none;
+  }
+
+  .settings-stack::-webkit-scrollbar {
+    display: none;
+  }
+
+  .settings-stack[data-active-tab="Genel"] .settings-card--sync,
+  .settings-stack[data-active-tab="Genel"] .settings-card--backend,
+  .settings-stack[data-active-tab="Entegrasyonlar"] .settings-card--backend,
+  .settings-stack[data-active-tab="Veri & Gizlilik"] .settings-card--sync,
+  .settings-stack[data-active-tab="Bildirimler"] .settings-card--preferences,
+  .settings-stack[data-active-tab="Gorunum"] .settings-card--account,
+  .settings-stack[data-active-tab="Guvenlik"] .settings-card--account {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .settings-stack[data-active-tab="Genel"] .settings-card--sync .settings-sync-list {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-stack[data-active-tab="Genel"] .settings-card--sync .settings-sync-list article {
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+  }
+
+  .settings-stack[data-active-tab="Genel"] .settings-card--sync .settings-sync-list article button {
+    grid-column: auto;
+    width: auto;
+  }
+
+  .settings-stack[data-active-tab="Genel"] .settings-card--backend .settings-backend-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-stack[data-active-tab="Genel"] .settings-card--backend .settings-backend-grid article,
+  .settings-stack[data-active-tab="Genel"] .settings-card--backend .settings-backend-grid article:last-child {
+    border-right: 0;
+    border-bottom: 1px solid rgba(105, 145, 190, 0.16);
+  }
+
+  .settings-stack[data-active-tab="Genel"] .settings-card--backend .settings-backend-grid article:last-child {
+    border-bottom: 0;
+  }
+
+  .settings-workspace .settings-header,
+  .settings-workspace .settings-header-actions,
+  .settings-workspace .settings-danger-zone {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .settings-workspace .settings-card {
+    height: auto;
+    overflow: visible;
+  }
+
+  .settings-workspace .settings-search {
+    width: 100%;
+  }
+}
+
+@media (max-width: 760px) {
+  .settings-workspace {
+    overflow: auto;
+    scrollbar-width: none;
+  }
+
+  .settings-workspace::-webkit-scrollbar {
+    display: none;
+  }
+
+  .settings-workspace .settings-account-layout,
+  .settings-workspace .settings-form-grid,
+  .settings-workspace .settings-backend-grid,
+  .settings-workspace .settings-sync-list article,
+  .settings-workspace .settings-endpoint-row {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-workspace .settings-tabs {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .settings-workspace .settings-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .settings-workspace .settings-save-button,
+  .settings-workspace .settings-env-button,
+  .settings-workspace .settings-sync-list button,
+  .settings-workspace .settings-endpoint-row button,
+  .settings-workspace .settings-danger-zone button {
+    width: 100%;
+  }
 }
 
 @keyframes aqua-tab-panel-in {
