@@ -38,8 +38,8 @@ export default function LoginPage() {
   const pointerY = useMotionValue(0);
   const springX = useSpring(pointerX, { stiffness: 170, damping: 24, mass: 0.35 });
   const springY = useSpring(pointerY, { stiffness: 170, damping: 24, mass: 0.35 });
-  const rotateX = useTransform(springY, [-0.5, 0.5], [5.5, -5.5]);
-  const rotateY = useTransform(springX, [-0.5, 0.5], [-6, 6]);
+  const rotateX = useTransform(springY, [-0.5, 0.5], [2.8, -2.8]);
+  const rotateY = useTransform(springX, [-0.5, 0.5], [-3.2, 3.2]);
 
   function handleFramePointerMove(event: PointerEvent<HTMLDivElement>) {
     if (reduceMotion) return;
@@ -50,15 +50,11 @@ export default function LoginPage() {
 
     pointerX.set(x);
     pointerY.set(y);
-    event.currentTarget.style.setProperty("--login-tilt-x", `${(x + 0.5) * 100}%`);
-    event.currentTarget.style.setProperty("--login-tilt-y", `${(y + 0.5) * 100}%`);
   }
 
-  function resetFrameTilt(event: PointerEvent<HTMLDivElement>) {
+  function resetFrameTilt() {
     pointerX.set(0);
     pointerY.set(0);
-    event.currentTarget.style.setProperty("--login-tilt-x", "50%");
-    event.currentTarget.style.setProperty("--login-tilt-y", "50%");
   }
 
   return (

@@ -1880,61 +1880,12 @@ body:has(.auth-stage) {
 }
 
 .login-frame-tilt-shell {
-  --login-tilt-x: 50%;
-  --login-tilt-y: 50%;
   position: relative;
   display: grid;
   place-items: center;
   transform-style: preserve-3d;
   perspective: 1400px;
   will-change: transform;
-  transition: filter 220ms ease;
-}
-
-.login-frame-tilt-shell:hover {
-  filter: drop-shadow(0 34px 72px rgba(0, 125, 255, 0.18));
-}
-
-.login-frame::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  opacity: 0;
-  background:
-    radial-gradient(
-      circle at var(--login-tilt-x) var(--login-tilt-y),
-      rgba(130, 229, 255, 0.22),
-      rgba(45, 139, 255, 0.09) 24%,
-      transparent 48%
-    );
-  mix-blend-mode: screen;
-  transition: opacity 220ms ease;
-}
-
-.login-frame::after {
-  content: "";
-  position: absolute;
-  inset: 1px;
-  z-index: 2;
-  pointer-events: none;
-  border-radius: inherit;
-  opacity: 0;
-  background:
-    linear-gradient(
-      120deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.08) 38%,
-      rgba(107, 222, 255, 0.16) 50%,
-      transparent 64%
-    );
-  transition: opacity 220ms ease;
-}
-
-.login-frame-tilt-shell:hover .login-frame::before,
-.login-frame-tilt-shell:hover .login-frame::after {
-  opacity: 1;
 }
 
 .login-frame-inner {
@@ -3114,15 +3065,6 @@ body:has(.auth-stage) {
 
   .login-frame-tilt-shell {
     transform: none !important;
-  }
-
-  .login-frame-tilt-shell:hover {
-    filter: none;
-  }
-
-  .login-frame::before,
-  .login-frame::after {
-    display: none;
   }
 
   .login-frame {
@@ -9945,15 +9887,6 @@ body.profile-dark-theme .profile-following img {
 @media (prefers-reduced-motion: reduce) {
   .login-frame-tilt-shell {
     transform: none !important;
-  }
-
-  .login-frame-tilt-shell:hover {
-    filter: none;
-  }
-
-  .login-frame::before,
-  .login-frame::after {
-    display: none;
   }
 }
 
