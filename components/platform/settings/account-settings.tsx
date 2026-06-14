@@ -1,10 +1,22 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { ChevronDown, Mail, MapPin, Pencil, User } from "lucide-react";
 
 const profileImage = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=85";
 
-export default function AccountSettings() {
+export default function AccountSettings({ activeTab }: { activeTab?: string }) {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [name, setName] = useState("Derya Yilmaz");
+  const [email, setEmail] = useState("derya@aquascope.io");
+  const [region, setRegion] = useState("izmir");
+  const [avatar, setAvatar] = useState(profileImage);
+
+  function handleAvatarUpload(file: File | null) {
+    if (!file) return;
+    setAvatar(URL.createObjectURL(file));
+  }
+
   return (
     <section className="settings-card settings-card--account">
       <header className="settings-card-head">
@@ -20,12 +32,20 @@ export default function AccountSettings() {
       <div className="settings-account-layout">
         <div className="settings-avatar-field">
           <span>Profil Fotografı</span>
-          <button type="button" aria-label="Profil fotografini degistir">
-            <img src={profileImage} alt="Derya Yilmaz" />
+          <button type="button" aria-label="Profil fotografini degistir" onClick={() => fileInputRef.current?.click()}>
+            <img src={avatar} alt={name} />
             <i>
               <Pencil size={16} />
             </i>
           </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            hidden
+            onChange={(event) => handleAvatarUpload(event.target.files?.[0] ?? null)}
+          />
+          <small>{activeTab === "Gorunum" ? "Profil gorseli gorunum ayarlarinda da kullanilir." : "JPG, PNG veya WEBP yukleyin."}</small>
         </div>
 
         <div className="settings-form-grid">
@@ -33,7 +53,7 @@ export default function AccountSettings() {
             <span>Ad Soyad</span>
             <div className="settings-input-shell">
               <User size={18} />
-              <input defaultValue="Derya Yilmaz" />
+              <input value={name} onChange={(event) => setName(event.target.value)} />
             </div>
           </label>
 
@@ -41,7 +61,7 @@ export default function AccountSettings() {
             <span>E-posta</span>
             <div className="settings-input-shell">
               <Mail size={18} />
-              <input defaultValue="derya@aquascope.io" type="email" />
+              <input value={email} onChange={(event) => setEmail(event.target.value)} type="email" />
             </div>
           </label>
 
@@ -49,7 +69,7 @@ export default function AccountSettings() {
             <span>Bolge</span>
             <div className="settings-input-shell">
               <MapPin size={18} />
-              <select defaultValue="izmir">
+              <select value={region} onChange={(event) => setRegion(event.target.value)}>
                 <option value="izmir">Izmir Korfezi, Turkiye</option>
                 <option value="ege">Kuzey Ege Bolgesi</option>
                 <option value="akdeniz">Akdeniz Kiyilari</option>

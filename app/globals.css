@@ -22790,7 +22790,97 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 .settings-stack {
+  width: 100%;
+  max-width: none;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  align-items: stretch;
   transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.settings-feedback {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 18px;
+  padding: 12px 16px;
+  border: 1px solid rgba(77, 132, 190, 0.22);
+  border-radius: 10px;
+  color: #b8cbe4;
+  background: rgba(8, 28, 53, 0.48);
+}
+
+.settings-feedback svg {
+  color: #16e6a4;
+}
+
+.settings-feedback strong {
+  margin-left: auto;
+  color: #5bd4ff;
+  font-size: 0.88rem;
+}
+
+.settings-card--account,
+.settings-card--backend {
+  grid-column: span 1;
+}
+
+.settings-card--preferences,
+.settings-card--sync {
+  grid-column: span 1;
+}
+
+.settings-stack[data-active-tab="Genel"] .settings-card--backend {
+  grid-column: 1 / -1;
+}
+
+.settings-stack[data-active-tab="Entegrasyonlar"] .settings-card--backend,
+.settings-stack[data-active-tab="Veri & Gizlilik"] .settings-card--sync,
+.settings-stack[data-active-tab="Bildirimler"] .settings-card--preferences,
+.settings-stack[data-active-tab="Gorunum"] .settings-card--account,
+.settings-stack[data-active-tab="Guvenlik"] .settings-card--account {
+  grid-column: 1 / -1;
+}
+
+.settings-workspace .settings-tabs,
+.settings-workspace .settings-danger-zone {
+  max-width: none;
+  width: 100%;
+}
+
+.settings-workspace .settings-search {
+  width: min(560px, 42vw);
+}
+
+.settings-avatar-field small {
+  color: #91a7c3;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.settings-sync-list button.is-complete,
+.settings-endpoint-row button.is-complete {
+  color: #16e6a4;
+  border-color: rgba(22, 230, 164, 0.38);
+  background: rgba(22, 230, 164, 0.1);
+}
+
+.settings-workspace .settings-card {
+  width: 100%;
+}
+
+.settings-workspace .settings-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.settings-stack[data-active-tab="Gorunum"] .settings-form-grid,
+.settings-stack[data-active-tab="Guvenlik"] .settings-form-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.settings-stack[data-active-tab="Gorunum"] .settings-field--wide,
+.settings-stack[data-active-tab="Guvenlik"] .settings-field--wide {
+  grid-column: auto;
 }
 
 @keyframes aqua-tab-panel-in {

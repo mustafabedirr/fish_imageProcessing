@@ -1,6 +1,29 @@
+"use client";
+
+import { useState } from "react";
 import { Clock3, Code2, Copy, Server, Zap } from "lucide-react";
 
-export default function BackendStatus() {
+const endpoint = "http://127.0.0.1:8000/api/v1/analyze-fish";
+
+export default function BackendStatus({ setNotice }: { setNotice: (notice: string) => void }) {
+  const [copied, setCopied] = useState(false);
+  const [lastChecked, setLastChecked] = useState("16 Mayis 2024 14:32");
+
+  async function copyEndpoint() {
+    try {
+      await navigator.clipboard.writeText(endpoint);
+      setCopied(true);
+      setNotice("API endpoint panoya kopyalandi.");
+    } catch {
+      setNotice("Tarayici pano izni vermedi, endpoint manuel kopyalanabilir.");
+    }
+  }
+
+  function refreshStatus() {
+    setLastChecked(new Date().toLocaleString("tr-TR", { dateStyle: "medium", timeStyle: "short" }));
+    setNotice("Backend baglanti durumu yenilendi.");
+  }
+
   return (
     <section className="settings-card settings-card--backend">
       <header className="settings-card-head">
@@ -32,23 +55,23 @@ export default function BackendStatus() {
           <Clock3 size={22} />
           <div>
             <small>Son Kontrol</small>
-            <strong>16 Mayis 2024 14:32</strong>
+            <strong>{lastChecked}</strong>
           </div>
         </article>
       </div>
 
       <div className="settings-endpoint-row">
         <span>API Endpoint</span>
-        <code>http://127.0.0.1:8000/api/v1/analyze-fish</code>
-        <button type="button">
+        <code>{endpoint}</code>
+        <button type="button" className={copied ? "is-complete" : ""} onClick={copyEndpoint}>
           <Copy size={15} />
-          Kopyala
+          {copied ? "Kopyalandi" : "Kopyala"}
         </button>
       </div>
 
-      <button type="button" className="settings-env-button">
+      <button type="button" className="settings-env-button" onClick={refreshStatus}>
         <Code2 size={18} />
-        FASTAPI_URL ile degistirilebilir
+        Baglantiyi Yenile
       </button>
     </section>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Bell, BookOpen, BriefcaseBusiness, CloudCog, DatabaseZap, SlidersHorizontal } from "lucide-react";
 
 const preferences = [
@@ -15,9 +16,25 @@ const preferences = [
   },
 ];
 
-export default function SettingsPanels() {
+export default function SettingsPanels({
+  activeTab,
+  setNotice,
+}: {
+  activeTab?: string;
+  setNotice: (notice: string) => void;
+}) {
+  const [enabledPreferences, setEnabledPreferences] = useState<Record<string, boolean>>(
+    Object.fromEntries(preferences.map((item) => [item.title, true])),
+  );
+  const [syncInterval, setSyncInterval] = useState("15 Dakikada Bir");
+  const [cacheCleared, setCacheCleared] = useState(false);
+  const [backupReady, setBackupReady] = useState(false);
+  const showPreferences = activeTab !== "Veri & Gizlilik";
+  const showSync = activeTab !== "Bildirimler";
+
   return (
     <>
+      {showPreferences ? (
       <section className="settings-card settings-card--preferences">
         <header className="settings-card-head">
           <span>
@@ -39,13 +56,23 @@ export default function SettingsPanels() {
                 <strong>{title}</strong>
                 <small>{description}</small>
               </span>
-              <input type="checkbox" defaultChecked />
+              <input
+                type="checkbox"
+                checked={enabledPreferences[title]}
+                onChange={(event) => {
+                  const checked = event.target.checked;
+                  setEnabledPreferences((current) => ({ ...current, [title]: checked }));
+                  setNotice(`${title}: ${checked ? "aktif" : "pasif"}.`);
+                }}
+              />
               <i aria-hidden />
             </label>
           ))}
         </div>
       </section>
+      ) : null}
 
+      {showSync ? (
       <section className="settings-card settings-card--sync">
         <header className="settings-card-head">
           <span>
@@ -66,8 +93,15 @@ export default function SettingsPanels() {
               <strong>Otomatik Senkronizasyon</strong>
               <small>Verileriniz arka planda otomatik senkronize edilir.</small>
             </div>
-            <button type="button">
-              15 Dakikada Bir
+            <button
+              type="button"
+              onClick={() => {
+                const next = syncInterval === "15 Dakikada Bir" ? "Saatte Bir" : syncInterval === "Saatte Bir" ? "Manuel" : "15 Dakikada Bir";
+                setSyncInterval(next);
+                setNotice(`Senkronizasyon sikligi: ${next}.`);
+              }}
+            >
+              {syncInterval}
               <SlidersHorizontal size={15} />
             </button>
           </article>
@@ -79,7 +113,16 @@ export default function SettingsPanels() {
               <strong>Veri On Bellegini Temizle</strong>
               <small>Gecici verileri temizleyerek uygulama performansini artirin.</small>
             </div>
-            <button type="button">Temizle</button>
+            <button
+              type="button"
+              className={cacheCleared ? "is-complete" : ""}
+              onClick={() => {
+                setCacheCleared(true);
+                setNotice("Gecici veri on bellegi temizlendi.");
+              }}
+            >
+              {cacheCleared ? "Temizlendi" : "Temizle"}
+            </button>
           </article>
           <article>
             <span className="settings-preference-icon">
@@ -89,10 +132,20 @@ export default function SettingsPanels() {
               <strong>Veri Yedekleme</strong>
               <small>Hesap verilerinizin yedegini indirin.</small>
             </div>
-            <button type="button">Yedekle</button>
+            <button
+              type="button"
+              className={backupReady ? "is-complete" : ""}
+              onClick={() => {
+                setBackupReady(true);
+                setNotice("Yedek dosyasi hazirlandi.");
+              }}
+            >
+              {backupReady ? "Hazir" : "Yedekle"}
+            </button>
           </article>
         </div>
       </section>
+      ) : null}
     </>
   );
 }
