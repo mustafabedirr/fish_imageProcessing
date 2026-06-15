@@ -21944,7 +21944,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 .social-area-page .social-area-content.social-area-content--mockup {
   --social-gap: clamp(12px, 1vw, 18px);
   --social-pad: clamp(12px, 1.2vw, 20px);
-  --social-post-min: clamp(300px, 34vh, 392px);
+  --social-post-min: clamp(340px, 38vh, 430px);
   grid-template-columns: minmax(0, 1fr) clamp(272px, 21vw, 328px);
   gap: var(--social-gap);
   height: 100%;
@@ -22025,36 +22025,46 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 
 .social-area-page .social-post-stack {
   align-content: start;
-  grid-auto-rows: minmax(var(--social-post-min), auto);
+  grid-auto-rows: auto;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   min-height: 0;
 }
 
 .social-area-page .social-post-card {
-  min-height: 0;
-  height: 100%;
+  min-height: var(--social-post-min);
+  height: auto;
 }
 
 .social-area-page .social-post-card > p {
-  min-height: 0;
+  min-height: clamp(68px, 8.5vh, 94px);
 }
 
 .social-area-page .social-post-photos img,
 .social-area-page .social-post-photos--grid figure:first-child img {
-  height: clamp(146px, 17vh, 210px);
+  height: clamp(164px, 18.4vh, 228px);
 }
 
 .social-area-page .social-post-card footer {
   margin-top: auto;
-  grid-template-columns: repeat(3, minmax(0, auto));
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 10px;
 }
 
 .social-area-page .social-post-action {
   min-width: 0;
+  width: 100%;
+  justify-content: flex-start;
+  white-space: nowrap;
 }
 
 .social-area-page .social-post-action:nth-child(2) {
   margin-left: 0;
+}
+
+.social-area-page .social-post-action span {
+  min-width: 0;
 }
 
 .social-area-page .social-interactions-panel {
