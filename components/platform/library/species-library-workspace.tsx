@@ -287,7 +287,6 @@ const pageSize = 9;
 export default function SpeciesLibraryWorkspace() {
   const [speciesList, setSpeciesList] = useState<FishSpecies[]>(initialSpeciesCards);
   const [query, setQuery] = useState("");
-  const [filtersVisible, setFiltersVisible] = useState(true);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [newSpecies, setNewSpecies] = useState({
@@ -426,7 +425,6 @@ export default function SpeciesLibraryWorkspace() {
         <header className="fish-library-header">
           <div className="fish-library-title">
             <h1>Tur Kutuphanesi</h1>
-            <p>Balik turlerini arayin, filtreleyin, favorileyin ve kayitlari yonetin.</p>
           </div>
 
           <div className="fish-library-actions">
@@ -443,10 +441,6 @@ export default function SpeciesLibraryWorkspace() {
               />
               <span>Ctrl K</span>
             </label>
-            <button type="button" className="fish-library-action" onClick={() => setFiltersVisible((visible) => !visible)}>
-              <SlidersHorizontal size={18} />
-              {filtersVisible ? "Filtreleri Gizle" : "Filtreleri Goster"}
-            </button>
             <div className="fish-library-view-toggle" aria-label="Gorunum secimi">
               <button type="button" className={viewMode === "grid" ? "is-active" : ""} aria-label="Grid gorunumu" onClick={() => setViewMode("grid")}>
                 <Grid2X2 size={18} />
@@ -464,15 +458,13 @@ export default function SpeciesLibraryWorkspace() {
 
         <div className="fish-library-layout">
           <main className="fish-library-main">
-            {filtersVisible ? (
-              <section className="fish-library-filter-panel" aria-label="Tur filtreleri">
-                <LibrarySelect label="Tur Grubu" value={group} options={["Tumu", "Etcil", "Otcul", "Dip Baligi"]} onChange={(value) => updateFilter(setGroup, value)} />
-                <LibrarySelect label="Yasam Alani" value={habitat} options={["Tumu", "Deniz", "Tatli Su", "Aci Su"]} onChange={(value) => updateFilter(setHabitat, value)} />
-                <LibrarySelect label="Dagilim Bolgesi" value={region} options={["Tumu", "Akdeniz", "Ege", "Karadeniz", "Ic Anadolu"]} onChange={(value) => updateFilter(setRegion, value)} />
-                <LibrarySelect label="Koruma Durumu" value={protection} options={["Tumu", "Guvenli", "Koruma Altinda", "Nesli Tehlikede"]} onChange={(value) => updateFilter(setProtection, value)} />
-                <LibrarySelect label="Sirala" value={sortBy} options={["Populerlik", "Uygunluk", "Kayit Sayisi", "Ada Gore"]} onChange={(value) => updateFilter(setSortBy, value)} icon={<SlidersHorizontal size={16} />} />
-              </section>
-            ) : null}
+            <section className="fish-library-filter-panel" aria-label="Tur filtreleri">
+              <LibrarySelect label="Tur Grubu" value={group} options={["Tumu", "Etcil", "Otcul", "Dip Baligi"]} onChange={(value) => updateFilter(setGroup, value)} />
+              <LibrarySelect label="Yasam Alani" value={habitat} options={["Tumu", "Deniz", "Tatli Su", "Aci Su"]} onChange={(value) => updateFilter(setHabitat, value)} />
+              <LibrarySelect label="Dagilim Bolgesi" value={region} options={["Tumu", "Akdeniz", "Ege", "Karadeniz", "Ic Anadolu"]} onChange={(value) => updateFilter(setRegion, value)} />
+              <LibrarySelect label="Koruma Durumu" value={protection} options={["Tumu", "Guvenli", "Koruma Altinda", "Nesli Tehlikede"]} onChange={(value) => updateFilter(setProtection, value)} />
+              <LibrarySelect label="Sirala" value={sortBy} options={["Populerlik", "Uygunluk", "Kayit Sayisi", "Ada Gore"]} onChange={(value) => updateFilter(setSortBy, value)} icon={<SlidersHorizontal size={16} />} />
+            </section>
 
             <div className="fish-library-result-row">
               <span>
