@@ -1,6 +1,7 @@
 "use client";
 
-import { Bell, Briefcase, ChevronDown, Mail, RefreshCw, Search } from "lucide-react";
+import { Briefcase, ChevronDown, Mail, RefreshCw, Search } from "lucide-react";
+import NotificationPopover from "./notification-popover";
 
 export default function PlatformUtilityBar({
   placeholder = "Search species, type, region...",
@@ -25,14 +26,7 @@ export default function PlatformUtilityBar({
         <button type="button" className="platform-utility-icon" aria-label="Messages">
           <Mail size={20} />
         </button>
-        <button type="button" className="platform-utility-icon platform-utility-icon--count" aria-label="Notifications">
-          <Bell size={20} />
-          <span>2</span>
-        </button>
-        <button type="button" className="platform-utility-icon platform-utility-icon--count" aria-label="Alerts">
-          <Bell size={20} />
-          <span className="platform-utility-badge-alt">3</span>
-        </button>
+        <NotificationPopover buttonClassName="platform-utility-icon platform-utility-icon--count" iconSize={20} label="Notifications" />
 
         <button type="button" className="platform-utility-profile" aria-label="Open profile menu">
           <img

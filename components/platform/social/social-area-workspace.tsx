@@ -34,6 +34,7 @@ import {
   X,
 } from "lucide-react";
 import AnimatedTabBar from "../../ui/animated-tab-bar";
+import NotificationPopover from "../shell/notification-popover";
 
 const avatar = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80";
 
@@ -349,10 +350,7 @@ export default function SocialAreaWorkspace() {
                 />
                 <span>Ctrl K</span>
               </label>
-              <button type="button" className="social-bell" aria-label="Notifications" onClick={() => openModal("notifications")}>
-                <Bell size={18} />
-                <b>3</b>
-              </button>
+              <NotificationPopover buttonClassName="social-bell" iconSize={18} label="Notifications" />
 
             </div>
           </header>

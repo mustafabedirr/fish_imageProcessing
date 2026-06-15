@@ -4,7 +4,6 @@ import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react"
 import Map, { Layer, Marker, Source, type MapRef } from "react-map-gl/maplibre";
 import {
   Anchor,
-  Bell,
   CalendarDays,
   Check,
   ChevronRight,
@@ -27,6 +26,7 @@ import {
   Wind,
   X,
 } from "lucide-react";
+import NotificationPopover from "../shell/notification-popover";
 
 const layerItems = [
   { id: "fish-density", icon: Fish, title: "Balik Yogunlugu", low: "Dusuk", high: "Yuksek", active: true, tone: "blue" },
@@ -553,10 +553,7 @@ export default function WorldMapWorkspace() {
                 <button type="button" onClick={() => applyFilterPreset("navigation")}>Navigasyon</button>
               </div>
             ) : null}
-            <button type="button" className="aqua-map-icon-button" aria-label="Bildirimler">
-              <Bell size={18} />
-              <b>3</b>
-            </button>
+            <NotificationPopover buttonClassName="aqua-map-icon-button" iconSize={18} />
             <button
               type="button"
               className={isLayerPanelOpen ? "is-selected" : ""}

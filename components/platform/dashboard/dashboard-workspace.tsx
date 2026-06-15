@@ -20,7 +20,6 @@ import {
   YAxis,
 } from "recharts";
 import {
-  Bell,
   CalendarDays,
   ChevronDown,
   ChevronRight,
@@ -37,6 +36,7 @@ import {
   UserRound,
   Waves,
 } from "lucide-react";
+import NotificationPopover from "../shell/notification-popover";
 
 const fishImages = [
   "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=260&q=80",
@@ -179,10 +179,7 @@ export default function DashboardWorkspace() {
             <CloudUpload size={18} />
             Veri Yukle
           </button>
-          <button type="button" className="aqua-dashboard-bell" aria-label="Bildirimler">
-            <Bell size={20} />
-            <span>3</span>
-          </button>
+          <NotificationPopover buttonClassName="aqua-dashboard-bell" iconSize={20} />
           <button type="button" className="aqua-dashboard-user">
             <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80" alt="" />
             <span>
