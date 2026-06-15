@@ -22991,6 +22991,81 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   }
 }
 
+/* Social composer utility buttons */
+.social-area-page .social-composer-tools {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.social-area-page .social-composer-actions {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  max-width: none;
+}
+
+.social-area-page .social-composer-actions button {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 12px;
+  color: #aebed2;
+  background:
+    radial-gradient(circle at 35% 0%, rgba(0, 212, 255, 0.12), transparent 58%),
+    rgba(4, 18, 35, 0.72);
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.social-area-page .social-composer-actions button span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.social-area-page .social-composer-actions button svg {
+  width: 19px;
+  height: 19px;
+  color: currentColor;
+}
+
+.social-area-page .social-composer-actions button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0, 212, 255, 0.52);
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 35% 0%, rgba(0, 212, 255, 0.2), transparent 60%),
+    rgba(9, 36, 67, 0.88);
+  box-shadow: 0 14px 28px rgba(0, 119, 255, 0.16);
+}
+
+.social-area-page .social-composer-actions button:active {
+  transform: translateY(0) scale(0.96);
+}
+
+@media (max-width: 720px) {
+  .social-area-page .social-composer-actions {
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .social-area-page .social-composer-actions::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @media (max-width: 1180px) {
   .settings-header,
   .settings-header-actions,
