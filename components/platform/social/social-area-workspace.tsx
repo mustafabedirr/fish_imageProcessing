@@ -305,6 +305,14 @@ const suggestedFriends = [
   ["Emma Davis", "6 mutual friends", "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80"],
 ];
 
+const featuredDemoPostIds = new Set([
+  "david-weekend-poll",
+  "alicia-kas-location",
+  "marcus-morning-text",
+  "lily-sunset-video",
+  "emma-catch-gallery",
+  "daniel-uzungol-location",
+]);
 const topics = [
   ["# BassFishing", "12.3k posts"],
   ["# TroutFishing", "9.1k posts"],
@@ -461,7 +469,7 @@ export default function SocialAreaWorkspace() {
       return searched.filter((post) => bookmarkedPosts[post.id]);
     }
 
-    return searched;
+    return [...searched].sort((a, b) => Number(featuredDemoPostIds.has(b.id)) - Number(featuredDemoPostIds.has(a.id)));
   }, [activeTab, bookmarkedPosts, posts, searchQuery]);
 
   const createPost = () => {
