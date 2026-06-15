@@ -21942,7 +21942,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 
 /* Social viewport fit refinements */
 .social-area-page .social-area-content.social-area-content--mockup {
-  --social-gap: clamp(12px, 1vw, 18px);
+  --social-gap: clamp(10px, 0.78vw, 14px);
   --social-pad: clamp(12px, 1.2vw, 20px);
   --social-post-min: clamp(340px, 38vh, 430px);
   grid-template-columns: minmax(0, 1fr) clamp(272px, 21vw, 328px);
@@ -21957,19 +21957,15 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 .social-area-page .social-area-title {
-  align-items: end;
-  grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.28fr);
-  gap: clamp(14px, 1.5vw, 22px);
-}
-
-.social-area-page .social-area-title p {
-  max-width: 560px;
-  font-size: clamp(0.84rem, 0.82vw, 0.95rem);
+  align-items: center;
+  grid-template-columns: minmax(160px, auto) minmax(0, 1fr);
+  gap: clamp(10px, 1vw, 16px);
 }
 
 .social-area-page .social-top-actions {
   display: flex;
   flex-wrap: nowrap;
+  justify-content: flex-end;
   min-width: 0;
 }
 
@@ -21979,11 +21975,6 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   max-width: none;
 }
 
-.social-area-page .social-create {
-  flex: 0 0 auto;
-  min-width: 152px;
-  padding-inline: 16px;
-}
 
 .social-area-page .social-tabs {
   align-items: center;
@@ -22027,6 +22018,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   align-content: start;
   grid-auto-rows: auto;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(10px, 0.82vw, 14px);
   min-height: 0;
 }
 

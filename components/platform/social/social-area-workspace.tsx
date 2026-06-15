@@ -336,7 +336,6 @@ export default function SocialAreaWorkspace() {
           <header className="social-area-title">
             <div>
               <h1>Social Area</h1>
-              <p>Connect with anglers, share your catches and fishing experiences.</p>
             </div>
 
             <div className="social-top-actions">
@@ -354,11 +353,7 @@ export default function SocialAreaWorkspace() {
                 <Bell size={18} />
                 <b>3</b>
               </button>
-              <button type="button" className="social-create" onClick={() => openModal("create")}>
-                <Plus size={18} />
-                Create Post
-                <ChevronDown size={16} />
-              </button>
+
             </div>
           </header>
 
