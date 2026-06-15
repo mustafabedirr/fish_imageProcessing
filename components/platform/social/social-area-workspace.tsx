@@ -21,6 +21,7 @@ import {
   Lock,
   MapPin,
   MessageCircle,
+  MoreVertical,
   Navigation,
   Plus,
   Search,
@@ -32,6 +33,7 @@ import {
   Tag,
   Trophy,
   Upload,
+  UserPlus,
   Users,
   Video,
   X,
@@ -41,12 +43,34 @@ import NotificationPopover from "../shell/notification-popover";
 
 const avatar = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80";
 
-const feedPosts = [
+type SocialPostKind = "text" | "photo" | "video" | "location" | "poll";
+type SocialPost = {
+  id: string;
+  author: string;
+  handle: string;
+  time: string;
+  avatar: string;
+  kind: SocialPostKind;
+  text: string;
+  tags: string[];
+  likes: number;
+  comments: number;
+  photos: string[];
+  location?: string;
+  poll?: {
+    question: string;
+    options: [string, number][];
+    votes: number;
+  };
+};
+
+const feedPosts: SocialPost[] = [
   {
     id: "james-rainbow-trout",
     author: "James Mitchell",
     handle: "@jamesfishes",
     time: "7 minutes ago",
+    kind: "text",
     avatar,
     text: "Finally caught my first rainbow trout today! What an exhilarating experience! Do you have any tips for where else I can find them?",
     tags: ["#RainbowTrout", "#Fishing", "#ProudCatch"],
@@ -63,6 +87,7 @@ const feedPosts = [
     author: "Lily Edmonds",
     handle: "@lilyfishes",
     time: "2 hours ago",
+    kind: "photo",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80",
     text: "Happy to land this nice largemouth bass today on a local lake.",
     tags: ["#BassFishing", "#FishingLife"],
@@ -75,6 +100,7 @@ const feedPosts = [
     author: "Michael Thompson",
     handle: "@michael_t",
     time: "4 hours ago",
+    kind: "video",
     avatar: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=96&q=80",
     text: "Perfect day for some deep sea fishing! Caught this amazing tuna.",
     tags: ["#DeepSea", "#Tuna"],
@@ -87,6 +113,8 @@ const feedPosts = [
     author: "Sophia Martinez",
     handle: "@sophiacatches",
     time: "6 hours ago",
+    kind: "location",
+    location: "Kas, Antalya",
     avatar: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80",
     text: "Early morning session paid off. Clear water, calm wind and a healthy catch before sunrise.",
     tags: ["#MorningCatch", "#LakeLife"],
@@ -99,6 +127,17 @@ const feedPosts = [
     author: "Emir Aydin",
     handle: "@emircasts",
     time: "8 hours ago",
+    kind: "poll",
+    poll: {
+      question: "Bu hafta sonu nerede balik tutmayi planliyorsunuz?",
+      options: [
+        ["Gol", 45],
+        ["Nehir", 30],
+        ["Deniz", 15],
+        ["Fikrim yok", 10],
+      ],
+      votes: 97,
+    },
     avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=96&q=80",
     text: "Night shore session around the bay. Light current, clear sky and a strong sea bass strike just after midnight.",
     tags: ["#SeaBass", "#NightFishing", "#Aegean"],
@@ -114,6 +153,7 @@ const feedPosts = [
     author: "Nora Yilmaz",
     handle: "@norafishing",
     time: "10 hours ago",
+    kind: "photo",
     avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=96&q=80",
     text: "Logged a new clear-water observation near the reef. Visibility was excellent and the fish activity stayed high until noon.",
     tags: ["#ReefWatch", "#ClearWater", "#Observation"],
@@ -126,6 +166,8 @@ const feedPosts = [
     author: "Can Demir",
     handle: "@cankayak",
     time: "Yesterday",
+    kind: "location",
+    location: "Uzungol, Trabzon",
     avatar: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?auto=format&fit=crop&w=96&q=80",
     text: "Mapped a quiet kayak route and marked three promising casting points for the weekend group trip.",
     tags: ["#KayakFishing", "#Route", "#WeekendPlan"],
@@ -142,12 +184,117 @@ const feedPosts = [
     author: "Ayla Kaya",
     handle: "@aylacatches",
     time: "Yesterday",
+    kind: "poll",
+    poll: {
+      question: "En sevdiginiz olta takimi hangisi?",
+      options: [
+        ["Spin", 50],
+        ["Fly Fishing", 25],
+        ["Surf Casting", 15],
+        ["Diger", 10],
+      ],
+      votes: 120,
+    },
     avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=96&q=80",
     text: "Catch and release log updated. Healthy juvenile group spotted near the shallows, so we kept the area low-impact today.",
     tags: ["#CatchAndRelease", "#Conservation", "#Shallows"],
     likes: 93,
     comments: 18,
     photos: ["https://images.unsplash.com/photo-1516685018646-5499d0a7d42f?auto=format&fit=crop&w=1200&q=85"],
+  },
+  {
+    id: "david-weekend-poll",
+    author: "David Anderson",
+    handle: "@davidcasts",
+    time: "6 hours ago",
+    kind: "poll",
+    poll: {
+      question: "Bu hafta sonu nerede balik tutmayi planliyorsunuz?",
+      options: [
+        ["Gol", 45],
+        ["Nehir", 30],
+        ["Deniz", 15],
+        ["Fikrim yok", 10],
+      ],
+      votes: 97,
+    },
+    avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=96&q=80",
+    text: "Hafta sonu icin rota secimi yapiyoruz.",
+    tags: ["#Poll", "#Weekend", "#FishingPlan"],
+    likes: 97,
+    comments: 18,
+    photos: [],
+  },
+  {
+    id: "alicia-kas-location",
+    author: "Alicia Vikander",
+    handle: "@avikander",
+    time: "5 hours ago",
+    kind: "location",
+    location: "Kas, Antalya",
+    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=96&q=80",
+    text: "Bugunku dalis noktasi sakin ve gorus mesafesi cok iyiydi.",
+    tags: ["#Location", "#Kas", "#Diving"],
+    likes: 64,
+    comments: 9,
+    photos: ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=85"],
+  },
+  {
+    id: "marcus-morning-text",
+    author: "Marcus Lee",
+    handle: "@marcuslee",
+    time: "7 hours ago",
+    kind: "text",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80",
+    text: "Sabahin bu saatinde denizde olmak bambaska bir huzur veriyor. Doga insana her zaman iyi geliyor.",
+    tags: ["#FishingLife", "#MorningVibes", "#Ocean"],
+    likes: 46,
+    comments: 3,
+    photos: [],
+  },
+  {
+    id: "lily-sunset-video",
+    author: "Lily Edmonds",
+    handle: "@lilyfishes",
+    time: "13 hours ago",
+    kind: "video",
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80",
+    text: "Gunun son isigi ile kisa bir av gunlugu.",
+    tags: ["#Sunset", "#Video", "#Lake"],
+    likes: 91,
+    comments: 14,
+    photos: ["https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1100&q=85"],
+  },
+  {
+    id: "emma-catch-gallery",
+    author: "Emma Watson",
+    handle: "@emmawaters",
+    time: "10 hours ago",
+    kind: "photo",
+    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=96&q=80",
+    text: "Ufak bir yakalama gunlugu. Renkler ve desenler gercekten etkileyici.",
+    tags: ["#Catch", "#Gallery", "#Trout"],
+    likes: 48,
+    comments: 7,
+    photos: [
+      "https://images.unsplash.com/photo-1544943910-4c1dc44aab44?auto=format&fit=crop&w=1100&q=85",
+      "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=520&q=85",
+      "https://images.unsplash.com/photo-1516685018646-5499d0a7d42f?auto=format&fit=crop&w=520&q=85",
+    ],
+  },
+  {
+    id: "daniel-uzungol-location",
+    author: "Daniel Kim",
+    handle: "@danielangler",
+    time: "12 hours ago",
+    kind: "location",
+    location: "Uzungol, Trabzon",
+    avatar: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=96&q=80",
+    text: "Sisli hava, temiz su ve cok sakin bir rota.",
+    tags: ["#Location", "#Uzungol", "#Route"],
+    likes: 71,
+    comments: 11,
+    photos: ["https://images.unsplash.com/photo-1476611338391-6f395a0ebc7b?auto=format&fit=crop&w=1000&q=85"],
   },
 ];
 
@@ -197,14 +344,15 @@ const interactionComments = [
     avatar: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80",
   },
 ];
-const feedTabs = ["For You", "Following", "Popular", "Groups", "New Posts"] as const;
+
+const feedTabs = ["For You", "Following", "Popular", "Groups", "Saved"] as const;
 type FeedTab = (typeof feedTabs)[number];
 const feedTabLabels: Record<FeedTab, string> = {
   "For You": "For You",
   Following: "Following",
   Popular: "Popular",
   Groups: "Groups",
-  "New Posts": "New Posts",
+  Saved: "Saved",
 };
 type SocialModal = "create" | "media" | "video" | "location" | "poll" | "achievement" | "notifications" | "comments" | "share" | "friends" | "topics" | "members" | "events" | null;
 
@@ -309,8 +457,12 @@ export default function SocialAreaWorkspace() {
       return [...searched].sort((a, b) => b.likes - a.likes);
     }
 
+    if (activeTab === "Saved") {
+      return searched.filter((post) => bookmarkedPosts[post.id]);
+    }
+
     return searched;
-  }, [activeTab, posts, searchQuery]);
+  }, [activeTab, bookmarkedPosts, posts, searchQuery]);
 
   const createPost = () => {
     const text = composerText.trim();
@@ -327,6 +479,7 @@ export default function SocialAreaWorkspace() {
         handle: "@deryayilmaz",
         time: "Just now",
         avatar,
+        kind: "text",
         text,
         tags,
         likes: 0,
@@ -336,7 +489,7 @@ export default function SocialAreaWorkspace() {
       ...current,
     ]);
     setComposerText("");
-    setActiveTab("New Posts");
+    setActiveTab("For You");
     setNotice(`${audience} icin yeni paylasim yayinlandi.`);
   };
 
@@ -377,7 +530,12 @@ export default function SocialAreaWorkspace() {
                 <span>Ctrl K</span>
               </label>
               <NotificationPopover buttonClassName="social-bell" iconSize={18} label="Notifications" />
-
+              <FriendRequestsPopover
+                addedFriends={addedFriends}
+                hiddenFriends={hiddenFriends}
+                onToggleAdd={(name) => setAddedFriends((current) => ({ ...current, [name]: !current[name] }))}
+                onHide={(name) => setHiddenFriends((current) => ({ ...current, [name]: true }))}
+              />
             </div>
           </header>
 
@@ -457,7 +615,7 @@ export default function SocialAreaWorkspace() {
           <div className="social-post-stack" key={activeTab}>
             {visiblePosts.length ? visiblePosts.map((post) => (
               <article
-                className="social-post-card"
+                className={`social-post-card social-post-card--${post.kind ?? "photo"}`}
                 key={post.id}
                 role="button"
                 tabIndex={0}
@@ -473,9 +631,11 @@ export default function SocialAreaWorkspace() {
                   <img src={post.avatar} alt={post.author} />
                   <div>
                     <strong>{post.author}</strong>
-                    <span>{post.handle}</span>
-                    <small>{post.time}</small>
+                    <span>{post.time}</span>
                   </div>
+                  <button type="button" className="social-post-more" aria-label="Post options" onClick={(event) => event.stopPropagation()}>
+                    <MoreVertical size={18} />
+                  </button>
                   <button
                     className={bookmarkedPosts[post.id] ? "social-bookmark is-active" : "social-bookmark"}
                     type="button"
@@ -489,21 +649,52 @@ export default function SocialAreaWorkspace() {
                   </button>
                 </header>
 
-                <p>{post.text}</p>
-                <div className="social-post-tags">
-                  {post.tags.map((tag) => (
-                    <span key={tag}>{tag}</span>
-                  ))}
-                </div>
+                {(post.kind ?? "photo") === "text" ? (
+                  <div className="social-post-text-body">
+                    <PostKindBadge kind="Text" />
+                    <p>{post.text}</p>
+                    <PostTags tags={post.tags} />
+                  </div>
+                ) : null}
 
-                <div className={post.photos.length > 1 ? "social-post-photos social-post-photos--grid" : "social-post-photos"}>
-                  {post.photos.slice(0, 2).map((photo, index) => (
-                    <figure key={photo}>
-                      <img src={photo} alt={`${post.author} catch ${index + 1}`} />
-                      {index === 1 && post.photos.length > 2 ? <figcaption>+{post.photos.length - 1}</figcaption> : null}
+                {post.kind === "poll" ? (
+                  <div className="social-post-poll-body">
+                    <PostKindBadge kind="Poll" />
+                    <p>{post.poll?.question ?? post.text}</p>
+                    <div className="social-poll-options">
+                      {post.poll?.options.map(([label, value]) => (
+                        <span key={label}>
+                          <b><em style={{ width: `${value}%` }} />{label}</b>
+                          <strong>{value}%</strong>
+                        </span>
+                      ))}
+                    </div>
+                    <small>{post.poll?.votes ?? 0} votes</small>
+                  </div>
+                ) : null}
+
+                {post.kind === "location" ? (
+                  <div className="social-post-location-body">
+                    <PostKindBadge kind="Location" />
+                    <h3>{post.location}</h3>
+                    <span>Turkiye</span>
+                    <figure>
+                      <img src={post.photos[0]} alt={post.location ?? post.author} />
                     </figure>
-                  ))}
-                </div>
+                  </div>
+                ) : null}
+
+                {(post.kind === "photo" || post.kind === "video" || !post.kind) ? (
+                  <div className={post.photos.length > 1 ? "social-post-photos social-post-photos--grid" : "social-post-photos"}>
+                    {post.photos.slice(0, 2).map((photo, index) => (
+                      <figure key={photo}>
+                        <img src={photo} alt={`${post.author} catch ${index + 1}`} />
+                        {post.kind === "video" ? <span className="social-video-play"><Video size={26} /></span> : null}
+                        {index === 1 && post.photos.length > 2 ? <figcaption>+{post.photos.length - 1}</figcaption> : null}
+                      </figure>
+                    ))}
+                  </div>
+                ) : null}
 
                 <footer>
                   <button
@@ -552,26 +743,6 @@ export default function SocialAreaWorkspace() {
         </main>
 
         <aside className="social-interactions-panel">
-          <SocialPanel title="Suggested Friends" action="View All" onAction={() => openModal("friends")}>
-            <div className="social-friend-list">
-              {suggestedFriends.filter(([name]) => !hiddenFriends[name]).map(([name, detail, image]) => (
-                <article key={name}>
-                  <img src={image} alt={name} />
-                  <div>
-                    <strong>{name}</strong>
-                    <span>{detail}</span>
-                  </div>
-                  <button type="button" className={addedFriends[name] ? "is-added" : ""} onClick={() => setAddedFriends((current) => ({ ...current, [name]: !current[name] }))}>
-                    {addedFriends[name] ? "Added" : "Add"}
-                  </button>
-                  <button type="button" className="social-dismiss" aria-label={`Dismiss ${name}`} onClick={() => setHiddenFriends((current) => ({ ...current, [name]: true }))}>
-                    <X size={16} />
-                  </button>
-                </article>
-              ))}
-            </div>
-          </SocialPanel>
-
           <SocialPanel title="Trending Topics" action="View All" onAction={() => openModal("topics")}>
             <div className="topic-list">
               {topics.map(([topic, count]) => (
@@ -641,7 +812,8 @@ export default function SocialAreaWorkspace() {
           }}
         />
       ) : activeModal ? (
-        <SocialFlowModal          modal={activeModal}
+        <SocialFlowModal
+          modal={activeModal}
           audience={audience}
           composerText={composerText}
           onClose={closeModal}
@@ -662,6 +834,7 @@ export default function SocialAreaWorkspace() {
                 handle: "@derya",
                 time: "Az once",
                 avatar,
+                kind: modal === "video" ? "video" : "photo",
                 text: composerText.trim() || (modal === "video" ? "Yeni bir av videosu paylasti." : "Yeni bir av gorseli paylasti."),
                 tags: modal === "video" ? ["#FishingVideo", "#AegeanSea"] : ["#Catch", "#Fishing"],
                 likes: 0,
@@ -674,7 +847,7 @@ export default function SocialAreaWorkspace() {
               };
               setPosts((currentPosts) => [current, ...currentPosts]);
               setComposerText("");
-              setActiveTab("New Posts");
+              setActiveTab("For You");
             }
             if (modal === "location") setComposerText((current) => `${current}${current ? " " : ""}Lake Washington`);
             if (modal === "achievement") setComposerText((current) => `${current}${current ? " " : ""}#Achievement`);
@@ -694,6 +867,89 @@ export default function SocialAreaWorkspace() {
         />
       ) : null}
     </section>
+  );
+}
+
+function PostKindBadge({ kind }: { kind: "Text" | "Poll" | "Location" }) {
+  const Icon = kind === "Poll" ? BarChart3 : kind === "Location" ? MapPin : SlidersHorizontal;
+
+  return (
+    <span className="social-post-kind">
+      <Icon size={16} />
+      {kind}
+    </span>
+  );
+}
+
+function PostTags({ tags }: { tags: string[] }) {
+  return (
+    <div className="social-post-tags">
+      {tags.map((tag) => (
+        <span key={tag}>{tag}</span>
+      ))}
+    </div>
+  );
+}
+
+function FriendRequestsPopover({
+  addedFriends,
+  hiddenFriends,
+  onToggleAdd,
+  onHide,
+}: {
+  addedFriends: Record<string, boolean>;
+  hiddenFriends: Record<string, boolean>;
+  onToggleAdd: (name: string) => void;
+  onHide: (name: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const visibleFriends = suggestedFriends.filter(([name]) => !hiddenFriends[name]);
+
+  return (
+    <div className="social-friend-popover">
+      <button
+        type="button"
+        className={open ? "social-friend-trigger is-open" : "social-friend-trigger"}
+        aria-label="Friend requests"
+        aria-expanded={open}
+        onClick={() => setOpen((current) => !current)}
+      >
+        <UserPlus size={18} />
+        {visibleFriends.length ? <b>{visibleFriends.length}</b> : null}
+      </button>
+
+      {open ? (
+        <section className="social-friend-menu">
+          <header>
+            <div>
+              <strong>Friend Requests</strong>
+              <span>Suggested anglers and pending invites</span>
+            </div>
+            <button type="button" onClick={() => setOpen(false)} aria-label="Close friend requests">
+              <X size={16} />
+            </button>
+          </header>
+
+          <div className="social-friend-menu-list">
+            {visibleFriends.map(([name, detail, image]) => (
+              <article key={name}>
+                <img src={image} alt={name} />
+                <div>
+                  <strong>{name}</strong>
+                  <span>{detail}</span>
+                </div>
+                <button type="button" className={addedFriends[name] ? "is-added" : ""} onClick={() => onToggleAdd(name)}>
+                  {addedFriends[name] ? "Added" : "Add"}
+                </button>
+                <button type="button" aria-label={`Dismiss ${name}`} onClick={() => onHide(name)}>
+                  <X size={15} />
+                </button>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
+    </div>
   );
 }
 
@@ -844,6 +1100,7 @@ function PostInteractionModal({
     </div>
   );
 }
+
 function SocialPanel({ title, action, children, onAction }: { title: string; action: string; children: ReactNode; onAction: () => void }) {
   return (
     <section>
@@ -1039,7 +1296,7 @@ function MiniAegeanMap({ large = false }: { large?: boolean }) {
             <MapPin size={20} />
             <small>Selected location</small>
             <strong>North Aegean Region</strong>
-            <span>39.2326° N, 26.4412° E</span>
+            <span>39.2326Â° N, 26.4412Â° E</span>
             <button type="button">Edit</button>
           </div>
           <b>50 km</b>
@@ -1146,7 +1403,7 @@ function VideoShareModalContent() {
           </div>
           <h3>Drag & drop your video here</h3>
           <p>or <button type="button" onClick={() => fileInputRef.current?.click()}>browse files</button></p>
-          <small>MP4, MOV, WebM up to 500MB · Max 2 minutes</small>
+          <small>MP4, MOV, WebM up to 500MB Â· Max 2 minutes</small>
           <input
             ref={fileInputRef}
             type="file"
@@ -1162,7 +1419,7 @@ function VideoShareModalContent() {
           </figure>
           <div>
             <strong>{selectedFile}</strong>
-            <span>128 MB · 01:24</span>
+            <span>128 MB Â· 01:24</span>
             <i><b /></i>
           </div>
           <em>100%</em>
@@ -1249,7 +1506,7 @@ function LocationShareModalContent() {
       <div className="social-location-ready">
         <span />
         <strong>Location ready</strong>
-        <small>{locationName} · Accuracy: 25 m</small>
+        <small>{locationName} Â· Accuracy: 25 m</small>
       </div>
     </div>
   );
@@ -1319,7 +1576,7 @@ function PollShareModalContent() {
           <article>
             <header>
               <span><BarChart3 size={20} /></span>
-              <div><strong>AquaScope</strong><small>Just now · Everyone</small></div>
+              <div><strong>AquaScope</strong><small>Just now Â· Everyone</small></div>
             </header>
             <p>{question || "Your poll question will appear here..."}</p>
             {options.map((option) => (
@@ -1334,5 +1591,5 @@ function PollShareModalContent() {
 }
 
 function CheckIcon() {
-  return <span className="social-check-icon">✓</span>;
+  return <span className="social-check-icon">âœ“</span>;
 }
