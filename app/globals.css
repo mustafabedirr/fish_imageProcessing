@@ -23235,6 +23235,59 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   }
 }
 
+/* Social composer compact height */
+.social-area-page .social-composer {
+  padding: clamp(10px, 0.9vw, 14px) clamp(16px, 1.35vw, 24px) clamp(10px, 0.95vw, 15px);
+}
+
+.social-area-page .social-composer-row {
+  grid-template-columns: clamp(38px, 2.8vw, 46px) minmax(0, 1fr);
+  gap: clamp(12px, 1vw, 16px);
+}
+
+.social-area-page .social-composer img {
+  width: clamp(38px, 2.8vw, 46px);
+  height: clamp(38px, 2.8vw, 46px);
+}
+
+.social-area-page .social-composer textarea {
+  min-height: clamp(28px, 3.1vh, 36px);
+  max-height: 54px;
+  padding-top: 2px;
+  font-size: clamp(0.88rem, 0.9vw, 1rem);
+  line-height: 1.25;
+}
+
+.social-area-page .social-composer-tools {
+  gap: clamp(10px, 1vw, 16px);
+  padding-top: clamp(6px, 0.8vh, 10px);
+}
+
+.social-area-page .social-composer-actions button {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  border-radius: 10px;
+}
+
+.social-area-page .social-composer-actions button svg {
+  width: 17px;
+  height: 17px;
+}
+
+.social-area-page .social-post-button {
+  min-width: clamp(72px, 5.4vw, 92px);
+  height: clamp(36px, 4vh, 44px) !important;
+  padding: 0 clamp(14px, 1.2vw, 20px) !important;
+  font-size: clamp(0.86rem, 0.9vw, 1rem);
+}
+
+@media (max-width: 720px) {
+  .social-area-page .social-composer {
+    padding: 12px 0 14px;
+  }
+}
+
 @media (max-width: 1180px) {
   .settings-header,
   .settings-header-actions,
