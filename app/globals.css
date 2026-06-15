@@ -23288,6 +23288,467 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   }
 }
 
+/* Social post detail interaction modal */
+.social-area-page .social-post-card {
+  cursor: pointer;
+}
+
+.social-post-detail-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 2vw, 30px);
+  background:
+    radial-gradient(circle at 32% 12%, rgba(0, 212, 255, 0.12), transparent 34%),
+    rgba(1, 8, 17, 0.78);
+  backdrop-filter: blur(18px);
+  animation: socialFlowFade 180ms ease both;
+}
+
+.social-post-detail-modal {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(340px, 0.95fr);
+  width: min(1500px, calc(100vw - 44px));
+  height: min(870px, calc(100vh - 44px));
+  overflow: hidden;
+  border: 1px solid rgba(83, 144, 205, 0.34);
+  border-radius: 16px;
+  color: #f5fbff;
+  background:
+    radial-gradient(circle at 72% 0%, rgba(0, 212, 255, 0.11), transparent 34%),
+    linear-gradient(145deg, rgba(5, 18, 33, 0.98), rgba(3, 13, 25, 0.98));
+  box-shadow: 0 38px 110px rgba(0, 0, 0, 0.56), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  animation: socialFlowRise 220ms ease both;
+}
+
+.social-post-detail-media {
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  min-width: 0;
+  padding: clamp(22px, 2vw, 34px);
+  border-right: 1px solid rgba(95, 148, 205, 0.22);
+  background:
+    radial-gradient(circle at 46% 34%, rgba(0, 212, 255, 0.08), transparent 42%),
+    linear-gradient(180deg, rgba(2, 10, 20, 0.54), rgba(2, 10, 20, 0.92));
+}
+
+.social-post-detail-close,
+.social-post-detail-nav,
+.social-post-detail-media-footer button,
+.social-post-detail-panel header > button,
+.social-post-detail-stats button,
+.social-post-detail-comments article > button,
+.social-post-detail-input button {
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgba(111, 167, 222, 0.28);
+  color: #ddecff;
+  background: rgba(6, 21, 39, 0.7);
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.social-post-detail-close {
+  position: absolute;
+  top: clamp(22px, 2vw, 34px);
+  left: clamp(22px, 2vw, 34px);
+  z-index: 3;
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+}
+
+.social-post-detail-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  background: rgba(5, 16, 31, 0.76);
+  transform: translateY(-50%);
+}
+
+.social-post-detail-nav--prev {
+  left: clamp(28px, 2.5vw, 46px);
+}
+
+.social-post-detail-nav--next {
+  right: clamp(28px, 2.5vw, 46px);
+}
+
+.social-post-detail-close:hover,
+.social-post-detail-nav:hover,
+.social-post-detail-media-footer button:hover,
+.social-post-detail-panel header > button:hover,
+.social-post-detail-stats button:hover,
+.social-post-detail-comments article > button:hover,
+.social-post-detail-input button:hover,
+.social-post-detail-media-footer button.is-active,
+.social-post-detail-panel header > button.is-active,
+.social-post-detail-stats button.is-active {
+  transform: translateY(-1px);
+  border-color: rgba(0, 212, 255, 0.62);
+  color: #ffffff;
+  background: rgba(9, 35, 62, 0.9);
+  box-shadow: 0 14px 34px rgba(0, 145, 255, 0.16);
+}
+
+.social-post-detail-nav:hover {
+  transform: translateY(-50%) scale(1.04);
+}
+
+.social-post-detail-media figure {
+  align-self: center;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #030c17;
+  box-shadow: 0 24px 68px rgba(0, 0, 0, 0.42);
+}
+
+.social-post-detail-media figure img {
+  display: block;
+  width: 100%;
+  height: min(620px, calc(100vh - 230px));
+  object-fit: cover;
+  filter: saturate(1.02) contrast(1.04) brightness(0.92);
+}
+
+.social-post-detail-dots {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(120px, 14vh, 150px);
+  z-index: 3;
+  display: inline-flex;
+  gap: 12px;
+  transform: translateX(-50%);
+}
+
+.social-post-detail-dots span {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(166, 191, 218, 0.42);
+}
+
+.social-post-detail-dots span.is-active {
+  background: #2ea8ff;
+  box-shadow: 0 0 18px rgba(46, 168, 255, 0.65);
+}
+
+.social-post-detail-media-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: clamp(20px, 2vh, 28px);
+}
+
+.social-post-detail-liked {
+  display: inline-flex;
+  align-items: center;
+  color: #d5e2f0;
+  font-size: clamp(0.92rem, 1vw, 1.08rem);
+}
+
+.social-post-detail-liked img {
+  width: 34px;
+  height: 34px;
+  margin-right: -10px;
+  border: 2px solid rgba(5, 18, 33, 0.95);
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.social-post-detail-liked img:last-of-type {
+  margin-right: 16px;
+}
+
+.social-post-detail-media-footer div {
+  display: flex;
+  gap: 12px;
+}
+
+.social-post-detail-media-footer button,
+.social-post-detail-panel header > button {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+}
+
+.social-post-detail-panel {
+  display: grid;
+  grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
+  gap: 20px;
+  min-width: 0;
+  padding: clamp(22px, 2vw, 32px);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(0, 212, 255, 0.08), transparent 38%),
+    rgba(6, 21, 39, 0.78);
+}
+
+.social-post-detail-panel > header {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 54px;
+  gap: 16px;
+  align-items: start;
+}
+
+.social-post-detail-panel > header img {
+  width: 64px;
+  height: 64px;
+  border: 1px solid rgba(219, 239, 255, 0.24);
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.social-post-detail-panel header strong {
+  display: block;
+  color: #ffffff;
+  font-size: 1.08rem;
+  font-weight: 800;
+}
+
+.social-post-detail-panel header span,
+.social-post-detail-panel header small {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+  color: #9eb0c5;
+  font-size: 0.9rem;
+}
+
+.social-post-detail-panel > p {
+  margin: 0;
+  color: #f0f6ff;
+  font-size: clamp(1rem, 1.08vw, 1.18rem);
+  line-height: 1.55;
+}
+
+.social-post-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.social-post-detail-tags span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 16px;
+  border-radius: 11px;
+  color: #4ecbff;
+  background: rgba(30, 144, 255, 0.13);
+  font-weight: 800;
+}
+
+.social-post-detail-stats {
+  display: flex;
+  gap: 28px;
+  padding: 22px 0;
+  border-top: 1px solid rgba(116, 158, 202, 0.18);
+  border-bottom: 1px solid rgba(116, 158, 202, 0.18);
+}
+
+.social-post-detail-stats button {
+  display: inline-flex;
+  gap: 10px;
+  border: 0;
+  background: transparent;
+  color: #b8c7d9;
+  font-size: 1rem;
+}
+
+.social-post-detail-comments {
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: none;
+}
+
+.social-post-detail-comments::-webkit-scrollbar {
+  display: none;
+}
+
+.social-post-detail-comments h3 {
+  margin: 0 0 18px;
+  color: #9eb0c5;
+  font-size: 0.88rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.social-post-detail-comments article {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) 46px;
+  gap: 14px;
+  align-items: start;
+  margin-bottom: 20px;
+}
+
+.social-post-detail-comments article > img {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.social-post-detail-comments article header {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.social-post-detail-comments article strong {
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+.social-post-detail-comments article span {
+  color: #8fa1b6;
+  font-size: 0.84rem;
+}
+
+.social-post-detail-comments article p {
+  margin: 6px 0 0;
+  color: #bfcadd;
+  line-height: 1.45;
+}
+
+.social-post-detail-comments article div button {
+  margin-top: 7px;
+  border: 0;
+  color: #adc0d5;
+  background: transparent;
+  font: inherit;
+  font-size: 0.84rem;
+  cursor: pointer;
+}
+
+.social-post-detail-comments article > button {
+  display: inline-flex;
+  gap: 6px;
+  justify-self: end;
+  border: 0;
+  background: transparent;
+  color: #aebdd0;
+}
+
+.social-post-detail-input {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding-top: 12px;
+}
+
+.social-post-detail-input > img {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.social-post-detail-input label {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 6px 0 16px;
+  border: 1px solid rgba(100, 158, 218, 0.3);
+  border-radius: 12px;
+  background: rgba(5, 18, 34, 0.78);
+}
+
+.social-post-detail-input input {
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  color: #eef7ff;
+  background: transparent;
+  font: inherit;
+}
+
+.social-post-detail-input input::placeholder {
+  color: #8fa1b6;
+}
+
+.social-post-detail-input button {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: linear-gradient(180deg, #40b8ff, #1e77ff);
+}
+
+@media (max-width: 1040px) {
+  .social-post-detail-modal {
+    grid-template-columns: 1fr;
+    height: min(920px, calc(100vh - 32px));
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+
+  .social-post-detail-modal::-webkit-scrollbar {
+    display: none;
+  }
+
+  .social-post-detail-media {
+    min-height: 520px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(95, 148, 205, 0.22);
+  }
+
+  .social-post-detail-media figure img {
+    height: 410px;
+  }
+
+  .social-post-detail-panel {
+    min-height: 560px;
+  }
+}
+
+@media (max-width: 680px) {
+  .social-post-detail-backdrop {
+    padding: 10px;
+  }
+
+  .social-post-detail-modal {
+    width: 100%;
+  }
+
+  .social-post-detail-media {
+    min-height: 420px;
+    padding: 18px;
+  }
+
+  .social-post-detail-media figure img {
+    height: 300px;
+  }
+
+  .social-post-detail-nav {
+    width: 44px;
+    height: 44px;
+  }
+
+  .social-post-detail-panel {
+    padding: 18px;
+  }
+
+  .social-post-detail-panel > header {
+    grid-template-columns: 50px minmax(0, 1fr) 46px;
+  }
+
+  .social-post-detail-panel > header img {
+    width: 50px;
+    height: 50px;
+  }
+}
 @media (max-width: 1180px) {
   .settings-header,
   .settings-header-actions,

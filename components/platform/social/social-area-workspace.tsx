@@ -9,6 +9,8 @@ import {
   Bookmark,
   CalendarDays,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Clock3,
   Film,
   Globe2,
@@ -22,6 +24,7 @@ import {
   Navigation,
   Plus,
   Search,
+  Send,
   ShieldCheck,
   Share2,
   SlidersHorizontal,
@@ -171,6 +174,29 @@ const members = [
   ["Sophia Martinez", "980 pts", "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80"],
 ];
 
+const interactionComments = [
+  {
+    author: "Lily Edmonds",
+    time: "1 saat once",
+    text: "Harika bir kare! Renkler ve netlik muthis.",
+    likes: 3,
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80",
+  },
+  {
+    author: "James Mitchell",
+    time: "45 dakika once",
+    text: "Bu balik surusu inanilmaz! Nerede dalis yaptiniz?",
+    likes: 2,
+    avatar,
+  },
+  {
+    author: "Sophia Turner",
+    time: "20 dakika once",
+    text: "Keske orada olabilseydim!",
+    likes: 1,
+    avatar: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80",
+  },
+];
 const feedTabs = ["For You", "Following", "Popular", "Groups", "New Posts"] as const;
 type FeedTab = (typeof feedTabs)[number];
 const feedTabLabels: Record<FeedTab, string> = {
@@ -430,7 +456,19 @@ export default function SocialAreaWorkspace() {
 
           <div className="social-post-stack" key={activeTab}>
             {visiblePosts.length ? visiblePosts.map((post) => (
-              <article className="social-post-card" key={post.id}>
+              <article
+                className="social-post-card"
+                key={post.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => openModal("comments", post.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    openModal("comments", post.id);
+                  }
+                }}
+              >
                 <header>
                   <img src={post.avatar} alt={post.author} />
                   <div>
@@ -442,7 +480,10 @@ export default function SocialAreaWorkspace() {
                     className={bookmarkedPosts[post.id] ? "social-bookmark is-active" : "social-bookmark"}
                     type="button"
                     aria-label="Bookmark post"
-                    onClick={() => setBookmarkedPosts((current) => ({ ...current, [post.id]: !current[post.id] }))}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setBookmarkedPosts((current) => ({ ...current, [post.id]: !current[post.id] }));
+                    }}
                   >
                     <Bookmark size={18} />
                   </button>
@@ -469,7 +510,10 @@ export default function SocialAreaWorkspace() {
                     className={likedPosts[post.id] ? "social-post-action is-active" : "social-post-action"}
                     type="button"
                     aria-pressed={Boolean(likedPosts[post.id])}
-                    onClick={() => setLikedPosts((current) => ({ ...current, [post.id]: !current[post.id] }))}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setLikedPosts((current) => ({ ...current, [post.id]: !current[post.id] }));
+                    }}
                   >
                     <Heart size={18} />
                     <span className="social-reaction-stack" aria-hidden>
@@ -482,7 +526,10 @@ export default function SocialAreaWorkspace() {
                   <button
                     className="social-post-action"
                     type="button"
-                    onClick={() => openModal("comments", post.id)}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openModal("comments", post.id);
+                    }}
                   >
                     <MessageCircle size={18} />
                     {commentCounts[post.id] ?? post.comments} Comments
@@ -490,7 +537,10 @@ export default function SocialAreaWorkspace() {
                   <button
                     className={sharedPosts[post.id] ? "social-post-action is-active" : "social-post-action"}
                     type="button"
-                    onClick={() => openModal("share", post.id)}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openModal("share", post.id);
+                    }}
                   >
                     <Share2 size={18} />
                     {sharedPosts[post.id] ? "Paylasildi" : "Paylas"}
@@ -565,9 +615,33 @@ export default function SocialAreaWorkspace() {
         </aside>
       </div>
 
-      {activeModal ? (
-        <SocialFlowModal
-          modal={activeModal}
+      {activeModal === "comments" ? (
+        <PostInteractionModal
+          post={visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]}
+          isBookmarked={Boolean(activeFlowPostId && bookmarkedPosts[activeFlowPostId])}
+          isLiked={Boolean(activeFlowPostId && likedPosts[activeFlowPostId])}
+          likeCount={(visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).likes + (activeFlowPostId && likedPosts[activeFlowPostId] ? 1 : 0)}
+          commentCount={activeFlowPostId ? (commentCounts[activeFlowPostId] ?? (visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).comments) : 0}
+          onClose={closeModal}
+          onToggleBookmark={() => {
+            const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? posts[0]?.id;
+            if (!targetPostId) return;
+            setBookmarkedPosts((current) => ({ ...current, [targetPostId]: !current[targetPostId] }));
+          }}
+          onToggleLike={() => {
+            const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? posts[0]?.id;
+            if (!targetPostId) return;
+            setLikedPosts((current) => ({ ...current, [targetPostId]: !current[targetPostId] }));
+          }}
+          onSubmitComment={() => {
+            const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? posts[0]?.id;
+            if (!targetPostId) return;
+            const targetPost = visiblePosts.find((post) => post.id === targetPostId) ?? posts.find((post) => post.id === targetPostId);
+            setCommentCounts((current) => ({ ...current, [targetPostId]: (current[targetPostId] ?? targetPost?.comments ?? 0) + 1 }));
+          }}
+        />
+      ) : activeModal ? (
+        <SocialFlowModal          modal={activeModal}
           audience={audience}
           composerText={composerText}
           onClose={closeModal}
@@ -623,6 +697,153 @@ export default function SocialAreaWorkspace() {
   );
 }
 
+function PostInteractionModal({
+  post,
+  isBookmarked,
+  isLiked,
+  likeCount,
+  commentCount,
+  onClose,
+  onToggleBookmark,
+  onToggleLike,
+  onSubmitComment,
+}: {
+  post: (typeof feedPosts)[number];
+  isBookmarked: boolean;
+  isLiked: boolean;
+  likeCount: number;
+  commentCount: number;
+  onClose: () => void;
+  onToggleBookmark: () => void;
+  onToggleLike: () => void;
+  onSubmitComment: () => void;
+}) {
+  const [comment, setComment] = useState("");
+  const primaryPhoto = post.photos[0];
+
+  const handleSubmit = () => {
+    if (!comment.trim()) return;
+    onSubmitComment();
+    setComment("");
+  };
+
+  return (
+    <div className="social-post-detail-backdrop" role="dialog" aria-modal="true" aria-label={`${post.author} post detail`}>
+      <section className="social-post-detail-modal">
+        <div className="social-post-detail-media">
+          <button type="button" className="social-post-detail-close" aria-label="Close detail" onClick={onClose}>
+            <X size={24} />
+          </button>
+
+          <button type="button" className="social-post-detail-nav social-post-detail-nav--prev" aria-label="Previous media">
+            <ChevronLeft size={24} />
+          </button>
+          <figure>
+            <img src={primaryPhoto} alt={`${post.author} shared catch`} />
+          </figure>
+          <button type="button" className="social-post-detail-nav social-post-detail-nav--next" aria-label="Next media">
+            <ChevronRight size={24} />
+          </button>
+
+          <div className="social-post-detail-dots" aria-hidden>
+            {[0, 1, 2, 3, 4].map((dot) => (
+              <span className={dot === 0 ? "is-active" : ""} key={dot} />
+            ))}
+          </div>
+
+          <div className="social-post-detail-media-footer">
+            <span className="social-post-detail-liked">
+              <img src={avatar} alt="" />
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=48&q=80" alt="" />
+              <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=48&q=80" alt="" />
+              {likeCount} kisi begendi
+            </span>
+            <div>
+              <button type="button" aria-pressed={isLiked} className={isLiked ? "is-active" : ""} onClick={onToggleLike}>
+                <Heart size={24} />
+              </button>
+              <button type="button" aria-label="Focus comments">
+                <MessageCircle size={24} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <aside className="social-post-detail-panel">
+          <header>
+            <img src={post.avatar} alt={post.author} />
+            <div>
+              <strong>{post.author}</strong>
+              <span>{post.time}</span>
+              <small><MapPin size={14} /> Bali, Endonezya</small>
+            </div>
+            <button type="button" className={isBookmarked ? "is-active" : ""} aria-pressed={isBookmarked} aria-label="Bookmark post" onClick={onToggleBookmark}>
+              <Bookmark size={24} />
+            </button>
+          </header>
+
+          <p>{post.text}</p>
+
+          <div className="social-post-detail-tags">
+            {post.tags.map((tag) => (
+              <span key={tag}>{tag}</span>
+            ))}
+          </div>
+
+          <div className="social-post-detail-stats">
+            <button type="button" className={isLiked ? "is-active" : ""} onClick={onToggleLike}>
+              <Heart size={26} />
+              {likeCount} Begeni
+            </button>
+            <button type="button">
+              <MessageCircle size={26} />
+              {commentCount} Yorum
+            </button>
+          </div>
+
+          <section className="social-post-detail-comments">
+            <h3>Yorumlar</h3>
+            {interactionComments.map((item) => (
+              <article key={`${item.author}-${item.time}`}>
+                <img src={item.avatar} alt={item.author} />
+                <div>
+                  <header>
+                    <strong>{item.author}</strong>
+                    <span>{item.time}</span>
+                  </header>
+                  <p>{item.text}</p>
+                  <button type="button">Yanitla</button>
+                </div>
+                <button type="button" aria-label={`Like ${item.author} comment`}>
+                  <Heart size={18} />
+                  <span>{item.likes}</span>
+                </button>
+              </article>
+            ))}
+          </section>
+
+          <div className="social-post-detail-input">
+            <img src={avatar} alt="Derya Yilmaz" />
+            <label>
+              <input
+                type="text"
+                value={comment}
+                placeholder="Yorum ekle..."
+                onChange={(event) => setComment(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") handleSubmit();
+                }}
+              />
+              <button type="button" aria-label="Send comment" onClick={handleSubmit}>
+                <Send size={18} />
+              </button>
+            </label>
+          </div>
+        </aside>
+      </section>
+    </div>
+  );
+}
 function SocialPanel({ title, action, children, onAction }: { title: string; action: string; children: ReactNode; onAction: () => void }) {
   return (
     <section>
