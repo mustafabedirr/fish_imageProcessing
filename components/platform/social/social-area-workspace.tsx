@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock3,
+  Edit,
   Film,
   Globe2,
   GripVertical,
@@ -76,7 +77,7 @@ const feedPosts: SocialPost[] = [
     tags: ["#RainbowTrout", "#Fishing", "#ProudCatch"],
     likes: 37,
     comments: 12,
-    photos: [],
+    photos: ["https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=85"],
   },
   {
     id: "flow-photo-lily",
@@ -87,9 +88,9 @@ const feedPosts: SocialPost[] = [
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80",
     text: "Happy to land this nice largemouth bass today on a local lake.",
     tags: ["#BassFishing", "#FishingLife"],
-    likes: 82,
-    comments: 21,
-    photos: ["https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=85"],
+    likes: 68,
+    comments: 24,
+    photos: ["https://images.unsplash.com/photo-1559825481-12a05cc00344?auto=format&fit=crop&w=1200&q=85"],
   },
   {
     id: "flow-poll-david",
@@ -250,11 +251,23 @@ const feedPosts: SocialPost[] = [
 ];
 
 const suggestedFriends = [
-  ["Kevin Hart", "12 mutual friends", avatar],
-  ["Sarah Johnson", "8 mutual friends", "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=96&q=80"],
-  ["Alex Rodriguez", "15 mutual friends", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=96&q=80"],
-  ["Emma Davis", "6 mutual friends", "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80"],
+  ["Julia Smith", "@juliasmith", "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=96&q=80"],
+  ["Vermillion D. Gray", "@vermilliongray", avatar],
+  ["Mai Senpai", "@maisenpai", "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80"],
+  ["Azunyan U. Wu", "@azunyardesu", "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80"],
+  ["Qarack Babarma", "@obama21", "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=96&q=80"],
 ];
+
+const storyItems = [
+  ["Your Story", avatar, true],
+  ["maieongu", "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80", false],
+  ["sayforTWirl", "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=96&q=80", false],
+  ["johndoe", "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=96&q=80", false],
+  ["maryjane2", "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=96&q=80", false],
+  ["dbanna", "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=96&q=80", false],
+  ["x_ae-21b", "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80", false],
+  ["x_ae-21b", "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=96&q=80", false],
+] as const;
 
 const featuredDemoPostIds = new Set([
   "flow-text-james",
@@ -489,12 +502,17 @@ export default function SocialAreaWorkspace() {
                 <Search size={18} />
                 <input
                   type="search"
-                  placeholder="Search posts, people, groups..."
+                  placeholder="Search for friends, groups, pages..."
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                 />
                 <span>Ctrl K</span>
               </label>
+              <button type="button" className="social-create-button" onClick={() => openModal("create")}>
+                <Edit size={16} />
+                Create Post
+                <ChevronDown size={15} />
+              </button>
               <NotificationPopover buttonClassName="social-bell" iconSize={18} label="Notifications" />
               <FriendRequestsPopover
                 addedFriends={addedFriends}
@@ -502,35 +520,13 @@ export default function SocialAreaWorkspace() {
                 onToggleAdd={(name) => setAddedFriends((current) => ({ ...current, [name]: !current[name] }))}
                 onHide={(name) => setHiddenFriends((current) => ({ ...current, [name]: true }))}
               />
+              <button type="button" className="social-profile-chip" aria-label="Open profile menu">
+                <img src={avatar} alt="Derya Yilmaz" />
+                <span />
+                <ChevronDown size={14} />
+              </button>
             </div>
           </header>
-
-          <AnimatedTabBar
-            ariaLabel="Social feed tabs"
-            activeButtonClassName="is-active"
-            activeValue={activeTab}
-            buttonClassName="social-tab-button"
-            className="social-tabs"
-            layoutId="social-feed-active-tab"
-            onChange={(value) => setActiveTab(value as FeedTab)}
-            tabs={feedTabs.map((tab) => ({ title: feedTabLabels[tab], value: tab }))}
-            trailingContent={
-              <>
-                <button type="button" className={filtersOpen ? "social-filter is-open" : "social-filter"} onClick={() => setFiltersOpen((open) => !open)}>
-                  <SlidersHorizontal size={15} />
-                  Filtreler
-                  <ChevronDown size={15} />
-                </button>
-                {filtersOpen ? (
-                  <div className="social-filter-menu">
-                    <button type="button" onClick={() => setActiveTab("Popular")}>High engagement</button>
-                    <button type="button" onClick={() => setSearchQuery("#Fishing")}>#Fishing</button>
-                    <button type="button" onClick={() => setSearchQuery("")}>Clear filters</button>
-                  </div>
-                ) : null}
-              </>
-            }
-          />
 
           <section className="social-composer">
             <div className="social-composer-row">
@@ -572,11 +568,54 @@ export default function SocialAreaWorkspace() {
                   </div>
                   <button type="button" className="social-post-button" onClick={createPost}>
                       Post
+                    <ChevronDown size={14} />
                   </button>
                 </div>
               </div>
             </div>
           </section>
+
+          <section className="social-story-rail" aria-label="Stories">
+            {storyItems.map(([name, image, ownStory]) => (
+              <button type="button" key={`${name}-${image}`} className={ownStory ? "social-story-item is-own" : "social-story-item"}>
+                <span>
+                  <img src={image} alt={name} />
+                  {ownStory ? <b><Plus size={12} /></b> : null}
+                </span>
+                <small>{name}</small>
+              </button>
+            ))}
+            <button type="button" className="social-story-next" aria-label="Next stories">
+              <ChevronRight size={19} />
+            </button>
+          </section>
+
+          <AnimatedTabBar
+            ariaLabel="Social feed tabs"
+            activeButtonClassName="is-active"
+            activeValue={activeTab}
+            buttonClassName="social-tab-button"
+            className="social-tabs"
+            layoutId="social-feed-active-tab"
+            onChange={(value) => setActiveTab(value as FeedTab)}
+            tabs={feedTabs.map((tab) => ({ title: feedTabLabels[tab], value: tab }))}
+            trailingContent={
+              <>
+                <button type="button" className={filtersOpen ? "social-filter is-open" : "social-filter"} onClick={() => setFiltersOpen((open) => !open)}>
+                  <SlidersHorizontal size={15} />
+                  Filtreler
+                  <ChevronDown size={15} />
+                </button>
+                {filtersOpen ? (
+                  <div className="social-filter-menu">
+                    <button type="button" onClick={() => setActiveTab("Popular")}>High engagement</button>
+                    <button type="button" onClick={() => setSearchQuery("#Fishing")}>#Fishing</button>
+                    <button type="button" onClick={() => setSearchQuery("")}>Clear filters</button>
+                  </div>
+                ) : null}
+              </>
+            }
+          />
 
           <div className="social-post-stack" key={activeTab}>
             {visiblePosts.length ? visiblePosts.map((post) => (
@@ -620,6 +659,13 @@ export default function SocialAreaWorkspace() {
                     <PostKindBadge kind="text" />
                     <p>{post.text}</p>
                     <PostTags tags={post.tags} />
+                    {post.photos[0] ? (
+                      <div className="social-post-photos">
+                        <figure>
+                          <img src={post.photos[0]} alt={`${post.author} shared moment`} />
+                        </figure>
+                      </div>
+                    ) : null}
                   </div>
                 ) : null}
 
@@ -707,7 +753,7 @@ export default function SocialAreaWorkspace() {
                     }}
                   >
                     <Share2 size={18} />
-                    {sharedPosts[post.id] ? "Paylasildi" : "Paylas"}
+                    {sharedPosts[post.id] ? "1" : post.id === "flow-text-james" ? "187" : ""}
                   </button>
                 </footer>
               </article>
@@ -716,31 +762,38 @@ export default function SocialAreaWorkspace() {
         </main>
 
         <aside className="social-interactions-panel">
-          <SocialPanel title="Trending Topics" action="View All" onAction={() => openModal("topics")}>
-            <div className="topic-list">
-              {topics.map(([topic, count]) => (
-                <article key={topic} onClick={() => setSearchQuery(topic.replace(" ", ""))}>
-                  <span>{topic}</span>
-                  <small>{count}</small>
-                </article>
-              ))}
-            </div>
-          </SocialPanel>
-
-          <SocialPanel title="Top Members" action="This Week" onAction={() => openModal("members")}>
-            <div className="social-member-list">
-              {members.map(([name, points, image], index) => (
+          <SocialPanel title="Friend Suggestions" action="See All" onAction={() => openModal("friends")}>
+            <div className="social-suggestion-list">
+              {suggestedFriends.map(([name, handle, image]) => (
                 <article key={name}>
-                  <b>{index + 1}</b>
                   <img src={image} alt={name} />
-                  <strong>{name}</strong>
-                  <span>{points}</span>
+                  <div>
+                    <strong>{name}</strong>
+                    <span>{handle}</span>
+                  </div>
+                  <button type="button" aria-label={`Add ${name}`} onClick={() => setAddedFriends((current) => ({ ...current, [name]: !current[name] }))}>
+                    <Plus size={16} />
+                  </button>
                 </article>
               ))}
             </div>
           </SocialPanel>
 
-          <SocialPanel title="Upcoming Events" action="View All" onAction={() => openModal("events")}>
+          <SocialPanel title="Profile Activity" action="" onAction={() => openModal("members")}>
+            <div className="social-profile-activity-card">
+              <div className="social-profile-activity-avatars">
+                {members.slice(0, 5).map(([name, , image]) => (
+                  <img key={name} src={image} alt={name} />
+                ))}
+                <span>+12</span>
+              </div>
+              <strong>+1,158 <span>Followers</span></strong>
+              <p><b>23%</b> vs last month</p>
+              <small>You gained a substantial amount of followers this month!</small>
+            </div>
+          </SocialPanel>
+
+          <SocialPanel title="Upcoming Events" action="See All" onAction={() => openModal("events")}>
             <div className="social-event-card">
               <time>
                 <span>MAY</span>
@@ -751,8 +804,9 @@ export default function SocialAreaWorkspace() {
                 <span>May 25, 2024 - 09:00 AM</span>
                 <small>Lake Washington</small>
               </div>
-              <button type="button" className={joinedEvent ? "is-joined" : ""} onClick={() => setJoinedEvent((joined) => !joined)}>
-                {joinedEvent ? "Joined" : "Join Event"}
+              <button type="button" aria-label="Previous event"><ChevronLeft size={16} /></button>
+              <button type="button" className={joinedEvent ? "is-joined" : ""} onClick={() => setJoinedEvent((joined) => !joined)} aria-label="Join event">
+                {joinedEvent ? "Joined" : <ChevronRight size={16} />}
               </button>
             </div>
           </SocialPanel>
@@ -1108,7 +1162,7 @@ function SocialPanel({ title, action, children, onAction }: { title: string; act
     <section>
       <header>
         <h2>{title}</h2>
-        <button type="button" onClick={onAction}>{action}</button>
+        {action ? <button type="button" onClick={onAction}>{action}</button> : null}
       </header>
       {children}
     </section>
