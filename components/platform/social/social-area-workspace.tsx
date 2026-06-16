@@ -66,144 +66,33 @@ type SocialPost = {
 
 const feedPosts: SocialPost[] = [
   {
-    id: "james-rainbow-trout",
+    id: "flow-text-james",
     author: "James Mitchell",
     handle: "@jamesfishes",
-    time: "7 minutes ago",
+    time: "2 hours ago",
     kind: "text",
     avatar,
     text: "Finally caught my first rainbow trout today! What an exhilarating experience! Do you have any tips for where else I can find them?",
     tags: ["#RainbowTrout", "#Fishing", "#ProudCatch"],
     likes: 37,
     comments: 12,
-    photos: [
-      "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=900&q=85",
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=520&q=85",
-      "https://images.unsplash.com/photo-1559825481-12a05cc00344?auto=format&fit=crop&w=520&q=85",
-    ],
+    photos: [],
   },
   {
-    id: "lily-bass",
+    id: "flow-photo-lily",
     author: "Lily Edmonds",
     handle: "@lilyfishes",
-    time: "2 hours ago",
+    time: "4 hours ago",
     kind: "photo",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80",
     text: "Happy to land this nice largemouth bass today on a local lake.",
     tags: ["#BassFishing", "#FishingLife"],
-    likes: 54,
-    comments: 5,
-    photos: ["https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=85"],
-  },
-  {
-    id: "michael-tuna",
-    author: "Michael Thompson",
-    handle: "@michael_t",
-    time: "4 hours ago",
-    kind: "video",
-    avatar: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=96&q=80",
-    text: "Perfect day for some deep sea fishing! Caught this amazing tuna.",
-    tags: ["#DeepSea", "#Tuna"],
-    likes: 29,
-    comments: 8,
-    photos: ["https://images.unsplash.com/photo-1560275619-4662e36fa65c?auto=format&fit=crop&w=1200&q=85"],
-  },
-  {
-    id: "sophia-morning-catch",
-    author: "Sophia Martinez",
-    handle: "@sophiacatches",
-    time: "6 hours ago",
-    kind: "location",
-    location: "Kas, Antalya",
-    avatar: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80",
-    text: "Early morning session paid off. Clear water, calm wind and a healthy catch before sunrise.",
-    tags: ["#MorningCatch", "#LakeLife"],
-    likes: 42,
-    comments: 10,
+    likes: 82,
+    comments: 21,
     photos: ["https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=85"],
   },
   {
-    id: "emir-night-shore",
-    author: "Emir Aydin",
-    handle: "@emircasts",
-    time: "8 hours ago",
-    kind: "poll",
-    poll: {
-      question: "Bu hafta sonu nerede balik tutmayi planliyorsunuz?",
-      options: [
-        ["Gol", 45],
-        ["Nehir", 30],
-        ["Deniz", 15],
-        ["Fikrim yok", 10],
-      ],
-      votes: 97,
-    },
-    avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=96&q=80",
-    text: "Night shore session around the bay. Light current, clear sky and a strong sea bass strike just after midnight.",
-    tags: ["#SeaBass", "#NightFishing", "#Aegean"],
-    likes: 68,
-    comments: 14,
-    photos: [
-      "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=520&q=85",
-    ],
-  },
-  {
-    id: "nora-clean-water",
-    author: "Nora Yilmaz",
-    handle: "@norafishing",
-    time: "10 hours ago",
-    kind: "photo",
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=96&q=80",
-    text: "Logged a new clear-water observation near the reef. Visibility was excellent and the fish activity stayed high until noon.",
-    tags: ["#ReefWatch", "#ClearWater", "#Observation"],
-    likes: 81,
-    comments: 21,
-    photos: ["https://images.unsplash.com/photo-1544552866-d3ed42536cfd?auto=format&fit=crop&w=1200&q=85"],
-  },
-  {
-    id: "can-kayak-route",
-    author: "Can Demir",
-    handle: "@cankayak",
-    time: "Yesterday",
-    kind: "location",
-    location: "Uzungol, Trabzon",
-    avatar: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?auto=format&fit=crop&w=96&q=80",
-    text: "Mapped a quiet kayak route and marked three promising casting points for the weekend group trip.",
-    tags: ["#KayakFishing", "#Route", "#WeekendPlan"],
-    likes: 46,
-    comments: 9,
-    photos: [
-      "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=85",
-      "https://images.unsplash.com/photo-1476611338391-6f395a0ebc7b?auto=format&fit=crop&w=520&q=85",
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=520&q=85",
-    ],
-  },
-  {
-    id: "ayla-release-log",
-    author: "Ayla Kaya",
-    handle: "@aylacatches",
-    time: "Yesterday",
-    kind: "poll",
-    poll: {
-      question: "En sevdiginiz olta takimi hangisi?",
-      options: [
-        ["Spin", 50],
-        ["Fly Fishing", 25],
-        ["Surf Casting", 15],
-        ["Diger", 10],
-      ],
-      votes: 120,
-    },
-    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=96&q=80",
-    text: "Catch and release log updated. Healthy juvenile group spotted near the shallows, so we kept the area low-impact today.",
-    tags: ["#CatchAndRelease", "#Conservation", "#Shallows"],
-    likes: 93,
-    comments: 18,
-    photos: ["https://images.unsplash.com/photo-1516685018646-5499d0a7d42f?auto=format&fit=crop&w=1200&q=85"],
-  },
-  {
-    id: "david-weekend-poll",
+    id: "flow-poll-david",
     author: "David Anderson",
     handle: "@davidcasts",
     time: "6 hours ago",
@@ -226,7 +115,20 @@ const feedPosts: SocialPost[] = [
     photos: [],
   },
   {
-    id: "alicia-kas-location",
+    id: "flow-video-sophia",
+    author: "Sophia Turner",
+    handle: "@sophiaturner",
+    time: "8 hours ago",
+    kind: "video",
+    avatar: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80",
+    text: "Bugunku dalis anlarindan kisa bir kesit.",
+    tags: ["#Diving", "#Underwater", "#OceanLife"],
+    likes: 54,
+    comments: 5,
+    photos: ["https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=85"],
+  },
+  {
+    id: "flow-location-alicia",
     author: "Alicia Vikander",
     handle: "@avikander",
     time: "5 hours ago",
@@ -240,7 +142,7 @@ const feedPosts: SocialPost[] = [
     photos: ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=85"],
   },
   {
-    id: "marcus-morning-text",
+    id: "flow-text-marcus",
     author: "Marcus Lee",
     handle: "@marcuslee",
     time: "7 hours ago",
@@ -253,20 +155,7 @@ const feedPosts: SocialPost[] = [
     photos: [],
   },
   {
-    id: "lily-sunset-video",
-    author: "Lily Edmonds",
-    handle: "@lilyfishes",
-    time: "13 hours ago",
-    kind: "video",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80",
-    text: "Gunun son isigi ile kisa bir av gunlugu.",
-    tags: ["#Sunset", "#Video", "#Lake"],
-    likes: 91,
-    comments: 14,
-    photos: ["https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1100&q=85"],
-  },
-  {
-    id: "emma-catch-gallery",
+    id: "flow-photo-emma",
     author: "Emma Watson",
     handle: "@emmawaters",
     time: "10 hours ago",
@@ -283,7 +172,7 @@ const feedPosts: SocialPost[] = [
     ],
   },
   {
-    id: "daniel-uzungol-location",
+    id: "flow-location-daniel",
     author: "Daniel Kim",
     handle: "@danielangler",
     time: "12 hours ago",
@@ -296,6 +185,68 @@ const feedPosts: SocialPost[] = [
     comments: 11,
     photos: ["https://images.unsplash.com/photo-1476611338391-6f395a0ebc7b?auto=format&fit=crop&w=1000&q=85"],
   },
+  {
+    id: "flow-video-lily-sunset",
+    author: "Lily Edmonds",
+    handle: "@lilyfishes",
+    time: "13 hours ago",
+    kind: "video",
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80",
+    text: "Gun batiminda kiyidan kisa bir olta denemesi. Isik harikaydi.",
+    tags: ["#SunsetFishing", "#LakeLife", "#Video"],
+    likes: 91,
+    comments: 14,
+    photos: ["https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=85"],
+  },
+  {
+    id: "flow-poll-james-gear",
+    author: "James Mitchell",
+    handle: "@jamesfishes",
+    time: "15 hours ago",
+    kind: "poll",
+    poll: {
+      question: "En sevdiginiz olta takimi hangisi?",
+      options: [
+        ["Spin", 50],
+        ["Fly Fishing", 25],
+        ["Surf Casting", 15],
+        ["Diger", 10],
+      ],
+      votes: 120,
+    },
+    avatar,
+    text: "Yeni ekipman listesi icin topluluk fikri aliyorum.",
+    tags: ["#Gear", "#Poll", "#Tackle"],
+    likes: 120,
+    comments: 20,
+    photos: [],
+  },
+  {
+    id: "flow-text-sophia-good-vibes",
+    author: "Sophia Turner",
+    handle: "@sophiaturner",
+    time: "16 hours ago",
+    kind: "text",
+    avatar: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80",
+    text: "Bugun harika bir gun gecirdik! Temiz hava, guzel insanlar ve bol kahkaha. Daha ne olsun?",
+    tags: ["#GoodVibes", "#Friends", "#Nature"],
+    likes: 38,
+    comments: 2,
+    photos: [],
+  },
+  {
+    id: "flow-photo-marcus-fish",
+    author: "Marcus Lee",
+    handle: "@marcuslee",
+    time: "18 hours ago",
+    kind: "photo",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80",
+    text: "Renkleriyle dikkat ceken guzel bir tur. Kisa bir gozlem notu olarak kaydettim.",
+    tags: ["#Species", "#Color", "#Observation"],
+    likes: 66,
+    comments: 6,
+    photos: ["https://images.unsplash.com/photo-1524704796725-9fc3044a58b2?auto=format&fit=crop&w=950&q=85"],
+  },
 ];
 
 const suggestedFriends = [
@@ -306,13 +257,20 @@ const suggestedFriends = [
 ];
 
 const featuredDemoPostIds = new Set([
-  "david-weekend-poll",
-  "alicia-kas-location",
-  "marcus-morning-text",
-  "lily-sunset-video",
-  "emma-catch-gallery",
-  "daniel-uzungol-location",
+  "flow-text-james",
+  "flow-photo-lily",
+  "flow-poll-david",
+  "flow-video-sophia",
+  "flow-location-alicia",
+  "flow-text-marcus",
+  "flow-photo-emma",
+  "flow-location-daniel",
+  "flow-video-lily-sunset",
+  "flow-poll-james-gear",
+  "flow-text-sophia-good-vibes",
+  "flow-photo-marcus-fish",
 ]);
+
 const topics = [
   ["# BassFishing", "12.3k posts"],
   ["# TroutFishing", "9.1k posts"],
@@ -659,7 +617,7 @@ export default function SocialAreaWorkspace() {
 
                 {(post.kind ?? "photo") === "text" ? (
                   <div className="social-post-text-body">
-                    <PostKindBadge kind="Text" />
+                    <PostKindBadge kind="text" />
                     <p>{post.text}</p>
                     <PostTags tags={post.tags} />
                   </div>
@@ -667,7 +625,7 @@ export default function SocialAreaWorkspace() {
 
                 {post.kind === "poll" ? (
                   <div className="social-post-poll-body">
-                    <PostKindBadge kind="Poll" />
+                    <PostKindBadge kind="poll" />
                     <p>{post.poll?.question ?? post.text}</p>
                     <div className="social-poll-options">
                       {post.poll?.options.map(([label, value]) => (
@@ -683,24 +641,31 @@ export default function SocialAreaWorkspace() {
 
                 {post.kind === "location" ? (
                   <div className="social-post-location-body">
-                    <PostKindBadge kind="Location" />
+                    <PostKindBadge kind="location" />
                     <h3>{post.location}</h3>
                     <span>Turkiye</span>
+                    <p>{post.text}</p>
                     <figure>
                       <img src={post.photos[0]} alt={post.location ?? post.author} />
                     </figure>
+                    <PostTags tags={post.tags} />
                   </div>
                 ) : null}
 
                 {(post.kind === "photo" || post.kind === "video" || !post.kind) ? (
-                  <div className={post.photos.length > 1 ? "social-post-photos social-post-photos--grid" : "social-post-photos"}>
-                    {post.photos.slice(0, 2).map((photo, index) => (
-                      <figure key={photo}>
-                        <img src={photo} alt={`${post.author} catch ${index + 1}`} />
-                        {post.kind === "video" ? <span className="social-video-play"><Video size={26} /></span> : null}
-                        {index === 1 && post.photos.length > 2 ? <figcaption>+{post.photos.length - 1}</figcaption> : null}
-                      </figure>
-                    ))}
+                  <div className="social-post-media-body">
+                    <PostKindBadge kind={post.kind === "video" ? "video" : "photo"} />
+                    <p className="social-post-caption">{post.text}</p>
+                    <PostTags tags={post.tags} />
+                    <div className={post.photos.length > 1 ? "social-post-photos social-post-photos--grid" : "social-post-photos"}>
+                      {post.photos.slice(0, 2).map((photo, index) => (
+                        <figure key={photo}>
+                          <img src={photo} alt={`${post.author} catch ${index + 1}`} />
+                          {post.kind === "video" ? <span className="social-video-play"><Video size={26} /></span> : null}
+                          {index === 1 && post.photos.length > 2 ? <figcaption>+{post.photos.length - 1}</figcaption> : null}
+                        </figure>
+                      ))}
+                    </div>
                   </div>
                 ) : null}
 
@@ -878,13 +843,20 @@ export default function SocialAreaWorkspace() {
   );
 }
 
-function PostKindBadge({ kind }: { kind: "Text" | "Poll" | "Location" }) {
-  const Icon = kind === "Poll" ? BarChart3 : kind === "Location" ? MapPin : SlidersHorizontal;
+function PostKindBadge({ kind }: { kind: SocialPostKind }) {
+  const badgeMap: Record<SocialPostKind, { label: string; Icon: typeof SlidersHorizontal }> = {
+    text: { label: "Text", Icon: SlidersHorizontal },
+    photo: { label: "Photo", Icon: ImageIcon },
+    video: { label: "Video", Icon: Video },
+    location: { label: "Location", Icon: MapPin },
+    poll: { label: "Poll", Icon: BarChart3 },
+  };
+  const { label, Icon } = badgeMap[kind];
 
   return (
-    <span className="social-post-kind">
+    <span className={`social-post-kind social-post-kind--${kind}`}>
       <Icon size={16} />
-      {kind}
+      {label}
     </span>
   );
 }
@@ -1003,7 +975,29 @@ function PostInteractionModal({
             <ChevronLeft size={24} />
           </button>
           <figure>
-            <img src={primaryPhoto} alt={`${post.author} shared catch`} />
+            {primaryPhoto ? (
+              <img src={primaryPhoto} alt={`${post.author} shared catch`} />
+            ) : (
+              <div className={`social-post-detail-placeholder social-post-detail-placeholder--${post.kind}`}>
+                <PostKindBadge kind={post.kind} />
+                {post.kind === "poll" ? (
+                  <>
+                    <h2>{post.poll?.question ?? post.text}</h2>
+                    <div className="social-post-detail-poll">
+                      {post.poll?.options.map(([label, value]) => (
+                        <span key={label}>
+                          <b>{label}</b>
+                          <em><i style={{ width: `${value}%` }} /></em>
+                          <strong>{value}%</strong>
+                        </span>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <h2>{post.text}</h2>
+                )}
+              </div>
+            )}
           </figure>
           <button type="button" className="social-post-detail-nav social-post-detail-nav--next" aria-label="Next media">
             <ChevronRight size={24} />

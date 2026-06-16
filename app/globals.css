@@ -26129,3 +26129,205 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
     column-count: 1;
   }
 }
+
+/* Social mixed-content masonry feed */
+.social-area-page .social-feed-panel {
+  min-width: 0;
+}
+
+.social-area-page .social-post-stack {
+  column-width: clamp(260px, 21vw, 340px);
+  column-count: auto;
+  column-gap: clamp(14px, 1.15vw, 20px);
+  padding-top: clamp(16px, 1.35vw, 22px);
+}
+
+.social-area-page .social-post-card {
+  border-radius: 18px;
+  padding: clamp(16px, 1.18vw, 20px);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(0, 212, 255, 0.105), transparent 36%),
+    linear-gradient(145deg, rgba(7, 28, 52, 0.94), rgba(3, 15, 29, 0.98));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.065), 0 18px 42px rgba(0, 0, 0, 0.2);
+}
+
+.social-area-page .social-post-card:hover {
+  transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.075), 0 22px 54px rgba(0, 0, 0, 0.28);
+}
+
+.social-area-page .social-post-card header {
+  grid-template-columns: 42px minmax(0, 1fr) 30px;
+}
+
+.social-area-page .social-post-more {
+  display: grid;
+}
+
+.social-area-page .social-bookmark {
+  position: absolute;
+  top: clamp(16px, 1.18vw, 20px);
+  right: clamp(16px, 1.18vw, 20px);
+}
+
+.social-area-page .social-post-kind {
+  width: max-content;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(62, 151, 255, 0.16);
+  border-radius: 999px;
+  color: #52d6ff;
+  background: rgba(10, 43, 78, 0.58);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.social-area-page .social-post-kind--poll {
+  color: #7ad7ff;
+}
+
+.social-area-page .social-post-kind--location {
+  color: #39d6ff;
+}
+
+.social-area-page .social-post-kind--video {
+  color: #8cc7ff;
+}
+
+.social-area-page .social-post-text-body > p,
+.social-area-page .social-post-poll-body > p,
+.social-area-page .social-post-caption,
+.social-area-page .social-post-location-body > p {
+  margin: clamp(14px, 1.1vw, 18px) 0 0;
+  color: #f5fbff;
+  font-size: clamp(0.96rem, 0.98vw, 1.08rem);
+  line-height: 1.54;
+}
+
+.social-area-page .social-post-media-body .social-post-tags,
+.social-area-page .social-post-location-body .social-post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.social-area-page .social-post-media-body .social-post-tags span,
+.social-area-page .social-post-location-body .social-post-tags span,
+.social-area-page .social-post-text-body .social-post-tags span {
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 9px;
+  color: #58cdff;
+  background: rgba(12, 65, 113, 0.66);
+  font-size: 0.79rem;
+  font-weight: 760;
+}
+
+.social-area-page .social-post-photos,
+.social-area-page .social-post-location-body figure {
+  border: 1px solid rgba(79, 139, 196, 0.16);
+  border-radius: 14px;
+}
+
+.social-area-page .social-post-photos img,
+.social-area-page .social-post-location-body figure img {
+  border-radius: 14px;
+}
+
+.social-area-page .social-post-card--text {
+  min-height: 260px;
+}
+
+.social-area-page .social-post-card--poll {
+  min-height: 360px;
+}
+
+.social-area-page .social-post-card--video .social-post-photos img {
+  min-height: clamp(300px, 30vw, 420px);
+}
+
+.social-area-page .social-post-card--photo .social-post-photos img {
+  min-height: clamp(210px, 19vw, 320px);
+}
+
+.social-area-page .social-post-card--location .social-post-location-body figure img {
+  min-height: clamp(150px, 13vw, 230px);
+}
+
+.social-area-page .social-post-card footer {
+  border-top: 1px solid rgba(111, 150, 190, 0.13);
+  padding-top: 14px;
+}
+
+.social-post-detail-placeholder {
+  display: grid;
+  place-content: center;
+  gap: 22px;
+  width: 100%;
+  min-height: min(610px, 66vh);
+  padding: clamp(28px, 5vw, 74px);
+  border-radius: 16px;
+  text-align: left;
+  background:
+    radial-gradient(circle at 42% 14%, rgba(0, 212, 255, 0.2), transparent 34%),
+    linear-gradient(145deg, rgba(8, 36, 66, 0.9), rgba(2, 10, 20, 0.96));
+}
+
+.social-post-detail-placeholder h2 {
+  max-width: 760px;
+  margin: 0;
+  color: #f6fbff;
+  font-size: clamp(1.55rem, 3vw, 3rem);
+  line-height: 1.22;
+}
+
+.social-post-detail-poll {
+  display: grid;
+  gap: 14px;
+  width: min(620px, 72vw);
+}
+
+.social-post-detail-poll span {
+  display: grid;
+  grid-template-columns: minmax(88px, 0.35fr) minmax(120px, 1fr) 48px;
+  gap: 12px;
+  align-items: center;
+}
+
+.social-post-detail-poll b,
+.social-post-detail-poll strong {
+  color: #e8f4ff;
+  font-size: 0.92rem;
+}
+
+.social-post-detail-poll em {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(78, 122, 168, 0.28);
+}
+
+.social-post-detail-poll i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #1ecfff, #377dff);
+  box-shadow: 0 0 18px rgba(30, 207, 255, 0.28);
+}
+
+@media (max-width: 1180px) {
+  .social-area-page .social-post-stack {
+    column-width: clamp(250px, 42vw, 360px);
+  }
+}
+
+@media (max-width: 760px) {
+  .social-area-page .social-post-stack {
+    column-width: auto;
+  }
+
+  .social-area-page .social-post-card--text,
+  .social-area-page .social-post-card--poll {
+    min-height: 0;
+  }
+}
