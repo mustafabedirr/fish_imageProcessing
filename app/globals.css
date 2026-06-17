@@ -28286,7 +28286,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 
 .social-area-page .social-feed-panel {
   display: grid;
-  grid-template-rows: auto auto auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto auto minmax(0, 1fr);
   align-content: start;
   height: 100%;
   max-height: 100%;
@@ -28304,10 +28304,74 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 .social-area-page .social-interactions-panel {
   position: sticky;
   top: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: max-content;
+  gap: 12px;
   height: 100%;
   max-height: 100%;
   overflow: hidden;
   align-self: start;
+}
+
+.social-area-page .social-side-toolbar {
+  position: relative;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid rgba(66, 127, 186, 0.2);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 86% 0%, rgba(0, 132, 255, 0.1), transparent 36%),
+    rgba(5, 22, 42, 0.84);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045), 0 18px 42px rgba(0, 0, 0, 0.18);
+}
+
+.social-area-page .social-side-toolbar .social-search {
+  min-width: 0;
+  min-height: 38px;
+  padding: 0 10px;
+  border-radius: 12px;
+}
+
+.social-area-page .social-side-toolbar .social-search input {
+  font-size: 0.78rem;
+}
+
+.social-area-page .social-side-toolbar .social-search span {
+  display: none;
+}
+
+.social-area-page .social-side-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.social-area-page .social-side-actions .social-bell,
+.social-area-page .social-side-actions .social-friend-trigger {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 12px;
+}
+
+.social-area-page .social-side-actions .social-profile-chip {
+  height: 38px;
+  padding: 0 4px;
+}
+
+.social-area-page .social-side-actions .social-profile-chip img {
+  width: 34px;
+  height: 34px;
+}
+
+.social-area-page .social-side-actions .social-profile-chip span {
+  right: 19px;
+  bottom: 5px;
 }
 
 .social-area-page .social-post-stack {
@@ -28414,6 +28478,10 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
     height: auto;
     max-height: none;
     overflow: visible;
+  }
+
+  .social-area-page .social-feed-panel {
+    grid-template-rows: auto;
   }
 
   .social-area-page .social-post-stack {

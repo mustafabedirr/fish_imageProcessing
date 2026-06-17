@@ -12,7 +12,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock3,
-  Edit,
   Film,
   Globe2,
   GripVertical,
@@ -661,41 +660,6 @@ export default function SocialAreaWorkspace() {
     <section className="social-area-page">
       <div className="social-area-content social-area-content--mockup">
         <main className="social-feed-panel">
-          <header className="social-area-title">
-            <div>
-              <h1>Social Area</h1>
-            </div>
-
-            <div className="social-top-actions">
-              <label className="social-search">
-                <Search size={18} />
-                <input
-                  type="search"
-                  placeholder="Search for friends, groups, pages..."
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                />
-                <span>Ctrl K</span>
-              </label>
-              <button type="button" className="social-create-button" onClick={() => openModal("create")}>
-                <Edit size={16} />
-                Create Post
-                <ChevronDown size={15} />
-              </button>
-              <NotificationPopover buttonClassName="social-bell" iconSize={18} label="Notifications" />
-              <FriendRequestsPopover
-                addedFriends={addedFriends}
-                hiddenFriends={hiddenFriends}
-                onToggleAdd={(name) => setAddedFriends((current) => ({ ...current, [name]: !current[name] }))}
-                onHide={(name) => setHiddenFriends((current) => ({ ...current, [name]: true }))}
-              />
-              <button type="button" className="social-profile-chip" aria-label="Open profile menu">
-                <img src={avatar} alt="Derya Yilmaz" />
-                <span />
-                <ChevronDown size={14} />
-              </button>
-            </div>
-          </header>
 
           <section className="social-composer">
             <div className="social-composer-row">
@@ -931,6 +895,31 @@ export default function SocialAreaWorkspace() {
         </main>
 
         <aside className="social-interactions-panel">
+          <div className="social-side-toolbar">
+            <label className="social-search">
+              <Search size={16} />
+              <input
+                type="search"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+              />
+            </label>
+            <div className="social-side-actions">
+              <NotificationPopover buttonClassName="social-bell" iconSize={17} label="Notifications" />
+              <FriendRequestsPopover
+                addedFriends={addedFriends}
+                hiddenFriends={hiddenFriends}
+                onToggleAdd={(name) => setAddedFriends((current) => ({ ...current, [name]: !current[name] }))}
+                onHide={(name) => setHiddenFriends((current) => ({ ...current, [name]: true }))}
+              />
+              <button type="button" className="social-profile-chip" aria-label="Open profile menu">
+                <img src={avatar} alt="Derya Yilmaz" />
+                <span />
+                <ChevronDown size={13} />
+              </button>
+            </div>
+          </div>
           <SocialPanel title="Friend Suggestions" action="See All" onAction={() => openModal("friends")}>
             <div className="social-suggestion-list">
               {suggestedFriends.map(([name, handle, image]) => (
