@@ -1,7 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { useMemo, useRef, useState } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Award,
   BarChart3,
@@ -1088,6 +1088,52 @@ function StoryViewer({
   onSelect: (index: number) => void;
 }) {
   const activeStory = stories[activeIndex];
+  const [progress, setProgress] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const progressRef = useRef(0);
+  const storyDurationMs = 5200;
+
+  useEffect(() => {
+    progressRef.current = 0;
+    setProgress(0);
+  }, [activeIndex]);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const startedAt = performance.now() - (progressRef.current / 100) * storyDurationMs;
+    let animationFrame = 0;
+
+    const tick = (now: number) => {
+      const nextProgress = Math.min(((now - startedAt) / storyDurationMs) * 100, 100);
+      progressRef.current = nextProgress;
+      setProgress(nextProgress);
+
+      if (nextProgress >= 100) {
+        onNext();
+        return;
+      }
+
+      animationFrame = requestAnimationFrame(tick);
+    };
+
+    animationFrame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [activeIndex, isPaused, onNext]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowRight") onNext();
+      if (event.key === "ArrowLeft") onPrevious();
+      if (event.key === "Escape") onClose();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose, onNext, onPrevious]);
+
+  const progressStyle = { "--story-progress": `${progress}%` } as CSSProperties;
+  const pauseStory = () => setIsPaused(true);
+  const resumeStory = () => setIsPaused(false);
 
   return (
     <div className="social-story-viewer-backdrop" role="dialog" aria-modal="true" aria-label={`${activeStory.name} story viewer`}>
@@ -1115,7 +1161,13 @@ function StoryViewer({
         <main className="social-story-stage">
           <div className="social-story-progress" aria-hidden>
             {stories.map((story, index) => (
-              <span key={`${story.name}-progress`} className={index <= activeIndex ? "is-filled" : ""} />
+              <span
+                key={`${story.name}-progress`}
+                className={index < activeIndex ? "is-filled" : index === activeIndex ? "is-active" : ""}
+                style={index === activeIndex ? progressStyle : undefined}
+              >
+                <i />
+              </span>
             ))}
           </div>
 
@@ -1130,9 +1182,20 @@ function StoryViewer({
             </button>
           </header>
 
-          <figure>
+          <figure className={isPaused ? "social-story-media is-paused" : "social-story-media"} key={`${activeStory.name}-${activeStory.image}`}>
             <img src={activeStory.image} alt={`${activeStory.name} story`} />
           </figure>
+
+          <div
+            className="social-story-tap-zones"
+            onPointerDown={pauseStory}
+            onPointerUp={resumeStory}
+            onPointerCancel={resumeStory}
+            onPointerLeave={resumeStory}
+          >
+            <button type="button" aria-label="Previous story content" onClick={onPrevious} />
+            <button type="button" aria-label="Next story content" onClick={onNext} />
+          </div>
 
           <button type="button" className="social-story-nav social-story-nav--previous" aria-label="Previous story" onClick={onPrevious}>
             <ChevronLeft size={23} />
@@ -1146,7 +1209,7 @@ function StoryViewer({
             <span><MapPin size={14} />{activeStory.location}</span>
           </div>
 
-          <label className="social-story-reply">
+          <label className="social-story-reply" onPointerDown={(event) => event.stopPropagation()}>
             <input type="text" placeholder="Reply..." />
             <button type="button" aria-label="Send reply">
               <Send size={20} />

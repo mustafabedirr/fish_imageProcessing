@@ -27937,3 +27937,87 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
     gap: 16px;
   }
 }
+
+/* Social story fluid content behavior */
+.social-story-stage .social-story-progress {
+  z-index: 5;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.social-story-stage .social-story-progress span {
+  position: relative;
+  overflow: hidden;
+  height: 4px;
+  background: rgba(218, 232, 246, 0.32);
+}
+
+.social-story-stage .social-story-progress span i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #eef8ff, #7edcff);
+  box-shadow: 0 0 16px rgba(93, 205, 255, 0.42);
+}
+
+.social-story-stage .social-story-progress span.is-filled i {
+  width: 100%;
+}
+
+.social-story-stage .social-story-progress span.is-active i {
+  width: var(--story-progress, 0%);
+}
+
+.social-story-stage .social-story-media {
+  animation: socialStoryMediaIn 260ms ease both;
+  will-change: opacity, transform, filter;
+}
+
+.social-story-stage .social-story-media.is-paused img {
+  filter: saturate(1.02) contrast(1.04) brightness(0.74);
+  transform: scale(1.012);
+}
+
+.social-story-stage .social-story-media img {
+  transition: filter 180ms ease, transform 220ms ease;
+}
+
+.social-story-tap-zones {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 38% 62%;
+}
+
+.social-story-tap-zones button {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.social-story-tap-zones button:focus-visible {
+  outline: 2px solid rgba(0, 212, 255, 0.72);
+  outline-offset: -10px;
+}
+
+.social-story-stage header,
+.social-story-caption,
+.social-story-reply,
+.social-story-nav {
+  z-index: 6;
+}
+
+@keyframes socialStoryMediaIn {
+  from {
+    opacity: 0.72;
+    filter: blur(8px);
+    transform: scale(1.025);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+}
