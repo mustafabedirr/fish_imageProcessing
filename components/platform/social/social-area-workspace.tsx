@@ -259,14 +259,76 @@ const suggestedFriends = [
 ];
 
 const storyItems = [
-  ["Your Story", avatar, true],
-  ["maieongu", "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80", false],
-  ["sayforTWirl", "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=96&q=80", false],
-  ["johndoe", "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=96&q=80", false],
-  ["maryjane2", "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=96&q=80", false],
-  ["dbanna", "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=96&q=80", false],
-  ["x_ae-21b", "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80", false],
-  ["x_ae-21b", "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=96&q=80", false],
+  {
+    name: "Your Story",
+    handle: "Add to story",
+    time: "Now",
+    avatar,
+    ownStory: true,
+    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=86",
+    caption: "Start a new story from your latest catch.",
+    location: "Lake Washington",
+  },
+  {
+    name: "maieongu",
+    handle: "maieongu",
+    time: "1h ago",
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80",
+    ownStory: false,
+    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=86",
+    caption: "Clear water and calm wind at sunrise.",
+    location: "Kas, Antalya",
+  },
+  {
+    name: "sayfortwirl",
+    handle: "sayfortwirl",
+    time: "2h ago",
+    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=96&q=80",
+    ownStory: false,
+    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=86",
+    caption: "Nothing beats a quiet morning by the lake.",
+    location: "Lake Washington",
+  },
+  {
+    name: "johndoe",
+    handle: "johndoe",
+    time: "3h ago",
+    avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=96&q=80",
+    ownStory: false,
+    image: "https://images.unsplash.com/photo-1476611338391-6f395a0ebc7b?auto=format&fit=crop&w=1200&q=86",
+    caption: "Mountain route marked for the weekend.",
+    location: "Uzungol",
+  },
+  {
+    name: "maryjane2",
+    handle: "maryjane2",
+    time: "4h ago",
+    avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=96&q=80",
+    ownStory: false,
+    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=86",
+    caption: "A short dive near the reef.",
+    location: "North Aegean",
+  },
+  {
+    name: "dbanna",
+    handle: "dbanna",
+    time: "5h ago",
+    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=96&q=80",
+    ownStory: false,
+    image: "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=1200&q=86",
+    caption: "Catch log updated after a clean release.",
+    location: "Aegean Bay",
+  },
+  {
+    name: "x_ae-21b",
+    handle: "x_ae-21b",
+    time: "6h ago",
+    avatar: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80",
+    ownStory: false,
+    image: "https://images.unsplash.com/photo-1559825481-12a05cc00344?auto=format&fit=crop&w=1200&q=86",
+    caption: "Bass activity was strong today.",
+    location: "Blue Water Lake",
+  },
 ] as const;
 
 const featuredDemoPostIds = new Set([
@@ -420,6 +482,7 @@ export default function SocialAreaWorkspace() {
   const [notice, setNotice] = useState("Topluluk akisiniz hazir.");
   const [activeModal, setActiveModal] = useState<SocialModal>(null);
   const [activeFlowPostId, setActiveFlowPostId] = useState<string | null>(null);
+  const [activeStoryIndex, setActiveStoryIndex] = useState<number | null>(null);
 
   const visiblePosts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -487,6 +550,16 @@ export default function SocialAreaWorkspace() {
     setActiveModal(null);
     setActiveFlowPostId(null);
   };
+
+  const closeStoryViewer = () => setActiveStoryIndex(null);
+  const goToPreviousStory = () => setActiveStoryIndex((current) => {
+    if (current === null) return null;
+    return current === 0 ? storyItems.length - 1 : current - 1;
+  });
+  const goToNextStory = () => setActiveStoryIndex((current) => {
+    if (current === null) return null;
+    return current === storyItems.length - 1 ? 0 : current + 1;
+  });
 
   return (
     <section className="social-area-page">
@@ -576,13 +649,13 @@ export default function SocialAreaWorkspace() {
           </section>
 
           <section className="social-story-rail" aria-label="Stories">
-            {storyItems.map(([name, image, ownStory]) => (
-              <button type="button" key={`${name}-${image}`} className={ownStory ? "social-story-item is-own" : "social-story-item"}>
+            {storyItems.map((story, index) => (
+              <button type="button" key={`${story.name}-${story.avatar}`} className={story.ownStory ? "social-story-item is-own" : "social-story-item"} onClick={() => setActiveStoryIndex(index)}>
                 <span>
-                  <img src={image} alt={name} />
-                  {ownStory ? <b><Plus size={12} /></b> : null}
+                  <img src={story.avatar} alt={story.name} />
+                  {story.ownStory ? <b><Plus size={12} /></b> : null}
                 </span>
-                <small>{name}</small>
+                <small>{story.name}</small>
               </button>
             ))}
             <button type="button" className="social-story-next" aria-label="Next stories">
@@ -813,6 +886,17 @@ export default function SocialAreaWorkspace() {
         </aside>
       </div>
 
+      {activeStoryIndex !== null ? (
+        <StoryViewer
+          activeIndex={activeStoryIndex}
+          stories={storyItems}
+          onClose={closeStoryViewer}
+          onNext={goToNextStory}
+          onPrevious={goToPreviousStory}
+          onSelect={setActiveStoryIndex}
+        />
+      ) : null}
+
       {activeModal === "comments" ? (
         <PostInteractionModal
           post={visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]}
@@ -983,6 +1067,102 @@ function FriendRequestsPopover({
           </div>
         </section>
       ) : null}
+    </div>
+  );
+}
+
+function StoryViewer({
+  activeIndex,
+  stories,
+  onClose,
+  onNext,
+  onPrevious,
+  onSelect,
+}: {
+  activeIndex: number;
+  stories: typeof storyItems;
+  onClose: () => void;
+  onNext: () => void;
+  onPrevious: () => void;
+  onSelect: (index: number) => void;
+}) {
+  const activeStory = stories[activeIndex];
+
+  return (
+    <div className="social-story-viewer-backdrop" role="dialog" aria-modal="true" aria-label={`${activeStory.name} story viewer`}>
+      <section className="social-story-viewer">
+        <aside className="social-story-list">
+          <h2>Stories</h2>
+          <div className="social-story-list-items">
+            {stories.map((story, index) => (
+              <button type="button" key={`${story.name}-${story.time}`} className={index === activeIndex ? "is-active" : ""} onClick={() => onSelect(index)}>
+                <span>
+                  <img src={story.avatar} alt={story.name} />
+                  {story.ownStory ? <b><Plus size={12} /></b> : null}
+                </span>
+                <div>
+                  <strong>{story.ownStory ? "Your Story" : story.name}</strong>
+                  <small>{story.ownStory ? story.handle : story.time}</small>
+                </div>
+                {!story.ownStory && index === activeIndex ? <i /> : null}
+              </button>
+            ))}
+          </div>
+          <button type="button" className="social-story-view-all">View All Stories</button>
+        </aside>
+
+        <main className="social-story-stage">
+          <div className="social-story-progress" aria-hidden>
+            {stories.map((story, index) => (
+              <span key={`${story.name}-progress`} className={index <= activeIndex ? "is-filled" : ""} />
+            ))}
+          </div>
+
+          <header>
+            <img src={activeStory.avatar} alt={activeStory.name} />
+            <div>
+              <strong>{activeStory.name}</strong>
+              <span>{activeStory.time}</span>
+            </div>
+            <button type="button" aria-label="Story options">
+              <MoreVertical size={19} />
+            </button>
+          </header>
+
+          <figure>
+            <img src={activeStory.image} alt={`${activeStory.name} story`} />
+          </figure>
+
+          <button type="button" className="social-story-nav social-story-nav--previous" aria-label="Previous story" onClick={onPrevious}>
+            <ChevronLeft size={23} />
+          </button>
+          <button type="button" className="social-story-nav social-story-nav--next" aria-label="Next story" onClick={onNext}>
+            <ChevronRight size={23} />
+          </button>
+
+          <div className="social-story-caption">
+            <p>{activeStory.caption}</p>
+            <span><MapPin size={14} />{activeStory.location}</span>
+          </div>
+
+          <label className="social-story-reply">
+            <input type="text" placeholder="Reply..." />
+            <button type="button" aria-label="Send reply">
+              <Send size={20} />
+            </button>
+          </label>
+        </main>
+
+        <aside className="social-story-actions">
+          <button type="button" className="social-story-close" aria-label="Close story viewer" onClick={onClose}>
+            <X size={25} />
+          </button>
+          <button type="button" aria-label="Like story"><Heart size={24} /><span>142</span></button>
+          <button type="button" aria-label="Comment story"><MessageCircle size={24} /><span>24</span></button>
+          <button type="button" aria-label="Share story"><Send size={23} /><span>12</span></button>
+          <button type="button" aria-label="Save story"><Bookmark size={23} /></button>
+        </aside>
+      </section>
     </div>
   );
 }
