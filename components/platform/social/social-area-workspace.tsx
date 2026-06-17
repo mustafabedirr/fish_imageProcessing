@@ -21,6 +21,7 @@ import {
   Image as ImageIcon,
   Lock,
   MapPin,
+  Maximize2,
   MessageCircle,
   MoreVertical,
   Navigation,
@@ -1190,6 +1191,8 @@ function PostInteractionModal({
 }) {
   const [comment, setComment] = useState("");
   const primaryPhoto = post.photos[0];
+  const galleryCount = Math.max(6, post.photos.length || 1);
+  const location = post.location ?? "Lake Washington";
 
   const handleSubmit = () => {
     if (!comment.trim()) return;
@@ -1202,12 +1205,15 @@ function PostInteractionModal({
       <section className="social-post-detail-modal">
         <div className="social-post-detail-media">
           <button type="button" className="social-post-detail-close" aria-label="Close detail" onClick={onClose}>
-            <X size={24} />
+            <X size={22} />
           </button>
 
+          <span className="social-post-detail-counter">1 / {galleryCount}</span>
+
           <button type="button" className="social-post-detail-nav social-post-detail-nav--prev" aria-label="Previous media">
-            <ChevronLeft size={24} />
+            <ChevronLeft size={25} />
           </button>
+
           <figure>
             {primaryPhoto ? (
               <img src={primaryPhoto} alt={`${post.author} shared catch`} />
@@ -1233,68 +1239,79 @@ function PostInteractionModal({
               </div>
             )}
           </figure>
+
           <button type="button" className="social-post-detail-nav social-post-detail-nav--next" aria-label="Next media">
-            <ChevronRight size={24} />
+            <ChevronRight size={25} />
           </button>
 
           <div className="social-post-detail-dots" aria-hidden>
-            {[0, 1, 2, 3, 4].map((dot) => (
+            {Array.from({ length: galleryCount }).map((_, dot) => (
               <span className={dot === 0 ? "is-active" : ""} key={dot} />
             ))}
           </div>
 
-          <div className="social-post-detail-media-footer">
-            <span className="social-post-detail-liked">
-              <img src={avatar} alt="" />
-              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=48&q=80" alt="" />
-              <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=48&q=80" alt="" />
-              {likeCount} kisi begendi
-            </span>
-            <div>
-              <button type="button" aria-pressed={isLiked} className={isLiked ? "is-active" : ""} onClick={onToggleLike}>
-                <Heart size={24} />
-              </button>
-              <button type="button" aria-label="Focus comments">
-                <MessageCircle size={24} />
-              </button>
-            </div>
-          </div>
+          <button type="button" className="social-post-detail-expand" aria-label="Expand media">
+            <Maximize2 size={18} />
+          </button>
         </div>
 
         <aside className="social-post-detail-panel">
-          <header>
+          <header className="social-post-detail-author">
             <img src={post.avatar} alt={post.author} />
             <div>
               <strong>{post.author}</strong>
               <span>{post.time}</span>
-              <small><MapPin size={14} /> Bali, Endonezya</small>
             </div>
-            <button type="button" className={isBookmarked ? "is-active" : ""} aria-pressed={isBookmarked} aria-label="Bookmark post" onClick={onToggleBookmark}>
-              <Bookmark size={24} />
+            <button type="button" className="social-detail-follow">
+              <Users size={15} />
+              Follow
+            </button>
+            <button type="button" className="social-detail-more" aria-label="Post options">
+              <MoreVertical size={19} />
             </button>
           </header>
 
-          <p>{post.text}</p>
+          <div className="social-post-detail-copy">
+            <p>{post.text}</p>
 
-          <div className="social-post-detail-tags">
-            {post.tags.map((tag) => (
-              <span key={tag}>{tag}</span>
-            ))}
+            <div className="social-post-detail-tags">
+              {post.tags.map((tag) => (
+                <span key={tag}>{tag}</span>
+              ))}
+            </div>
+
+            <span className="social-post-detail-location">
+              <MapPin size={15} />
+              {location}
+            </span>
           </div>
 
           <div className="social-post-detail-stats">
             <button type="button" className={isLiked ? "is-active" : ""} onClick={onToggleLike}>
-              <Heart size={26} />
-              {likeCount} Begeni
+              <Heart size={24} />
+              {likeCount}
             </button>
             <button type="button">
-              <MessageCircle size={26} />
-              {commentCount} Yorum
+              <MessageCircle size={24} />
+              {commentCount}
+            </button>
+            <button type="button">
+              <Share2 size={23} />
+              187
+            </button>
+            <button type="button" className={isBookmarked ? "is-active" : ""} aria-pressed={isBookmarked} aria-label="Bookmark post" onClick={onToggleBookmark}>
+              <Bookmark size={23} />
             </button>
           </div>
 
           <section className="social-post-detail-comments">
-            <h3>Yorumlar</h3>
+            <div className="social-post-detail-comments-head">
+              <h3>Comments ({commentCount})</h3>
+              <button type="button">
+                Most Recent
+                <ChevronDown size={14} />
+              </button>
+            </div>
             {interactionComments.map((item) => (
               <article key={`${item.author}-${item.time}`}>
                 <img src={item.avatar} alt={item.author} />
@@ -1304,7 +1321,7 @@ function PostInteractionModal({
                     <span>{item.time}</span>
                   </header>
                   <p>{item.text}</p>
-                  <button type="button">Yanitla</button>
+                  <button type="button">Reply</button>
                 </div>
                 <button type="button" aria-label={`Like ${item.author} comment`}>
                   <Heart size={18} />
@@ -1312,6 +1329,10 @@ function PostInteractionModal({
                 </button>
               </article>
             ))}
+            <button type="button" className="social-post-detail-view-all">
+              View all comments
+              <ChevronDown size={14} />
+            </button>
           </section>
 
           <div className="social-post-detail-input">
@@ -1320,14 +1341,20 @@ function PostInteractionModal({
               <input
                 type="text"
                 value={comment}
-                placeholder="Yorum ekle..."
+                placeholder="Write a comment..."
                 onChange={(event) => setComment(event.target.value)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter") handleSubmit();
                 }}
               />
+              <button type="button" aria-label="Add emoji">
+                <Smile size={17} />
+              </button>
+              <button type="button" aria-label="Attach image">
+                <ImageIcon size={17} />
+              </button>
               <button type="button" aria-label="Send comment" onClick={handleSubmit}>
-                <Send size={18} />
+                <Send size={17} />
               </button>
             </label>
           </div>
