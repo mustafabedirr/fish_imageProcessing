@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -91,9 +91,9 @@ const modules = [
 
 const stats = [
   { value: 10000, label: "Aktif Kullanıcı", icon: BrainCircuit, suffix: "+", compact: "k", duration: 1800 },
-  { value: 350, label: "Balık Türü", icon: Fish, suffix: "+", duration: 1500 },
-  { value: 500, label: "Analiz Kategorisi", icon: Users, suffix: "+", duration: 1650 },
-  { value: 50, label: "Ülke", icon: ShieldCheck, suffix: "+", duration: 1300 },
+  { value: 350, label: "Balık Türü", icon: Fish, suffix: "+", compact: undefined, duration: 1500 },
+  { value: 500, label: "Analiz Kategorisi", icon: Users, suffix: "+", compact: undefined, duration: 1650 },
+  { value: 50, label: "Ülke", icon: ShieldCheck, suffix: "+", compact: undefined, duration: 1300 },
 ] as const;
 
 const heroTitleLines = ["Balık Türlerini", "Keşfet, Analiz Et,", "Dünyayla Paylaş!"] as const;

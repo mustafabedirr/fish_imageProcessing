@@ -494,17 +494,17 @@ type SocialModal = "create" | "media" | "video" | "location" | "poll" | "achieve
 
 const modalCopy: Record<Exclude<SocialModal, null>, { title: string; eyebrow: string; description: string }> = {
   create: {
-    eyebrow: "Yeni Paylasim",
-    title: "Toplulukla yeni bir av deneyimi paylas",
-    description: "Metin, gorsel, konum ve hedef kitle bilgilerini tek akista duzenleyebilirsiniz.",
+    eyebrow: "Yeni Paylaşım",
+    title: "Toplulukla yeni bir av deneyimi paylaş",
+    description: "Metin, görsel, konum ve hedef kitle bilgilerini tek akışta düzenleyebilirsiniz.",
   },
   media: {
-    eyebrow: "Medya Akisi",
+    eyebrow: "Medya Akışı",
     title: "Share Your Catch",
     description: "Add a photo or video from your fishing adventure.",
   },
   video: {
-    eyebrow: "Video Akisi",
+    eyebrow: "Video Akışı",
     title: "Share a Video",
     description: "Upload your fishing moments and share with the community.",
   },
@@ -519,7 +519,7 @@ const modalCopy: Record<Exclude<SocialModal, null>, { title: string; eyebrow: st
     description: "Ask a question to the community and see what they think.",
   },
   achievement: {
-    eyebrow: "Basari",
+    eyebrow: "Başarı",
     title: "Yakalama basarisini one cikar",
     description: "Skor, agirlik veya tur rozeti ekleyerek paylasiminizi daha belirgin hale getirin.",
   },
@@ -534,12 +534,12 @@ const modalCopy: Record<Exclude<SocialModal, null>, { title: string; eyebrow: st
     description: "Kisa bir yorum ekleyin veya mevcut yorum akisindaki geri bildirimleri inceleyin.",
   },
   share: {
-    eyebrow: "Paylas",
+    eyebrow: "Paylaş",
     title: "Gonderiyi paylasim kanalina gonder",
     description: "AquaScope icinde, profilinizde veya harici baglanti olarak paylasabilirsiniz.",
   },
   friends: {
-    eyebrow: "Arkadaslar",
+    eyebrow: "Arkadaşlar",
     title: "Onerilen kullanicilari incele",
     description: "Ortak ilgi alanlarina gore onerilen balikcilari takip listenize ekleyin.",
   },
@@ -660,54 +660,6 @@ export default function SocialAreaWorkspace() {
     <section className="social-area-page">
       <div className="social-area-content social-area-content--mockup">
         <main className="social-feed-panel">
-
-          <section className="social-composer">
-            <div className="social-composer-row">
-              <img src={avatar} alt="Derya Yilmaz" />
-              <div className="social-composer-body">
-                <textarea
-                  placeholder="What's happening, Derya?"
-                  aria-label="Share a post"
-                  value={composerText}
-                  onChange={(event) => setComposerText(event.target.value)}
-                  onKeyDown={(event) => {
-                    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") createPost();
-                  }}
-                  rows={2}
-                />
-
-                <div className="social-composer-tools">
-                  <div className="social-composer-actions">
-                    <button type="button" aria-label="Add photo" title="Photo" onClick={() => openModal("media")}>
-                      <ImageIcon size={17} />
-                      <span>Photo</span>
-                    </button>
-                    <button type="button" aria-label="Add video" title="Video" onClick={() => openModal("video")}>
-                      <Video size={17} />
-                      <span>Video</span>
-                    </button>
-                    <button type="button" aria-label="Add location" title="Location" onClick={() => openModal("location")}>
-                      <MapPin size={17} />
-                      <span>Location</span>
-                    </button>
-                    <button type="button" aria-label="Add poll" title="Poll" onClick={() => openModal("poll")}>
-                      <SlidersHorizontal size={17} />
-                      <span>Poll</span>
-                    </button>
-                    <button type="button" aria-label="Add feeling" title="Feeling">
-                      <Smile size={17} />
-                      <span>Feeling</span>
-                    </button>
-                  </div>
-                  <button type="button" className="social-post-button" onClick={createPost}>
-                      Post
-                    <ChevronDown size={14} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
-
           <section className="social-story-rail" aria-label="Stories">
             {storyItems.map((story, index) => (
               <button type="button" key={`${story.name}-${story.avatar}`} className={story.ownStory ? "social-story-item is-own" : "social-story-item"} onClick={() => setActiveStoryIndex(index)}>
@@ -751,6 +703,53 @@ export default function SocialAreaWorkspace() {
           />
 
           <div className="social-post-stack" key={activeTab}>
+            <section className="social-composer">
+              <div className="social-composer-row">
+                <img src={avatar} alt="Derya Yilmaz" />
+                <div className="social-composer-body">
+                  <textarea
+                    placeholder="What's happening, Derya?"
+                    aria-label="Share a post"
+                    value={composerText}
+                    onChange={(event) => setComposerText(event.target.value)}
+                    onKeyDown={(event) => {
+                      if ((event.ctrlKey || event.metaKey) && event.key === "Enter") createPost();
+                    }}
+                    rows={2}
+                  />
+
+                  <div className="social-composer-tools">
+                    <div className="social-composer-actions">
+                      <button type="button" aria-label="Add photo" title="Photo" onClick={() => openModal("media")}>
+                        <ImageIcon size={17} />
+                        <span>Photo</span>
+                      </button>
+                      <button type="button" aria-label="Add video" title="Video" onClick={() => openModal("video")}>
+                        <Video size={17} />
+                        <span>Video</span>
+                      </button>
+                      <button type="button" aria-label="Add location" title="Location" onClick={() => openModal("location")}>
+                        <MapPin size={17} />
+                        <span>Location</span>
+                      </button>
+                      <button type="button" aria-label="Add poll" title="Poll" onClick={() => openModal("poll")}>
+                        <SlidersHorizontal size={17} />
+                        <span>Poll</span>
+                      </button>
+                      <button type="button" aria-label="Add feeling" title="Feeling">
+                        <Smile size={17} />
+                        <span>Feeling</span>
+                      </button>
+                    </div>
+                    <button type="button" className="social-post-button" onClick={createPost}>
+                      Post
+                      <ChevronDown size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
             {visiblePosts.length ? visiblePosts.map((post) => (
               <article
                 className={`social-post-card social-post-card--${post.kind ?? "photo"}`}
@@ -920,6 +919,7 @@ export default function SocialAreaWorkspace() {
               </button>
             </div>
           </div>
+
           <SocialPanel title="Friend Suggestions" action="See All" onAction={() => openModal("friends")}>
             <div className="social-suggestion-list">
               {suggestedFriends.map(([name, handle, image]) => (
@@ -1706,7 +1706,7 @@ function MiniAegeanMap({ large = false }: { large?: boolean }) {
             <MapPin size={20} />
             <small>Selected location</small>
             <strong>North Aegean Region</strong>
-            <span>39.2326Â° N, 26.4412Â° E</span>
+            <span>39.2326° N, 26.4412° E</span>
             <button type="button">Edit</button>
           </div>
           <b>50 km</b>
@@ -1813,7 +1813,7 @@ function VideoShareModalContent() {
           </div>
           <h3>Drag & drop your video here</h3>
           <p>or <button type="button" onClick={() => fileInputRef.current?.click()}>browse files</button></p>
-          <small>MP4, MOV, WebM up to 500MB Â· Max 2 minutes</small>
+          <small>MP4, MOV, WebM up to 500MB · Max 2 minutes</small>
           <input
             ref={fileInputRef}
             type="file"
@@ -1829,7 +1829,7 @@ function VideoShareModalContent() {
           </figure>
           <div>
             <strong>{selectedFile}</strong>
-            <span>128 MB Â· 01:24</span>
+            <span>128 MB · 01:24</span>
             <i><b /></i>
           </div>
           <em>100%</em>
@@ -1916,7 +1916,7 @@ function LocationShareModalContent() {
       <div className="social-location-ready">
         <span />
         <strong>Location ready</strong>
-        <small>{locationName} Â· Accuracy: 25 m</small>
+        <small>{locationName} · Accuracy: 25 m</small>
       </div>
     </div>
   );
@@ -1986,7 +1986,7 @@ function PollShareModalContent() {
           <article>
             <header>
               <span><BarChart3 size={20} /></span>
-              <div><strong>AquaScope</strong><small>Just now Â· Everyone</small></div>
+              <div><strong>AquaScope</strong><small>Just now · Everyone</small></div>
             </header>
             <p>{question || "Your poll question will appear here..."}</p>
             {options.map((option) => (
@@ -2001,5 +2001,5 @@ function PollShareModalContent() {
 }
 
 function CheckIcon() {
-  return <span className="social-check-icon">âœ“</span>;
+  return <span className="social-check-icon">✓</span>;
 }

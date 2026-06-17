@@ -309,7 +309,7 @@ export default function UserProfileWorkspace() {
               className="profile-tabs"
               layoutId="profile-active-tab"
               onChange={selectTab}
-              tabs={tabs.map(({ id, label, icon }) => ({ title: label, value: id, icon }))}
+              tabs={tabs.map(({ id, label, icon }) => ({ title: label, value: id, icon: icon as any }))}
             />
           </section>
 
@@ -659,7 +659,7 @@ function AnimatedGalleryImage({
   src: string;
   staggerIndex: number;
 }) {
-  const ref = useRef<HTMLFigureElement | null>(null);
+  const ref = useRef<HTMLElement | null>(null);
   const isInView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
   const [isLoading, setIsLoading] = useState(true);
   const [imgSrc, setImgSrc] = useState(src);

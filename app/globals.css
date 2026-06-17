@@ -2513,7 +2513,7 @@ body:has(.auth-stage) {
 }
 
 .social-area-page .topic-list article::after {
-  content: "â†—";
+  content: "↗";
   color: #15e49f;
   font-size: 0.82rem;
 }
@@ -5442,10 +5442,6 @@ body.sidebar-collapsed .sidebar.aqua-sidebar {
   position: relative;
   display: grid;
   place-items: center;
-  width: 100%;
-  min-width: 0;
-  height: 100%;
-  padding: 0;
   border: 0;
   background: transparent;
   color: inherit;
@@ -7085,7 +7081,6 @@ body.profile-dark-theme .profile-following img {
   margin: 0;
   overflow: hidden;
   border-radius: 10px;
-  flex: 0 0 auto;
 }
 
 .profile-post-card header {
@@ -25868,7 +25863,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 /* =============================================
-   AquaScope Map â€” Premium Glass Enhancement
+   AquaScope Map — Premium Glass Enhancement
    ============================================= */
 
 :root {
@@ -25878,7 +25873,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   --map-neon-glow: 0 0 12px rgba(0, 212, 255, 0.4);
 }
 
-/* Glass panel utility â€” used by floating toolbar, layer dock, timeline */
+/* Glass panel utility — used by floating toolbar, layer dock, timeline */
 .aqua-glass-panel {
   background: var(--map-glass-bg) !important;
   backdrop-filter: blur(16px) !important;
@@ -26070,6 +26065,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 .aqua-map-timeline.aqua-glass-panel {
   border-radius: 14px;
 }
+
 /* Social feed final masonry lock */
 .social-area-page .social-area-content.social-area-content--mockup {
   grid-template-columns: minmax(0, 1fr) clamp(252px, 18vw, 288px);
@@ -28023,138 +28019,6 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 }
 
 /* Social feed independent scroll */
-.social-area-page {
-  height: calc(100dvh - 24px);
-  min-height: 0;
-  overflow: hidden;
-}
-
-.social-area-page .social-area-content.social-area-content--mockup {
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.social-area-page .social-feed-panel {
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: visible;
-  overscroll-behavior: contain;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.social-area-page .social-feed-panel::-webkit-scrollbar {
-  display: none;
-}
-
-.social-area-page .social-interactions-panel {
-  position: sticky;
-  top: 0;
-  max-height: 100%;
-  overflow: hidden;
-  align-self: start;
-}
-
-.social-area-page .social-post-stack {
-  padding-bottom: clamp(44px, 7vh, 86px);
-}
-
-@media (max-width: 1180px) {
-  .social-area-page {
-    height: auto;
-    overflow: visible;
-  }
-
-  .social-area-page .social-area-content.social-area-content--mockup,
-  .social-area-page .social-feed-panel {
-    height: auto;
-    overflow: visible;
-  }
-
-  .social-area-page .social-interactions-panel {
-    position: static;
-    max-height: none;
-  }
-}
-
-/* Social feed independent scroll */
-.platform-main:has(.social-area-page) {
-  height: 100svh;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.social-area-page {
-  width: 100%;
-  height: 100%;
-  max-height: 100%;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.social-area-page .social-area-content.social-area-content--mockup {
-  height: 100%;
-  max-height: 100%;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.social-area-page .social-feed-panel {
-  height: 100%;
-  max-height: 100%;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: visible;
-  overscroll-behavior: contain;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.social-area-page .social-feed-panel::-webkit-scrollbar {
-  display: none;
-}
-
-.social-area-page .social-interactions-panel {
-  position: sticky;
-  top: 0;
-  height: 100%;
-  max-height: 100%;
-  overflow: hidden;
-  align-self: start;
-}
-
-.social-area-page .social-post-stack {
-  padding-bottom: clamp(44px, 7vh, 86px);
-}
-
-@media (max-width: 900px) {
-  .platform-main:has(.social-area-page) {
-    height: auto;
-    overflow: visible;
-  }
-
-  .social-area-page {
-    height: auto;
-    max-height: none;
-    overflow: visible;
-  }
-
-  .social-area-page .social-area-content.social-area-content--mockup,
-  .social-area-page .social-feed-panel {
-    height: auto;
-    max-height: none;
-    overflow: visible;
-  }
-
-  .social-area-page .social-interactions-panel {
-    position: static;
-    height: auto;
-    max-height: none;
-  }
-}
-
-/* Social feed independent scroll */
 .platform-main:has(.social-area-page) {
   height: 100svh;
   min-height: 0;
@@ -28178,115 +28042,7 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
 
 .social-area-page .social-feed-panel {
   display: grid;
-  grid-template-rows: auto auto auto auto minmax(0, 1fr);
-  align-content: start;
-  height: 100%;
-  max-height: 100%;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.social-area-page .social-tabs {
-  position: relative;
-  z-index: 4;
-  flex: 0 0 auto;
-  background: rgba(2, 12, 24, 0.96);
-}
-
-.social-area-page .social-interactions-panel {
-  position: sticky;
-  top: 0;
-  height: 100%;
-  max-height: 100%;
-  overflow: hidden;
-  align-self: start;
-}
-
-.social-area-page .social-post-stack {
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: visible;
-  overscroll-behavior: contain;
-  padding-bottom: clamp(44px, 7vh, 86px);
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.social-area-page .social-post-stack::-webkit-scrollbar {
-  display: none;
-}
-
-.social-area-page .social-post-card {
-  min-height: max-content;
-  height: auto;
-  overflow: visible;
-}
-
-.social-area-page .social-post-card > header,
-.social-area-page .social-post-card > footer,
-.social-area-page .social-post-text-body,
-.social-area-page .social-post-media-body,
-.social-area-page .social-post-location-body,
-.social-area-page .social-post-poll-body {
-  position: relative;
-  z-index: 1;
-}
-
-@media (max-width: 900px) {
-  .platform-main:has(.social-area-page) {
-    height: auto;
-    overflow: visible;
-  }
-
-  .social-area-page {
-    height: auto;
-    max-height: none;
-    overflow: visible;
-  }
-
-  .social-area-page .social-area-content.social-area-content--mockup,
-  .social-area-page .social-feed-panel {
-    height: auto;
-    max-height: none;
-    overflow: visible;
-  }
-
-  .social-area-page .social-post-stack {
-    overflow: visible;
-  }
-
-  .social-area-page .social-interactions-panel {
-    position: static;
-    height: auto;
-    max-height: none;
-  }
-}
-
-/* Social feed independent scroll */
-.platform-main:has(.social-area-page) {
-  height: 100svh;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.social-area-page {
-  width: 100%;
-  height: 100%;
-  max-height: 100%;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.social-area-page .social-area-content.social-area-content--mockup {
-  height: 100%;
-  max-height: 100%;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.social-area-page .social-feed-panel {
-  display: grid;
-  grid-template-rows: auto auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
   align-content: start;
   height: 100%;
   max-height: 100%;
@@ -28386,10 +28142,15 @@ body.sidebar-collapsed .aqua-sidebar__insight-card {
   overflow-y: auto;
   overflow-x: visible;
   overscroll-behavior: contain;
-  padding: 12px 2px clamp(44px, 7vh, 86px) 0;
+  padding: 4px 2px clamp(44px, 7vh, 86px) 0;
   border-top: 0;
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+.social-area-page .social-post-stack > .social-composer {
+  flex: 0 0 auto;
+  margin: 0;
 }
 
 .social-area-page .social-post-stack::-webkit-scrollbar {

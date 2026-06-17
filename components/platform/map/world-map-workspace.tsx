@@ -25,6 +25,13 @@ import {
   Waves,
   Wind,
   X,
+  LayoutDashboard,
+  Map as MapIcon,
+  LineChart,
+  FileText,
+  BrainCircuit,
+  User,
+  Settings,
 } from "lucide-react";
 import NotificationPopover from "../shell/notification-popover";
 
@@ -218,7 +225,7 @@ type MarineMapData = {
   isDynamic: boolean;
 };
 
-const toPointCollection = (items: Array<{ position: readonly [number, number] | readonly number[]; weight: number }>) => ({
+const toPointCollection = (items: ReadonlyArray<{ position: readonly [number, number] | readonly number[]; weight: number }>) => ({
   type: "FeatureCollection",
   features: items.map((item) => ({
     type: "Feature",
@@ -227,7 +234,7 @@ const toPointCollection = (items: Array<{ position: readonly [number, number] | 
   })),
 });
 
-const toLineCollection = (items: Array<{ path: readonly (readonly number[])[]; speed: number }>) => ({
+const toLineCollection = (items: ReadonlyArray<{ path: readonly (readonly number[])[]; speed: number }>) => ({
   type: "FeatureCollection",
   features: items.map((item) => ({
     type: "Feature",
@@ -236,7 +243,7 @@ const toLineCollection = (items: Array<{ path: readonly (readonly number[])[]; s
   })),
 });
 
-const toPolygonCollection = (items: Array<{ name: string; polygon: readonly (readonly number[])[] }>) => ({
+const toPolygonCollection = (items: ReadonlyArray<{ name: string; polygon: readonly (readonly number[])[] }>) => ({
   type: "FeatureCollection",
   features: items.map((item) => ({
     type: "Feature",
@@ -317,7 +324,9 @@ export default function WorldMapWorkspace() {
   const floatingMetrics = [
     { icon: Thermometer, label: "Su Sicakligi", value: marineConditions?.waterTemperature ?? selectedRegion.temperature },
     { icon: Wind, label: "Ruzgar", value: marineConditions?.windSpeed ?? selectedRegion.wind },
-    { icon: Waves, label: "Dalga Yuksekligi", value: marineConditions?.waveHeight ?? selectedRegion.wave },
+    { icon: Waves, label: "Dalga", value: marineConditions?.waveHeight ?? selectedRegion.wave },
+    { icon: Waves, label: "Akinti", value: selectedRegion.current },
+    { icon: Layers, label: "Tuzluluk", value: "36.1 PSU" },
   ];
 
   const activeMapStyle = useMemo(() => {
@@ -521,11 +530,14 @@ export default function WorldMapWorkspace() {
 
   return (
     <section className={isExpanded ? "aqua-map-workspace is-expanded" : "aqua-map-workspace"}>
+
+
+
       <div className="aqua-map-screen">
         <header className="aqua-map-header">
           <div>
             <h1>Harita</h1>
-            <p>Bolgeleri kesfedin, verileri goruntuleyin ve analiz edin.</p>
+            <p>Deniz sartlarini ve balik populasyonlarini anlik takip edin.</p>
           </div>
 
           <div className="aqua-map-actions">
@@ -640,22 +652,22 @@ export default function WorldMapWorkspace() {
 
           <main className="aqua-map-stage">
             <section className="aqua-map-viewport">
-              <div className="aqua-map-floating-toolbar">
-                <button
-                  type="button"
-                  className={isLayerPanelOpen ? "aqua-map-toolbar-layers is-active" : "aqua-map-toolbar-layers"}
-                  onClick={() => setIsLayerPanelOpen((current) => !current)}
-                >
-                  <Layers size={18} />
-                  Veri Katmanlari
-                </button>
+              <div className="aqua-map-floating-toolbar aqua-glass-panel">
+                <div className="aqua-map-live-status">
+                  <span className="aqua-live-dot" />
+                  <strong>Canli Veri</strong>
+                  <small>14:32 Guncellendi</small>
+                </div>
+                <div className="aqua-map-metrics-divider" />
                 {floatingMetrics.map((metric) => {
                   const Icon = metric.icon;
                   return (
-                    <article key={metric.label}>
-                      <Icon size={19} />
-                      <strong>{metric.value}</strong>
-                      <span>{metric.label}</span>
+                    <article key={metric.label} className="aqua-metric-item">
+                      <Icon size={16} className="aqua-metric-icon" />
+                      <div>
+                        <span>{metric.label}</span>
+                        <strong>{metric.value}</strong>
+                      </div>
                     </article>
                   );
                 })}
@@ -788,6 +800,29 @@ export default function WorldMapWorkspace() {
                 <div className="aqua-map-data-overlay" aria-hidden />
               </div>
 
+              <div className="aqua-map-layer-dock aqua-glass-panel">
+                {layerItems.map((item) => {
+                  const Icon = item.icon;
+                  const active = Boolean(activeLayers[item.id]);
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className={`aqua-layer-pill ${active ? "is-active" : ""}`}
+                      onClick={() => toggleLayer(item.id)}
+                    >
+                      <Icon size={16} />
+                      <span>{item.title}</span>
+                    </button>
+                  );
+                })}
+                <div className="aqua-layer-dock-divider" />
+                <button type="button" className="aqua-layer-pill aqua-layer-pill-add" onClick={() => setIsLayerPanelOpen((current) => !current)}>
+                  <Plus size={16} />
+                  <span>Katman Ekle</span>
+                </button>
+              </div>
+
               <div className="aqua-map-context-label">
                 <strong>{selectedRegion.name}</strong>
                 <span>{selectedRegion.coordinatesText}</span>
@@ -817,7 +852,7 @@ export default function WorldMapWorkspace() {
                 <span>50 km</span>
               </div>
 
-              <div className="aqua-map-timeline">
+              <div className="aqua-map-timeline aqua-glass-panel">
                 <button
                   type="button"
                   className={isPlaying ? "aqua-timeline-play is-active" : "aqua-timeline-play"}
@@ -867,7 +902,7 @@ export default function WorldMapWorkspace() {
             </section>
           </main>
 
-          <aside className="aqua-region-panel">
+          <aside className="aqua-region-panel aqua-glass-panel">
             <section className="aqua-region-card">
               <div className="aqua-region-title">
                 <span>Secili Bolge</span>

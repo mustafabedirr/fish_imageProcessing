@@ -1,0 +1,204 @@
+
+/* =============================================
+   AquaScope Map — Premium Glass Enhancement
+   ============================================= */
+
+:root {
+  --map-glass-bg: rgba(11, 32, 56, 0.65);
+  --map-glass-border: rgba(34, 211, 238, 0.15);
+  --map-accent-cyan: #00D4FF;
+  --map-neon-glow: 0 0 12px rgba(0, 212, 255, 0.4);
+}
+
+/* Glass panel utility — used by floating toolbar, layer dock, timeline */
+.aqua-glass-panel {
+  background: var(--map-glass-bg) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid var(--map-glass-border) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ---- Floating Metric Toolbar (top bar) ---- */
+.aqua-map-floating-toolbar.aqua-glass-panel {
+  top: 18px;
+  left: 18px;
+  right: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 20px;
+  border-radius: 16px;
+  width: max-content;
+  max-width: calc(100% - 36px);
+}
+
+.aqua-map-content:not(.is-layer-panel-closed) .aqua-map-floating-toolbar.aqua-glass-panel {
+  left: 318px;
+  max-width: calc(100% - 420px);
+}
+
+.aqua-map-live-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.aqua-map-live-status strong {
+  font-size: 0.85rem;
+  color: #fff;
+}
+
+.aqua-map-live-status small {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.aqua-live-dot {
+  width: 8px;
+  height: 8px;
+  background: #00C996;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #00C996;
+  animation: aqua-pulse 2s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes aqua-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(0, 201, 150, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(0, 201, 150, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 201, 150, 0); }
+}
+
+.aqua-map-metrics-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+
+.aqua-metric-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.aqua-metric-icon {
+  color: var(--map-accent-cyan);
+  flex-shrink: 0;
+}
+
+.aqua-metric-item > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.aqua-metric-item span {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+
+.aqua-metric-item strong {
+  font-size: 0.9rem;
+  color: #fff;
+  line-height: 1.2;
+}
+
+/* ---- Horizontal Layer Dock (bottom bar) ---- */
+.aqua-map-layer-dock {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  z-index: 6;
+  border-radius: 100px;
+  max-width: calc(100% - 36px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.aqua-map-layer-dock::-webkit-scrollbar {
+  display: none;
+}
+
+.aqua-layer-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid transparent;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.aqua-layer-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.aqua-layer-pill.is-active {
+  background: rgba(34, 211, 238, 0.15);
+  border-color: var(--map-accent-cyan);
+  color: var(--map-accent-cyan);
+  box-shadow: inset 0 0 12px rgba(0, 212, 255, 0.1);
+}
+
+.aqua-layer-dock-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+.aqua-layer-pill-add {
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+}
+
+.aqua-layer-pill-add:hover {
+  border-color: var(--map-accent-cyan);
+  color: var(--map-accent-cyan);
+}
+
+/* ---- Region Panel Glass Overlay ---- */
+.aqua-region-panel.aqua-glass-panel {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.aqua-region-panel.aqua-glass-panel .aqua-region-card {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid var(--map-glass-border);
+}
+
+.aqua-region-panel.aqua-glass-panel .aqua-observation-card {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  border: none;
+}
+
+/* ---- Timeline Glass ---- */
+.aqua-map-timeline.aqua-glass-panel {
+  border-radius: 14px;
+}

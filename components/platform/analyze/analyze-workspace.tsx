@@ -273,7 +273,7 @@ export default function AnalyzeWorkspace() {
             accept="image/png,image/jpeg,image/jpg,image/webp"
             onChange={handleFileChange}
           />
-          <button type="button" onClick={analyzeImage} disabled={loading}>
+          <button type="button" onClick={() => analyzeImage()} disabled={loading}>
             {loading ? <Loader2 className="fish-spinner" size={17} /> : <Sparkles size={17} />}
             {loading ? "Analiz Ediliyor" : "Analiz Et"}
           </button>
@@ -681,7 +681,7 @@ function readTopPredictions(source: Record<string, unknown>): TopPrediction[] {
         confidence,
         name_tr: readString(item, "name_tr"),
         display_name: readString(item, "display_name"),
-      };
+      } as TopPrediction;
     })
     .filter((item): item is TopPrediction => item !== null);
 }
