@@ -122,7 +122,7 @@ const initialSpeciesCards: FishSpecies[] = [
     favorite: true,
   },
   {
-    id: "turna",
+    id: "barbun",
     name: "Barbun",
     latin: "Mullus barbatus",
     group: "Etçil",
@@ -262,6 +262,75 @@ const initialSpeciesCards: FishSpecies[] = [
     favorite: false,
   },
   {
+    id: "mercan",
+    name: "Mercan",
+    latin: "Pagellus erythrinus",
+    group: "Etcil",
+    habitat: "Deniz",
+    region: "Ege",
+    protection: "Guvenli",
+    tags: ["Deniz", "Orta Boy"],
+    score: 88.4,
+    records: 452,
+    image: "https://images.unsplash.com/photo-1559825481-12a05cc00344?auto=format&fit=crop&w=900&q=80",
+    favorite: false,
+  },
+  {
+    id: "dil-baligi",
+    name: "Dil Baligi",
+    latin: "Solea solea",
+    group: "Dip Baligi",
+    habitat: "Deniz",
+    region: "Akdeniz",
+    protection: "Guvenli",
+    tags: ["Deniz", "Dip Baligi"],
+    score: 86.7,
+    records: 336,
+    image: "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=900&q=80",
+    favorite: false,
+  },
+  {
+    id: "mezgit",
+    name: "Mezgit",
+    latin: "Merlangius merlangus",
+    group: "Etcil",
+    habitat: "Deniz",
+    region: "Karadeniz",
+    protection: "Guvenli",
+    tags: ["Deniz", "Kucuk Boy"],
+    score: 85.9,
+    records: 389,
+    image: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?auto=format&fit=crop&w=900&q=80",
+    favorite: false,
+  },
+  {
+    id: "karagoz",
+    name: "Karagoz",
+    latin: "Diplodus vulgaris",
+    group: "Etcil",
+    habitat: "Deniz",
+    region: "Ege",
+    protection: "Guvenli",
+    tags: ["Deniz", "Kayalik"],
+    score: 84.5,
+    records: 302,
+    image: "https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=900&q=80",
+    favorite: false,
+  },
+  {
+    id: "lagos",
+    name: "Lagos",
+    latin: "Epinephelus aeneus",
+    group: "Etcil",
+    habitat: "Deniz",
+    region: "Akdeniz",
+    protection: "Koruma Altinda",
+    tags: ["Deniz", "Buyuk Boy"],
+    score: 83.8,
+    records: 276,
+    image: "https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=900&q=80",
+    favorite: false,
+  },  {
     id: "orkinos",
     name: "Orkinos",
     latin: "Thunnus thynnus",
@@ -421,7 +490,7 @@ export default function SpeciesLibraryWorkspace() {
               />
               <span>Ctrl K</span>
             </label>
-            <div className="fish-library-view-toggle" aria-label="Gorunum secimi">
+            <div className={`fish-library-view-toggle fish-library-view-toggle--${viewMode}`} aria-label="Gorunum secimi">
               <button type="button" className={viewMode === "grid" ? "is-active" : ""} aria-label="Grid görünümü" onClick={() => setViewMode("grid")}>
                 <Grid2X2 size={18} />
               </button>
@@ -451,7 +520,7 @@ export default function SpeciesLibraryWorkspace() {
                 pagedSpecies.map((fish) => (
                   <article className="fish-library-card" key={fish.id}>
                     <img src={fish.image} alt={fish.name} />
-                    <button type="button" className="fish-library-favorite" aria-label={`${fish.name} favori`} onClick={() => toggleFavorite(fish.id)}>
+                    <button type="button" className={`fish-library-favorite${favorites.has(fish.id) ? " is-active" : ""}`} aria-label={`${fish.name} favori`} onClick={() => toggleFavorite(fish.id)}>
                       <Star size={18} fill={favorites.has(fish.id) ? "currentColor" : "none"} />
                     </button>
                     <div className="fish-library-card-shade" />
@@ -478,8 +547,7 @@ export default function SpeciesLibraryWorkspace() {
             </section>
 
             <nav className="fish-library-pagination fish-library-pagination--sm" aria-label="Sayfalama">
-              <div className="fish-library-pagination-content">
-                <button
+              <button
                   className="fish-library-pagination-control"
                   type="button"
                   disabled={currentPage === 1}
@@ -508,7 +576,6 @@ export default function SpeciesLibraryWorkspace() {
                   <span>Next</span>
                   <ChevronRight size={14} />
                 </button>
-              </div>
             </nav>
           </main>
 

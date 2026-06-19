@@ -1,0 +1,95 @@
+﻿generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Visibility {
+  public
+  followers
+  private
+}
+
+enum SocialPostKind {
+  text
+  photo
+  video
+  location
+  poll
+}
+
+model User {
+  id           String       @id
+  email        String       @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  profile      Profile?
+  settings     UserSettings?
+  posts        SocialPost[]
+  following    Follow[]     @relation("following")
+  followers    Follow[]     @relation("followers")
+}
+
+model Profile {
+  id                  String     @id
+  userId              String     @unique
+  handle              String     @unique
+  region              String
+  level               String
+  bio                 String
+  avatarUrl           String?
+  coverUrl            String?
+  interests           String     @default("[]")
+  experience          String
+  visibility          Visibility @default(public)
+  onboardingCompleted Boolean    @default(false)
+  catches             Int        @default(0)
+  analyses            Int        @default(0)
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  user                User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserSettings {
+  id                         String   @id
+  userId                     String   @unique
+  addResultsToLibrary        Boolean  @default(true)
+  densityAlerts              Boolean  @default(true)
+  syncInterval               String   @default("15m")
+  emailNotifications         Boolean  @default(true)
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+  user                       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SocialPost {
+  id        String         @id
+  userId    String
+  kind      SocialPostKind @default(text)
+  body      String
+  tags      String         @default("[]")
+  mediaUrls String         @default("[]")
+  region    String?
+  species   String?
+  likes     Int            @default(0)
+  comments  Int            @default(0)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Follow {
+  id          String   @id
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  follower    User     @relation("following", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}

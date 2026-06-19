@@ -28,6 +28,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "../../../lib/utils";
+import { useCurrentUser } from "../../../hooks/use-current-user";
 import AnimatedTabBar from "../../ui/animated-tab-bar";
 
 const avatar = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=180&q=80";
@@ -274,6 +275,7 @@ const tabs = [
 type ProfileTab = (typeof tabs)[number]["id"];
 
 export default function UserProfileWorkspace() {
+  const { user, updateUser } = useCurrentUser();
   const [activeTab, setActiveTab] = useState<ProfileTab>("posts");
   const [isProfileCollapsed, setIsProfileCollapsed] = useState(false);
   const profileCollapsedRef = useRef(false);
@@ -287,6 +289,20 @@ export default function UserProfileWorkspace() {
   });
   const [draftProfile, setDraftProfile] = useState(profile);
   const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (!user) return;
+    const nextProfile = {
+      name: user.name,
+      handle: user.handle,
+      bio: user.bio ?? "AquaScope ile deniz verilerini ve tur kesiflerini takip ediyor.",
+    };
+    setProfile(nextProfile);
+    setDraftProfile(nextProfile);
+    if (user.avatarUrl) setAvatarSrc(user.avatarUrl);
+  }, [user]);
+
+
   const [sharedPosts, setSharedPosts] = useState<Record<string, boolean>>({});
 
   const postStats = useMemo(
@@ -313,13 +329,22 @@ export default function UserProfileWorkspace() {
   };
 
   const saveProfile = () => {
-    setProfile({
+    const nextProfile = {
       name: draftProfile.name.trim() || profile.name,
       handle: draftProfile.handle.trim().startsWith("@")
         ? draftProfile.handle.trim()
         : `@${draftProfile.handle.trim() || profile.handle.replace("@", "")}`,
       bio: draftProfile.bio.trim() || profile.bio,
-    });
+    };
+    setProfile(nextProfile);
+    updateUser(nextProfile);
+    if (user?.id) {
+      fetch(`/api/users/${user.id}/profile`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(nextProfile),
+      }).catch(() => undefined);
+    }
     setIsEditing(false);
   };
 
@@ -352,7 +377,7 @@ export default function UserProfileWorkspace() {
             <button type="button" className="profile-cover" aria-label="Kapak gorselini degistir" onClick={openEditProfile}>
               <span>
                 <Camera size={16} />
-                Kapak gorselini degistir
+                Kapak görselini değiştir
               </span>
             </button>
             <div className="profile-hero-actions">
@@ -369,7 +394,7 @@ export default function UserProfileWorkspace() {
                 <img src={avatarSrc} alt={profile.name} />
                 <span className="profile-avatar-edit">
                   <Camera size={15} />
-                  Degistir
+                  Değiştir
                 </span>
                 <i>
                   <Check size={14} />
@@ -563,6 +588,14 @@ export default function UserProfileWorkspace() {
           onClose={() => setIsAvatarEditorOpen(false)}
           onSave={(nextImage) => {
             setAvatarSrc(nextImage);
+            updateUser({ avatarUrl: nextImage });
+            if (user?.id) {
+              fetch(`/api/users/${user.id}/profile`, {
+                method: "PATCH",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ avatarUrl: nextImage }),
+              }).catch(() => undefined);
+            }
             setIsAvatarEditorOpen(false);
           }}
         />
@@ -722,7 +755,7 @@ function ProfileImagePickerModal({
       ?.drawImage(video, offsetX, offsetY, size, size, 0, 0, canvas.width, canvas.height);
 
     setPreview(canvas.toDataURL("image/jpeg", 0.9));
-    setFileName("Kamera fotografi");
+    setFileName("Kamera fotografı");
   };
 
   const resetPreview = () => {
@@ -738,7 +771,7 @@ function ProfileImagePickerModal({
             <h2 id="profile-image-title">Profil fotoğrafını değiştir</h2>
             <p>Bir görsel yükleyin veya kamerayla yeni bir profil fotoğrafı çekin.</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="Profil fotografi penceresini kapat">
+          <button type="button" onClick={onClose} aria-label="Profil fotoğrafı penceresini kapat">
             <X size={20} />
           </button>
         </header>
@@ -746,14 +779,14 @@ function ProfileImagePickerModal({
         <div className="profile-image-modal__content">
           <section className="profile-image-modal__preview">
             <div>
-              <img src={preview} alt="Profil fotografi onizleme" />
+              <img src={preview} alt="Profil fotoğrafı önizleme" />
               <span>Önizleme</span>
             </div>
             <p>{fileName || "Mevcut profil fotoğrafı"}</p>
           </section>
 
           <section className="profile-image-modal__tools">
-            <div className="profile-image-tool-tabs" role="tablist" aria-label="Profil fotografi secenekleri">
+            <div className="profile-image-tool-tabs" role="tablist" aria-label="Profil fotoğrafı seçenekleri">
               <button type="button" className={mode === "upload" ? "active" : ""} onClick={() => { setMode("upload"); stopCamera(); }}>
                 <UploadCloud size={18} />
                 Yükle

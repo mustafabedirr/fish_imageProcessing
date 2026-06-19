@@ -5,6 +5,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Apple, AppWindow, ArrowRight, Chrome, Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { demoCredentials } from "../../lib/auth";
+import { saveStoredUser } from "../../lib/user-session";
 
 type AuthMode = "login" | "register";
 
@@ -60,7 +61,7 @@ export default function LoginCard({ mode = "login", onModeChange }: LoginCardPro
       const response = await fetch("/api/auth", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ mode, name: fullName, email, password }),
       });
 
       const data = await response.json().catch(() => null);
@@ -68,9 +69,13 @@ export default function LoginCard({ mode = "login", onModeChange }: LoginCardPro
         throw new Error(String(data?.error ?? (isRegister ? "Kayıt işlemi başarısız oldu." : "Giriş başarısız oldu.")));
       }
 
+      if (data?.user) {
+        saveStoredUser(data.user);
+      }
+
       setShowLaunchOverlay(true);
       window.setTimeout(() => {
-        router.push("/platform");
+        router.push(data?.nextStep === "onboarding" ? "/onboarding" : "/platform");
       }, 1850);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error.");

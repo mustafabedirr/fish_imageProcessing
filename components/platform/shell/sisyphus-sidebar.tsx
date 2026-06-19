@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { ElementType } from "react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useCurrentUser } from "../../../hooks/use-current-user";
 import {
   BarChart3,
   ChevronDown,
@@ -40,6 +41,8 @@ const lowerItems: SidebarNavItem[] = [
 
 export default function SisyphusSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useCurrentUser();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -59,6 +62,16 @@ export default function SisyphusSidebar() {
       window.localStorage.setItem("aquascope-sidebar-collapsed", String(next));
       return next;
     });
+  }
+
+  const displayName = user?.name ?? "AquaScope User";
+  const displayEmail = user?.email ?? `${user?.handle ?? "@aquascope"}`;
+  const avatarUrl = user?.avatarUrl ?? "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80";
+
+  function confirmLogout() {
+    logout();
+    setShowLogoutModal(false);
+    router.push("/login");
   }
 
   return (
@@ -119,15 +132,15 @@ export default function SisyphusSidebar() {
           <Link href="/platform/profile" className="aqua-sidebar__user">
             <div className="aqua-sidebar__avatar-wrap">
               <img
-                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80"
-                alt="Derya Yılmaz"
+                src={avatarUrl}
+                alt={displayName}
               />
               <span className="aqua-sidebar__status" aria-hidden />
             </div>
 
             <div className="aqua-sidebar__user-text">
-              <strong>Derya Yılmaz</strong>
-              <span>derya@aquascope.io</span>
+              <strong>{displayName}</strong>
+              <span>{displayEmail}</span>
             </div>
 
             <span className="aqua-sidebar__settings" aria-hidden>
@@ -135,7 +148,7 @@ export default function SisyphusSidebar() {
             </span>
           </Link>
 
-          <button className="aqua-sidebar__logout aqua-sidebar__logout--icon" type="button" aria-label="Çıkış Yap" onClick={() => setShowLogoutModal(true)}>
+          <button className="aqua-sidebar__logout aqua-sidebar__logout--icon" type="button" aria-label="Cikis Yap" onClick={() => setShowLogoutModal(true)}>
             <LogOut className="aqua-sidebar__logout-icon" size={20} />
           </button>
         </div>
@@ -154,9 +167,9 @@ export default function SisyphusSidebar() {
                   <button className="logout-stay-button" type="button" onClick={() => setShowLogoutModal(false)}>
                     Sayfada Kal
                   </button>
-                  <Link className="logout-confirm-button" href="/">
-                    Çıkış
-                  </Link>
+                  <button className="logout-confirm-button" type="button" onClick={confirmLogout}>
+                    ??k??
+                  </button>
                 </div>
               </div>
             </div>,

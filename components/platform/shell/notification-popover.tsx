@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bell } from "lucide-react";
 import { cn } from "../../../lib/utils";
@@ -43,15 +43,30 @@ export default function NotificationPopover({
   buttonClassName,
   iconSize = 18,
   label = "Bildirimler",
+  panelClassName,
 }: {
   notifications?: AquaNotification[];
   buttonClassName?: string;
   iconSize?: number;
   label?: string;
+  panelClassName?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const popoverRef = useRef<HTMLDivElement | null>(null);
   const [notifications, setNotifications] = useState(initialNotifications);
   const unreadCount = notifications.filter((notification) => !notification.read).length;
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (popoverRef.current?.contains(event.target as Node)) return;
+      setIsOpen(false);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [isOpen]);
 
   function markAllAsRead() {
     setNotifications((current) => current.map((notification) => ({ ...notification, read: true })));
@@ -62,7 +77,7 @@ export default function NotificationPopover({
   }
 
   return (
-    <div className={styles.wrap}>
+    <div className={styles.wrap} ref={popoverRef}>
       <button
         type="button"
         className={cn(styles.trigger, buttonClassName)}
@@ -77,7 +92,7 @@ export default function NotificationPopover({
       <AnimatePresence>
         {isOpen ? (
           <motion.section
-            className={styles.panel}
+            className={cn(styles.panel, panelClassName)}
             initial={{ opacity: 0, y: 10, scale: 0.96, filter: "blur(8px)" }}
             animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: 8, scale: 0.96, filter: "blur(8px)" }}

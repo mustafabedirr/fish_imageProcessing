@@ -40,6 +40,7 @@ import {
   X,
 } from "lucide-react";
 import AnimatedTabBar from "../../ui/animated-tab-bar";
+import { useCurrentUser } from "../../../hooks/use-current-user";
 import NotificationPopover from "../shell/notification-popover";
 
 const avatar = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80";
@@ -418,6 +419,46 @@ const storyItems = [
     caption: "Bass activity was strong today.",
     location: "Blue Water Lake",
   },
+  {
+    name: "harbor_nora",
+    handle: "harbor_nora",
+    time: "7h ago",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=96&q=80",
+    ownStory: false,
+    image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=86",
+    caption: "Harbor lights after a quiet evening session.",
+    location: "Izmir Marina",
+  },
+  {
+    name: "owentides",
+    handle: "owentides",
+    time: "8h ago",
+    avatar: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=96&q=80",
+    ownStory: false,
+    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=86",
+    caption: "Low tide revealed a clean reef line.",
+    location: "Aegean Coast",
+  },
+  {
+    name: "maya_bay",
+    handle: "maya_bay",
+    time: "9h ago",
+    avatar: "https://images.unsplash.com/photo-1512316609839-ce289d3eba0a?auto=format&fit=crop&w=96&q=80",
+    ownStory: false,
+    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=86",
+    caption: "Sunset scouting before tomorrow's trip.",
+    location: "Blue Water Lake",
+  },
+  {
+    name: "kaan_dive",
+    handle: "kaan_dive",
+    time: "10h ago",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=96&q=80",
+    ownStory: false,
+    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=86",
+    caption: "Visibility was perfect near the wall.",
+    location: "North Aegean",
+  },
 ] as const;
 
 const featuredDemoPostIds = new Set([
@@ -561,6 +602,10 @@ const modalCopy: Record<Exclude<SocialModal, null>, { title: string; eyebrow: st
 };
 
 export default function SocialAreaWorkspace() {
+  const { user } = useCurrentUser();
+  const currentUserName = user?.name ?? "Derya Y?lmaz";
+  const currentUserHandle = user?.handle ?? "@deryayilmaz";
+  const currentUserAvatar = user?.avatarUrl ?? avatar;
   const [posts, setPosts] = useState(feedPosts);
   const [activeTab, setActiveTab] = useState<FeedTab>("For You");
   const [searchQuery, setSearchQuery] = useState("");
@@ -578,6 +623,7 @@ export default function SocialAreaWorkspace() {
   const [activeModal, setActiveModal] = useState<SocialModal>(null);
   const [activeFlowPostId, setActiveFlowPostId] = useState<string | null>(null);
   const [activeStoryIndex, setActiveStoryIndex] = useState<number | null>(null);
+  const storyRailRef = useRef<HTMLElement | null>(null);
 
   const visiblePosts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -601,33 +647,40 @@ export default function SocialAreaWorkspace() {
     return [...searched].sort((a, b) => Number(featuredDemoPostIds.has(b.id)) - Number(featuredDemoPostIds.has(a.id)));
   }, [activeTab, bookmarkedPosts, posts, searchQuery]);
 
-  const createPost = () => {
+  const createPost = async () => {
     const text = composerText.trim();
     if (!text) {
-      setNotice("Paylaşım yapmak için önce bir metin girin.");
+      setNotice("Paylasim yapmak icin once bir metin girin.");
       return;
     }
 
     const tags = Array.from(new Set(text.match(/#[\w-]+/g) ?? ["#AquaScope"]));
-    setPosts((current) => [
-      {
-        id: `local-${Date.now()}`,
-        author: "Derya Yılmaz",
-        handle: "@deryayilmaz",
-        time: "Just now",
-        avatar,
-        kind: "text",
-        text,
-        tags,
-        likes: 0,
-        comments: 0,
-        photos: ["https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=85"],
-      },
-      ...current,
-    ]);
+    const optimisticPost: SocialPost = {
+      id: `local-${Date.now()}`,
+      author: currentUserName,
+      handle: currentUserHandle,
+      time: "Just now",
+      avatar: currentUserAvatar,
+      kind: "text",
+      text,
+      tags,
+      likes: 0,
+      comments: 0,
+      photos: ["https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=85"],
+    };
+
+    setPosts((current) => [optimisticPost, ...current]);
     setComposerText("");
     setActiveTab("For You");
-    setNotice(`${audience} için yeni paylaşım yayınlandı.`);
+    setNotice(`${audience} icin yeni paylasim yayinlandi.`);
+
+    if (user?.id) {
+      fetch("/api/posts", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ userId: user.id, body: text, kind: "text", tags }),
+      }).catch(() => setNotice("Paylasim yerel olarak eklendi, backend kaydi daha sonra tekrar denenebilir."));
+    }
   };
 
   const toggleAudience = () => {
@@ -646,6 +699,12 @@ export default function SocialAreaWorkspace() {
     setActiveFlowPostId(null);
   };
 
+  const scrollStories = () => {
+    const rail = storyRailRef.current;
+    if (!rail) return;
+    rail.scrollBy({ left: Math.min(rail.clientWidth - 96, 520), behavior: "smooth" });
+  };
+
   const closeStoryViewer = () => setActiveStoryIndex(null);
   const goToPreviousStory = () => setActiveStoryIndex((current) => {
     if (current === null) return null;
@@ -660,7 +719,7 @@ export default function SocialAreaWorkspace() {
     <section className="social-area-page">
       <div className="social-area-content social-area-content--mockup">
         <main className="social-feed-panel">
-          <section className="social-story-rail" aria-label="Stories">
+          <section className="social-story-rail" aria-label="Stories" ref={storyRailRef}>
             {storyItems.map((story, index) => (
               <button type="button" key={`${story.name}-${story.avatar}`} className={story.ownStory ? "social-story-item is-own" : "social-story-item"} onClick={() => setActiveStoryIndex(index)}>
                 <span>
@@ -670,7 +729,7 @@ export default function SocialAreaWorkspace() {
                 <small>{story.name}</small>
               </button>
             ))}
-            <button type="button" className="social-story-next" aria-label="Next stories">
+            <button type="button" className="social-story-next" aria-label="Next stories" onClick={scrollStories}>
               <ChevronRight size={19} />
             </button>
           </section>
@@ -705,10 +764,10 @@ export default function SocialAreaWorkspace() {
           <div className="social-post-stack" key={activeTab}>
             <section className="social-composer">
               <div className="social-composer-row">
-                <img src={avatar} alt="Derya Yilmaz" />
+                <img src={currentUserAvatar} alt={currentUserName} />
                 <div className="social-composer-body">
                   <textarea
-                    placeholder="What's happening, Derya?"
+                    placeholder={`What's happening, ${currentUserName.split(" ")[0] ?? "there"}?`}
                     aria-label="Share a post"
                     value={composerText}
                     onChange={(event) => setComposerText(event.target.value)}
@@ -859,7 +918,7 @@ export default function SocialAreaWorkspace() {
                   >
                     <Heart size={18} />
                     <span className="social-reaction-stack" aria-hidden>
-                      <img src={avatar} alt="" />
+                      <img src={currentUserAvatar} alt="" />
                       <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=48&q=80" alt="" />
                       <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=48&q=80" alt="" />
                     </span>
@@ -905,7 +964,7 @@ export default function SocialAreaWorkspace() {
               />
             </label>
             <div className="social-side-actions">
-              <NotificationPopover buttonClassName="social-bell" iconSize={17} label="Notifications" />
+              <NotificationPopover buttonClassName="social-bell" panelClassName="social-notification-panel" iconSize={17} label="Notifications" />
               <FriendRequestsPopover
                 addedFriends={addedFriends}
                 hiddenFriends={hiddenFriends}
@@ -913,7 +972,7 @@ export default function SocialAreaWorkspace() {
                 onHide={(name) => setHiddenFriends((current) => ({ ...current, [name]: true }))}
               />
               <button type="button" className="social-profile-chip" aria-label="Open profile menu">
-                <img src={avatar} alt="Derya Yilmaz" />
+                <img src={currentUserAvatar} alt={currentUserName} />
                 <span />
                 <ChevronDown size={13} />
               </button>
@@ -1026,10 +1085,10 @@ export default function SocialAreaWorkspace() {
             if (modal === "media" || modal === "video") {
               const current: SocialPost = {
                 id: `${modal}-${Date.now()}`,
-                author: "Derya Yilmaz",
-                handle: "@derya",
+                author: currentUserName,
+                handle: currentUserHandle,
                 time: "Az once",
-                avatar,
+                avatar: currentUserAvatar,
                 kind: modal === "video" ? "video" : "photo",
                 text: composerText.trim() || (modal === "video" ? "Yeni bir av videosu paylaştı." : "Yeni bir av görseli paylaştı."),
                 tags: modal === "video" ? ["#FishingVideo", "#AegeanSea"] : ["#Catch", "#Fishing"],
@@ -1106,10 +1165,23 @@ function FriendRequestsPopover({
   onHide: (name: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const popoverRef = useRef<HTMLDivElement | null>(null);
   const visibleFriends = suggestedFriends.filter(([name]) => !hiddenFriends[name]);
 
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (popoverRef.current?.contains(event.target as Node)) return;
+      setOpen(false);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [open]);
+
   return (
-    <div className="social-friend-popover">
+    <div className="social-friend-popover" ref={popoverRef}>
       <button
         type="button"
         className={open ? "social-friend-trigger is-open" : "social-friend-trigger"}
@@ -1483,7 +1555,7 @@ function PostInteractionModal({
           </section>
 
           <div className="social-post-detail-input">
-            <img src={avatar} alt="Derya Yilmaz" />
+            <img src={currentUserAvatar} alt={currentUserName} />
             <label>
               <input
                 type="text"

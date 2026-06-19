@@ -23,7 +23,7 @@ export default function FishMorphometricViewer({ species, measurements }: FishMo
     <div className="morph-viewer" aria-label={`${species} morfometrik olcum gorseli`}>
       <div className="morph-svg-wrap">
         <svg viewBox="0 0 480 260" role="img" aria-labelledby="morph-title">
-          <title id="morph-title">{species} morfometrik olcumleri</title>
+          <title id="morph-title">{species} morfometrik ölçümleri</title>
           <defs>
             <linearGradient id="morphBody" x1="0" x2="1" y1="0" y2="1">
               <stop offset="0%" stopColor="#7892a8" />

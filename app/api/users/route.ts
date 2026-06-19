@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
-import { demoUser } from "../../../lib/constants";
+﻿import { NextResponse } from "next/server";
+import { listUsers } from "../../../lib/server/aquascope-db";
 
 export async function GET() {
-  return NextResponse.json({ users: [demoUser] });
+  const users = await listUsers();
+  return NextResponse.json({ users });
 }

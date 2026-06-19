@@ -298,6 +298,8 @@ export default function WorldMapWorkspace() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isRegionPanelOpen, setIsRegionPanelOpen] = useState(false);
+  const [isLiveBarExpanded, setIsLiveBarExpanded] = useState(true);
   const [activeRegionIndex, setActiveRegionIndex] = useState(0);
   const [activeRegionTab, setActiveRegionTab] = useState<(typeof regionTabs)[number]>("Ozet");
   const [favoriteRegion, setFavoriteRegion] = useState(false);
@@ -357,11 +359,13 @@ export default function WorldMapWorkspace() {
     const region = mapRegions[index] as MarineMapRegion;
     setActiveRegionIndex(index);
     setViewportRegion(null);
+    setIsRegionPanelOpen(true);
     mapRef.current?.flyTo({ center: region.center as [number, number], zoom: 7.25, duration: 850 });
   };
 
   const focusMarineRegion = (region: MarineMapRegion) => {
     setViewportRegion(region);
+    setIsRegionPanelOpen(true);
     mapRef.current?.flyTo({ center: region.center, zoom: Math.max(viewportZoom, 6.2), duration: 750 });
   };
 
@@ -468,6 +472,7 @@ export default function WorldMapWorkspace() {
         wind: "13 kn",
       };
       setViewportRegion(region);
+      setIsRegionPanelOpen(true);
       mapRef.current?.flyTo({ center: region.center, zoom: 6.7, duration: 950 });
     }
   };
@@ -537,7 +542,6 @@ export default function WorldMapWorkspace() {
         <header className="aqua-map-header">
           <div>
             <h1>Harita</h1>
-            <p>Deniz sartlarini ve balik populasyonlarini anlik takip edin.</p>
           </div>
 
           <div className="aqua-map-actions">
@@ -652,25 +656,37 @@ export default function WorldMapWorkspace() {
 
           <main className="aqua-map-stage">
             <section className="aqua-map-viewport">
-              <div className="aqua-map-floating-toolbar aqua-glass-panel">
-                <div className="aqua-map-live-status">
+              <div className={isLiveBarExpanded ? "aqua-map-floating-toolbar aqua-glass-panel is-expanded" : "aqua-map-floating-toolbar aqua-glass-panel is-collapsed"}>
+                <button
+                  type="button"
+                  className="aqua-map-live-toggle"
+                  aria-expanded={isLiveBarExpanded}
+                  onClick={() => setIsLiveBarExpanded((current) => !current)}
+                >
                   <span className="aqua-live-dot" />
-                  <strong>Canli Veri</strong>
-                  <small>14:32 Guncellendi</small>
-                </div>
-                <div className="aqua-map-metrics-divider" />
-                {floatingMetrics.map((metric) => {
-                  const Icon = metric.icon;
-                  return (
-                    <article key={metric.label} className="aqua-metric-item">
-                      <Icon size={16} className="aqua-metric-icon" />
-                      <div>
-                        <span>{metric.label}</span>
-                        <strong>{metric.value}</strong>
-                      </div>
-                    </article>
-                  );
-                })}
+                  <span>
+                    <strong>Canli Veri</strong>
+                    <small>{isLiveBarExpanded ? "14:32 Guncellendi" : liveSourceLabel}</small>
+                  </span>
+                  <ChevronRight size={15} />
+                </button>
+                {isLiveBarExpanded ? (
+                  <>
+                    <div className="aqua-map-metrics-divider" />
+                    {floatingMetrics.map((metric) => {
+                      const Icon = metric.icon;
+                      return (
+                        <article key={metric.label} className="aqua-metric-item">
+                          <Icon size={16} className="aqua-metric-icon" />
+                          <div>
+                            <span>{metric.label}</span>
+                            <strong>{metric.value}</strong>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </>
+                ) : null}
               </div>
 
               <div className="aqua-map-canvas-v2" aria-label="Ege Denizi veri haritasi">
@@ -902,18 +918,23 @@ export default function WorldMapWorkspace() {
             </section>
           </main>
 
-          <aside className="aqua-region-panel aqua-glass-panel">
+          <aside className={isRegionPanelOpen ? "aqua-region-panel aqua-glass-panel is-open" : "aqua-region-panel aqua-glass-panel"} aria-hidden={!isRegionPanelOpen}>
             <section className="aqua-region-card">
               <div className="aqua-region-title">
                 <span>Secili Bolge</span>
-                <button
-                  type="button"
-                  className={favoriteRegion ? "is-favorite" : ""}
-                  aria-label="Bolgeyi favorilere ekle"
-                  onClick={() => setFavoriteRegion((current) => !current)}
-                >
-                  <Star size={18} />
-                </button>
+                <div className="aqua-region-title-actions">
+                  <button
+                    type="button"
+                    className={favoriteRegion ? "is-favorite" : ""}
+                    aria-label="Bolgeyi favorilere ekle"
+                    onClick={() => setFavoriteRegion((current) => !current)}
+                  >
+                    <Star size={18} />
+                  </button>
+                  <button type="button" aria-label="Bolge panelini kapat" onClick={() => setIsRegionPanelOpen(false)}>
+                    <X size={17} />
+                  </button>
+                </div>
               </div>
               <h2>{selectedRegion.name}</h2>
               <p>{selectedRegion.coordinatesText}</p>

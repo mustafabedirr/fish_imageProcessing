@@ -119,31 +119,31 @@ const speciesProfiles: Record<string, SpeciesProfile> = {
       habitat: "Uygun",
       habitatScore: 91,
     },
-    colors: ["Gumus %42", "Altin Hat %18", "Mavi-Gri %17", "Beyaz %14", "Diger %9"],
+    colors: ["Gümüş %42", "Altın Hat %18", "Mavi-Gri %17", "Beyaz %14", "Diğer %9"],
     distribution: [8, 22, 48, 76, 66, 38, 20],
   },
   palamut: {
     commonName: "Palamut",
     latin: "Sarda sarda",
-    description: "Suruler halinde gezen, hizli hareket eden ve acik denizlerde izlenen pelajik bir turdur.",
-    location: "Marmara Gecisi",
+    description: "Sürüler halinde gezen, hızlı hareket eden ve açık denizlerde izlenen pelajik bir türdür.",
+    location: "Marmara Geçişi",
     coordinates: "40.796 N, 28.982 E",
     environment: {
       temperature: "17.4 C",
       salinity: "25.9 PSU",
       ph: "8.2",
       oxygen: "8.0 mg/L",
-      habitat: "Cok Uygun",
+      habitat: "Çok Uygun",
       habitatScore: 93,
     },
-    colors: ["Mavi-Gri %44", "Gumus %34", "Koyu Cizgi %12", "Beyaz %7", "Diger %3"],
+    colors: ["Mavi-Gri %44", "Gümüş %34", "Koyu Çizgi %12", "Beyaz %7", "Diğer %3"],
     distribution: [5, 15, 33, 58, 79, 64, 30],
   },
   kefal: {
     commonName: "Kefal",
     latin: "Mugil cephalus",
-    description: "Kiyiya yakin, lagun ve acisu gecislerinde sik gorulen dayanikli bir turdur.",
-    location: "Izmir Korfezi",
+    description: "Kıyıya yakın, lagün ve acı su geçişlerinde sık görülen dayanıklı bir türdür.",
+    location: "İzmir Körfezi",
     coordinates: "38.435 N, 27.142 E",
     environment: {
       temperature: "19.1 C",
@@ -153,7 +153,7 @@ const speciesProfiles: Record<string, SpeciesProfile> = {
       habitat: "Uygun",
       habitatScore: 88,
     },
-    colors: ["Gumus %50", "Koyu Gri %24", "Beyaz %14", "Yesilimsi %7", "Diger %5"],
+    colors: ["Gümüş %50", "Koyu Gri %24", "Beyaz %14", "Yeşilimsi %7", "Diğer %5"],
     distribution: [18, 36, 74, 69, 42, 21, 9],
   },
 };
@@ -357,25 +357,25 @@ export default function AnalyzeWorkspace() {
   }
 
   async function handleShareAnalysis() {
-    const shareText = `${displaySpecies} analizi - ${confidenceText} guven skoru`;
+    const shareText = `${displaySpecies} analizi - ${confidenceText} güven skoru`;
 
     try {
       if (navigator.share) {
-        await navigator.share({ title: "AquaScope Analiz", text: shareText });
+        await navigator.share({ title: "AquaLens Analiz", text: shareText });
       } else if (navigator.clipboard) {
         await navigator.clipboard.writeText(shareText);
-        setActionMessage("Analiz ozeti panoya kopyalandi.");
+        setActionMessage("Analiz özeti panoya kopyalandı.");
       } else {
-        setActionMessage("Paylasim ozeti hazirlandi.");
+        setActionMessage("Paylaşım özeti hazırlandı.");
       }
     } catch {
-      setActionMessage("Paylasim iptal edildi.");
+      setActionMessage("Paylaşım iptal edildi.");
     }
   }
 
   function handleDownloadImage() {
     if (!file && !previewUrl.startsWith("blob:")) {
-      setActionMessage("Indirmek icin once bir gorsel secin.");
+      setActionMessage("İndirmek için önce bir görsel seçin.");
       return;
     }
 
@@ -385,11 +385,11 @@ export default function AnalyzeWorkspace() {
     document.body.appendChild(link);
     link.click();
     link.remove();
-    setActionMessage("Gorsel indirme baslatildi.");
+    setActionMessage("Görsel indirme başlatıldı.");
   }
 
   function handleCreateReport() {
-    setActionMessage(result ? "Analiz raporu hazirlandi." : "Rapor icin once analiz sonucu gerekli.");
+    setActionMessage(result ? "Analiz raporu hazırlandı." : "Rapor için önce analiz sonucu gerekli.");
   }
 
   return (
@@ -504,10 +504,10 @@ export default function AnalyzeWorkspace() {
                     <div>
                       <h2>Genel Analiz Skoru</h2>
                     </div>
-                    <span className="fish-score-info" tabIndex={0} aria-label="Genel analiz skoru aciklamasi">
+                    <span className="fish-score-info" tabIndex={0} aria-label="Genel analiz skoru açıklaması">
                       i
                       <span className="fish-score-info-tooltip" role="tooltip">
-                        AI modelimiz, gorseli analiz ederek habitat, tur ozellikleri ve veri kalitesini degerlendirdi.
+                        AI modelimiz, görseli analiz ederek habitat, tür özellikleri ve veri kalitesini değerlendirdi.
                       </span>
                     </span>
                   </div>
@@ -561,7 +561,7 @@ export default function AnalyzeWorkspace() {
                   <div className="fish-score-recharts-metrics">
                     {scoreMetricRows.map((row) => {
                       const Icon = row.icon;
-                      const value = row.label === "Tur Dogruluk Skoru" ? Math.round(confidence) : row.value;
+                      const value = row.label === "Tür Doğruluk Skoru" ? Math.round(confidence) : row.value;
                       const description = "description" in row ? row.description : getScoreDescription(row.label);
                       return (
                         <div className="fish-score-recharts-row" key={row.label}>
@@ -596,7 +596,7 @@ export default function AnalyzeWorkspace() {
                   <div>
                     <strong>{confidence.toFixed(1)}</strong>
                     <span>{scoreLabel}</span>
-                    <small className="fish-score-stars" aria-label="Bes yildizli analiz skoru">★★★★★</small>
+                    <small className="fish-score-stars" aria-label="Beş yıldızlı analiz skoru">★★★★★</small>
                   </div>
                 </div>
                 <div className="fish-score-copy">
@@ -749,8 +749,8 @@ export default function AnalyzeWorkspace() {
             </button>
             {isMoreActionsOpen ? (
               <div className="fish-more-actions" role="menu">
-                <button type="button" onClick={() => { setActionMessage("Analiz arsive eklendi."); setIsMoreActionsOpen(false); }}>Arsive ekle</button>
-                <button type="button" onClick={() => { setActionMessage("Karsilastirma listesine eklendi."); setIsMoreActionsOpen(false); }}>Karsilastir</button>
+                <button type="button" onClick={() => { setActionMessage("Analiz arşive eklendi."); setIsMoreActionsOpen(false); }}>Arsive ekle</button>
+                <button type="button" onClick={() => { setActionMessage("Karşılaştırma listesine eklendi."); setIsMoreActionsOpen(false); }}>Karsilastir</button>
               </div>
             ) : null}
           </div>
