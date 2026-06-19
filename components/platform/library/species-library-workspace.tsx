@@ -4,20 +4,16 @@ import type { FormEvent, ReactNode } from "react";
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  AlertTriangle,
-  BarChart3,
   Check,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   Fish,
   Grid2X2,
-  Hash,
-  Heart,
-  Layers,
   List,
   Plus,
   Search,
+  Shield,
   SlidersHorizontal,
   Star,
   TrendingUp,
@@ -73,11 +69,11 @@ const initialSpeciesCards: FishSpecies[] = [
     id: "palamut",
     name: "Palamut",
     latin: "Sarda sarda",
-    group: "Etcil",
+    group: "Etçil",
     habitat: "Deniz",
     region: "Karadeniz",
-    protection: "Guvenli",
-    tags: ["Deniz", "Etcil", "Pelajik"],
+    protection: "Güvenli",
+    tags: ["Deniz", "Etçil", "Pelajik"],
     score: 91.3,
     records: 876,
     image: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?auto=format&fit=crop&w=900&q=80",
@@ -87,11 +83,11 @@ const initialSpeciesCards: FishSpecies[] = [
     id: "kefal",
     name: "Kefal",
     latin: "Mugil cephalus",
-    group: "Otcul",
-    habitat: "Aci Su",
+    group: "Otçul",
+    habitat: "Acı Su",
     region: "Ege",
-    protection: "Guvenli",
-    tags: ["Deniz / Acisu", "Otcul"],
+    protection: "Güvenli",
+    tags: ["Deniz / Acı su", "OtÇul"],
     score: 90.3,
     records: 754,
     image: "https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=900&q=80",
@@ -101,11 +97,11 @@ const initialSpeciesCards: FishSpecies[] = [
     id: "sardalya",
     name: "Sardalya",
     latin: "Sardina pilchardus",
-    group: "Otcul",
+    group: "OtÇul",
     habitat: "Deniz",
     region: "Akdeniz",
-    protection: "Guvenli",
-    tags: ["Deniz", "Otcul", "Pelajik"],
+    protection: "GÜvenli",
+    tags: ["Deniz", "Otçul", "Pelajik"],
     score: 89.7,
     records: 689,
     image: "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=900&q=80",
@@ -115,11 +111,11 @@ const initialSpeciesCards: FishSpecies[] = [
     id: "kalkan",
     name: "Kalkan",
     latin: "Scophthalmus maximus",
-    group: "Dip Baligi",
+    group: "Dip Balığı",
     habitat: "Deniz",
     region: "Karadeniz",
-    protection: "Koruma Altinda",
-    tags: ["Deniz", "Dip Baligi", "Koruma Altinda"],
+    protection: "Koruma Altında",
+    tags: ["Deniz", "Dip Balığı", "Koruma Altında"],
     score: 88.6,
     records: 612,
     image: "https://images.unsplash.com/photo-1559825481-12a05cc00344?auto=format&fit=crop&w=900&q=80",
@@ -129,11 +125,11 @@ const initialSpeciesCards: FishSpecies[] = [
     id: "turna",
     name: "Barbun",
     latin: "Mullus barbatus",
-    group: "Etcil",
+    group: "Etçil",
     habitat: "Deniz",
     region: "Ege",
-    protection: "Guvenli",
-    tags: ["Deniz", "Etcil"],
+    protection: "Güvenli",
+    tags: ["Deniz", "Etçil"],
     score: 88.1,
     records: 574,
     image: "https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=900&q=80",
@@ -143,11 +139,11 @@ const initialSpeciesCards: FishSpecies[] = [
     id: "mersin",
     name: "Lufer",
     latin: "Pomatomus saltatrix",
-    group: "Etcil",
+    group: "Etçil",
     habitat: "Deniz",
     region: "Karadeniz",
-    protection: "Guvenli",
-    tags: ["Deniz", "Etcil", "Pelajik"],
+    protection: "Güvenli",
+    tags: ["Deniz", "Etçil", "Pelajik"],
     score: 87.6,
     records: 543,
     image: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?auto=format&fit=crop&w=900&q=80",
@@ -157,10 +153,10 @@ const initialSpeciesCards: FishSpecies[] = [
     id: "istavrit",
     name: "Istavrit",
     latin: "Trachurus trachurus",
-    group: "Etcil",
+    group: "Etçil",
     habitat: "Deniz",
     region: "Karadeniz",
-    protection: "Guvenli",
+    protection: "Güvenli",
     tags: ["Deniz", "Pelajik"],
     score: 86.9,
     records: 498,
@@ -171,11 +167,11 @@ const initialSpeciesCards: FishSpecies[] = [
     id: "turna",
     name: "Turna",
     latin: "Esox lucius",
-    group: "Etcil",
-    habitat: "Tatli Su",
-    region: "Ic Anadolu",
-    protection: "Guvenli",
-    tags: ["Tatli Su", "Etcil"],
+    group: "Etçil",
+    habitat: "Tatlı Su",
+    region: "İç Anadolu",
+    protection: "Güvenli",
+    tags: ["Tatlı Su", "Etçil"],
     score: 84.8,
     records: 421,
     image: "https://images.unsplash.com/photo-1573925788206-7f8f0df1987e?auto=format&fit=crop&w=900&q=80",
@@ -183,13 +179,13 @@ const initialSpeciesCards: FishSpecies[] = [
   },
   {
     id: "mersin-baligi",
-    name: "Mersin Baligi",
+    name: "Mersin Balığı",
     latin: "Acipenser sturio",
-    group: "Dip Baligi",
-    habitat: "Aci Su",
+    group: "Dip Balığı",
+    habitat: "Acı Su",
     region: "Karadeniz",
     protection: "Nesli Tehlikede",
-    tags: ["Acisu", "Dip Baligi", "Nesli Tehlikede"],
+    tags: ["Acı su", "Dip Balığı", "Nesli Tehlikede"],
     score: 83.4,
     records: 288,
     image: "https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=900&q=80",
@@ -199,11 +195,11 @@ const initialSpeciesCards: FishSpecies[] = [
     id: "minekop",
     name: "Minekop",
     latin: "Umbrina cirrosa",
-    group: "Dip Baligi",
+    group: "Dip Balığı",
     habitat: "Deniz",
     region: "Akdeniz",
-    protection: "Guvenli",
-    tags: ["Deniz", "Dip Baligi"],
+    protection: "Güvenli",
+    tags: ["Deniz", "Dip Balığı"],
     score: 82.6,
     records: 251,
     image: "https://images.unsplash.com/photo-1559825481-12a05cc00344?auto=format&fit=crop&w=900&q=80",
@@ -213,10 +209,10 @@ const initialSpeciesCards: FishSpecies[] = [
     id: "uskumru",
     name: "Uskumru",
     latin: "Scomber scombrus",
-    group: "Etcil",
+    group: "Etçil",
     habitat: "Deniz",
     region: "Karadeniz",
-    protection: "Guvenli",
+    protection: "Güvenli",
     tags: ["Deniz", "Pelajik"],
     score: 81.8,
     records: 238,
@@ -227,11 +223,11 @@ const initialSpeciesCards: FishSpecies[] = [
     id: "sazan",
     name: "Sazan",
     latin: "Cyprinus carpio",
-    group: "Otcul",
-    habitat: "Tatli Su",
-    region: "Ic Anadolu",
-    protection: "Guvenli",
-    tags: ["Tatli Su", "Otcul"],
+    group: "Otçul",
+    habitat: "Tatlı Su",
+    region: "İç Anadolu",
+    protection: "Güvenli",
+    tags: ["Tatlı Su", "Otçul"],
     score: 80.9,
     records: 214,
     image: "https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=900&q=80",
@@ -241,10 +237,10 @@ const initialSpeciesCards: FishSpecies[] = [
     id: "hamsi",
     name: "Hamsi",
     latin: "Engraulis encrasicolus",
-    group: "Otcul",
+    group: "Otçul",
     habitat: "Deniz",
     region: "Karadeniz",
-    protection: "Guvenli",
+    protection: "Güvenli",
     tags: ["Deniz", "Pelajik"],
     score: 80.1,
     records: 196,
@@ -255,11 +251,11 @@ const initialSpeciesCards: FishSpecies[] = [
     id: "alabalik",
     name: "Alabalik",
     latin: "Oncorhynchus mykiss",
-    group: "Etcil",
-    habitat: "Tatli Su",
-    region: "Ic Anadolu",
-    protection: "Guvenli",
-    tags: ["Tatli Su", "Etcil"],
+    group: "Etçil",
+    habitat: "Tatlı Su",
+    region: "İç Anadolu",
+    protection: "Güvenli",
+    tags: ["Tatlı Su", "Etçil"],
     score: 79.6,
     records: 183,
     image: "https://images.unsplash.com/photo-1573925788206-7f8f0df1987e?auto=format&fit=crop&w=900&q=80",
@@ -269,11 +265,11 @@ const initialSpeciesCards: FishSpecies[] = [
     id: "orkinos",
     name: "Orkinos",
     latin: "Thunnus thynnus",
-    group: "Etcil",
+    group: "Etçil",
     habitat: "Deniz",
     region: "Akdeniz",
-    protection: "Koruma Altinda",
-    tags: ["Deniz", "Etcil", "Pelajik"],
+    protection: "Koruma Altında",
+    tags: ["Deniz", "Etçil", "Pelajik"],
     score: 78.8,
     records: 162,
     image: "https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=900&q=80",
@@ -281,8 +277,7 @@ const initialSpeciesCards: FishSpecies[] = [
   },
 ];
 
-const tags = ["Deniz", "Tatli Su", "Aci Su", "Etcil", "Otcul", "Dip Baligi", "Pelajik", "Nesli Tehlikede", "Koruma Altinda"];
-const pageSize = 9;
+const pageSize = 6;
 
 export default function SpeciesLibraryWorkspace() {
   const [speciesList, setSpeciesList] = useState<FishSpecies[]>(initialSpeciesCards);
@@ -292,17 +287,17 @@ export default function SpeciesLibraryWorkspace() {
   const [newSpecies, setNewSpecies] = useState({
     name: "",
     latin: "",
-    group: "Etcil",
+    group: "Etçil",
     habitat: "Deniz",
     region: "Akdeniz",
-    protection: "Guvenli",
-    tags: "Deniz, Etcil",
+    protection: "Güvenli",
+    tags: "Deniz, Etçil",
   });
-  const [group, setGroup] = useState("Tumu");
-  const [habitat, setHabitat] = useState("Tumu");
-  const [region, setRegion] = useState("Tumu");
-  const [protection, setProtection] = useState("Tumu");
-  const [sortBy, setSortBy] = useState("Populerlik");
+  const [group, setGroup] = useState("Tümü");
+  const [habitat, setHabitat] = useState("Tümü");
+  const [region, setRegion] = useState("Tümü");
+  const [protection, setProtection] = useState("Tümü");
+  const [sortBy, setSortBy] = useState("Popülerlik");
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [favoriteOnly, setFavoriteOnly] = useState(false);
   const [favorites, setFavorites] = useState(() => new Set(initialSpeciesCards.filter((fish) => fish.favorite).map((fish) => fish.id)));
@@ -313,10 +308,10 @@ export default function SpeciesLibraryWorkspace() {
     const result = speciesList.filter((fish) => {
       const haystack = normalize([fish.name, fish.latin, fish.group, fish.habitat, fish.region, fish.protection, ...fish.tags].join(" "));
       const matchesQuery = !normalizedQuery || haystack.includes(normalizedQuery);
-      const matchesGroup = group === "Tumu" || fish.group === group;
-      const matchesHabitat = habitat === "Tumu" || fish.habitat === habitat;
-      const matchesRegion = region === "Tumu" || fish.region === region;
-      const matchesProtection = protection === "Tumu" || fish.protection === protection;
+      const matchesGroup = group === "Tümü" || fish.group === group;
+      const matchesHabitat = habitat === "Tümü" || fish.habitat === habitat;
+      const matchesRegion = region === "Tümü" || fish.region === region;
+      const matchesProtection = protection === "Tümü" || fish.protection === protection;
       const matchesTag = !activeTag || fish.tags.some((tag) => normalize(tag) === normalize(activeTag));
       const matchesFavorite = !favoriteOnly || favorites.has(fish.id);
 
@@ -324,8 +319,8 @@ export default function SpeciesLibraryWorkspace() {
     });
 
     return result.sort((a, b) => {
-      if (sortBy === "Ada Gore") return a.name.localeCompare(b.name, "tr");
-      if (sortBy === "Kayit Sayisi") return b.records - a.records;
+      if (sortBy === "Ada Göre") return a.name.localeCompare(b.name, "tr");
+      if (sortBy === "Kayıt Sayısı") return b.records - a.records;
       if (sortBy === "Uygunluk") return b.score - a.score;
       return b.score + b.records / 1000 - (a.score + a.records / 1000);
     });
@@ -335,22 +330,7 @@ export default function SpeciesLibraryWorkspace() {
   const currentPage = Math.min(page, pageCount);
   const pagedSpecies = filteredSpecies.slice((currentPage - 1) * pageSize, currentPage * pageSize);
   const favoriteCount = favorites.size;
-  const endangeredCount = speciesList.filter((fish) => fish.protection === "Nesli Tehlikede").length;
-  const familyCount = new Set(speciesList.map((fish) => fish.group)).size;
-  const habitatCount = new Set(speciesList.map((fish) => fish.habitat)).size;
   const popularSpecies = [...speciesList].sort((a, b) => b.score - a.score).slice(0, 5);
-
-  function resetFilters() {
-    setQuery("");
-    setGroup("Tumu");
-    setHabitat("Tumu");
-    setRegion("Tumu");
-    setProtection("Tumu");
-    setSortBy("Populerlik");
-    setActiveTag(null);
-    setFavoriteOnly(false);
-    setPage(1);
-  }
 
   function toggleFavorite(id: string) {
     setFavorites((current) => {
@@ -359,12 +339,6 @@ export default function SpeciesLibraryWorkspace() {
       else next.add(id);
       return next;
     });
-  }
-
-  function selectTag(tag: string) {
-    setActiveTag((current) => (current === tag ? null : tag));
-    setFavoriteOnly(false);
-    setPage(1);
   }
 
   function updateFilter(setter: (value: string) => void, value: string) {
@@ -404,19 +378,25 @@ export default function SpeciesLibraryWorkspace() {
     setNewSpecies({
       name: "",
       latin: "",
-      group: "Etcil",
+      group: "Etçil",
       habitat: "Deniz",
       region: "Akdeniz",
-      protection: "Guvenli",
-      tags: "Deniz, Etcil",
+      protection: "Güvenli",
+      tags: "Deniz, Etçil",
     });
   }
 
   const summaryItems = [
-    { label: "Toplam Tur", value: speciesList.length.toString(), icon: Fish, tone: "cyan" },
-    { label: "Aile", value: familyCount.toString(), icon: Layers, tone: "blue" },
-    { label: "Yasam Alani", value: habitatCount.toString(), icon: Waves, tone: "white" },
-    { label: "Tehlike Altinda", value: endangeredCount.toString(), icon: AlertTriangle, tone: "yellow" },
+    { label: "Toplam Tür", value: "128", icon: Fish, tone: "cyan" },
+    { label: "Deniz Türü", value: "45", icon: Waves, tone: "blue" },
+    { label: "Tatlı Su Türü", value: "38", icon: Waves, tone: "teal" },
+    { label: "Koruma Altında", value: "45", icon: Shield, tone: "orange" },
+  ];
+  const groupDistribution = [
+    { label: "Balık", value: 96, percent: 72, color: "#168fff" },
+    { label: "Köpek Balığı", value: 8, percent: 6, color: "#7c5cff" },
+    { label: "Vatoz", value: 8, percent: 6, color: "#dc8b8b" },
+    { label: "Diğer", value: 16, percent: 13, color: "#f39c28" },
   ];
 
   return (
@@ -424,7 +404,7 @@ export default function SpeciesLibraryWorkspace() {
       <div className="fish-library-shell">
         <header className="fish-library-header">
           <div className="fish-library-title">
-            <h1>Tur Kutuphanesi</h1>
+            <h1>Tür Kütüphanesi</h1>
           </div>
 
           <div className="fish-library-actions">
@@ -433,7 +413,7 @@ export default function SpeciesLibraryWorkspace() {
               <input
                 type="search"
                 value={query}
-                placeholder="Tur, bilimsel ad veya anahtar kelime ara..."
+                placeholder="Tür, bilimsel ad veya anahtar kelime ara..."
                 onChange={(event) => {
                   setQuery(event.target.value);
                   setPage(1);
@@ -442,38 +422,29 @@ export default function SpeciesLibraryWorkspace() {
               <span>Ctrl K</span>
             </label>
             <div className="fish-library-view-toggle" aria-label="Gorunum secimi">
-              <button type="button" className={viewMode === "grid" ? "is-active" : ""} aria-label="Grid gorunumu" onClick={() => setViewMode("grid")}>
+              <button type="button" className={viewMode === "grid" ? "is-active" : ""} aria-label="Grid görünümü" onClick={() => setViewMode("grid")}>
                 <Grid2X2 size={18} />
               </button>
-              <button type="button" className={viewMode === "list" ? "is-active" : ""} aria-label="Liste gorunumu" onClick={() => setViewMode("list")}>
+              <button type="button" className={viewMode === "list" ? "is-active" : ""} aria-label="Liste görünümü" onClick={() => setViewMode("list")}>
                 <List size={18} />
               </button>
             </div>
             <button type="button" className="fish-library-primary" onClick={() => setAddModalOpen(true)}>
               <Plus size={18} />
-              Yeni Tur Ekle
+              Yeni Tür Ekle
             </button>
           </div>
         </header>
 
         <div className="fish-library-layout">
           <main className="fish-library-main">
-            <section className="fish-library-filter-panel" aria-label="Tur filtreleri">
-              <LibrarySelect label="Tur Grubu" value={group} options={["Tumu", "Etcil", "Otcul", "Dip Baligi"]} onChange={(value) => updateFilter(setGroup, value)} />
-              <LibrarySelect label="Yasam Alani" value={habitat} options={["Tumu", "Deniz", "Tatli Su", "Aci Su"]} onChange={(value) => updateFilter(setHabitat, value)} />
-              <LibrarySelect label="Dagilim Bolgesi" value={region} options={["Tumu", "Akdeniz", "Ege", "Karadeniz", "Ic Anadolu"]} onChange={(value) => updateFilter(setRegion, value)} />
-              <LibrarySelect label="Koruma Durumu" value={protection} options={["Tumu", "Guvenli", "Koruma Altinda", "Nesli Tehlikede"]} onChange={(value) => updateFilter(setProtection, value)} />
-              <LibrarySelect label="Sirala" value={sortBy} options={["Populerlik", "Uygunluk", "Kayit Sayisi", "Ada Gore"]} onChange={(value) => updateFilter(setSortBy, value)} icon={<SlidersHorizontal size={16} />} />
+            <section className="fish-library-filter-panel" aria-label="Tür filtreleri">
+              <LibrarySelect label="Tür Grubu" value={group} options={["Tümü", "Etçil", "Otçul", "Dip Balığı"]} onChange={(value) => updateFilter(setGroup, value)} />
+              <LibrarySelect label="Yaşam Alanı" value={habitat} options={["Tümü", "Deniz", "Tatlı Su", "Acı Su"]} onChange={(value) => updateFilter(setHabitat, value)} />
+              <LibrarySelect label="Dağılım Bölgesi" value={region} options={["Tümü", "Akdeniz", "Ege", "Karadeniz", "İc Anadolu"]} onChange={(value) => updateFilter(setRegion, value)} />
+              <LibrarySelect label="Koruma Durumu" value={protection} options={["Tümü", "Güvenli", "Koruma Altında", "Nesli Tehlikede"]} onChange={(value) => updateFilter(setProtection, value)} />
+              <LibrarySelect label="Sırala" value={sortBy} options={["Popülerlik", "Uygunluk", "Kayit Sayısı", "Ada Göre"]} onChange={(value) => updateFilter(setSortBy, value)} icon={<SlidersHorizontal size={16} />} />
             </section>
-
-            <div className="fish-library-result-row">
-              <span>
-                {filteredSpecies.length} tur bulundu
-                {activeTag ? ` - ${activeTag} etiketi aktif` : ""}
-                {favoriteOnly ? " - favoriler" : ""}
-              </span>
-              <button type="button" onClick={resetFilters}>Temizle</button>
-            </div>
 
             <section className={viewMode === "grid" ? "fish-library-grid" : "fish-library-grid fish-library-grid--list"} aria-label="Balik turleri">
               {pagedSpecies.length ? (
@@ -485,13 +456,8 @@ export default function SpeciesLibraryWorkspace() {
                     </button>
                     <div className="fish-library-card-shade" />
                     <div className="fish-library-card-copy">
-                      <h2>{fish.name}</h2>
+                      <h3>{fish.name}</h3>
                       <p>{fish.latin}</p>
-                      <div className="fish-library-card-tags">
-                        {fish.tags.map((tag) => (
-                          <span key={tag}>{tag}</span>
-                        ))}
-                      </div>
                     </div>
                     <footer>
                       <strong>
@@ -505,32 +471,52 @@ export default function SpeciesLibraryWorkspace() {
               ) : (
                 <div className="fish-library-empty">
                   <Search size={24} />
-                  <strong>Sonuc bulunamadi</strong>
-                  <span>Arama veya filtreleri degistirerek tekrar deneyin.</span>
+                  <strong>Sonuç bulunamadı</strong>
+                  <span>Arama veya filtreleri değiştirerek tekrar deneyin.</span>
                 </div>
               )}
             </section>
 
-            <nav className="fish-library-pagination" aria-label="Sayfalama">
-              <button type="button" aria-label="Onceki sayfa" disabled={currentPage === 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>
-                <ChevronLeft size={18} />
-              </button>
-              {Array.from({ length: pageCount }, (_, index) => index + 1).map((pageNumber) => (
-                <button key={pageNumber} type="button" className={pageNumber === currentPage ? "is-active" : ""} onClick={() => setPage(pageNumber)}>
-                  {pageNumber}
+            <nav className="fish-library-pagination fish-library-pagination--sm" aria-label="Sayfalama">
+              <div className="fish-library-pagination-content">
+                <button
+                  className="fish-library-pagination-control"
+                  type="button"
+                  disabled={currentPage === 1}
+                  onClick={() => setPage((value) => Math.max(1, value - 1))}
+                >
+                  <ChevronLeft size={14} />
+                  <span>Previous</span>
                 </button>
-              ))}
-              <button type="button" aria-label="Sonraki sayfa" disabled={currentPage === pageCount} onClick={() => setPage((value) => Math.min(pageCount, value + 1))}>
-                <ChevronRight size={18} />
-              </button>
+                {Array.from({ length: pageCount }, (_, index) => index + 1).map((pageNumber) => (
+                  <button
+                    key={pageNumber}
+                    type="button"
+                    className={`fish-library-pagination-link${pageNumber === currentPage ? " is-active" : ""}`}
+                    onClick={() => setPage(pageNumber)}
+                    aria-current={pageNumber === currentPage ? "page" : undefined}
+                  >
+                    {pageNumber}
+                  </button>
+                ))}
+                <button
+                  className="fish-library-pagination-control"
+                  type="button"
+                  disabled={currentPage === pageCount}
+                  onClick={() => setPage((value) => Math.min(pageCount, value + 1))}
+                >
+                  <span>Next</span>
+                  <ChevronRight size={14} />
+                </button>
+              </div>
             </nav>
           </main>
 
           <aside className="fish-library-side">
             <section className="fish-library-panel">
               <div className="fish-library-panel-head">
-                <h2>Kutuphane Ozeti</h2>
-                <a href="/platform/analyze">Detayli Rapor <ChevronRight size={14} /></a>
+                <h2>Kütüphane Ozeti</h2>
+                <a href="/platform/analyze">Detaylı Rapor <ChevronRight size={14} /></a>
               </div>
               <div className="fish-library-summary">
                 {summaryItems.map(({ icon: Icon, label, value, tone }) => (
@@ -549,8 +535,28 @@ export default function SpeciesLibraryWorkspace() {
 
             <section className="fish-library-panel">
               <div className="fish-library-panel-head">
-                <h2>Populer Turler</h2>
-                <a href="/platform/library" onClick={(event) => event.preventDefault()}>Tumunu Gor <ChevronRight size={14} /></a>
+                <h2>Tür Grubuna Göre Dağılım</h2>
+                <a href="/platform/library" onClick={(event) => event.preventDefault()}>Tümünü Gör <ChevronRight size={14} /></a>
+              </div>
+              <div className="fish-library-distribution">
+                <div className="fish-library-donut" aria-hidden="true" />
+                <div className="fish-library-distribution-list">
+                  {groupDistribution.map((item) => (
+                    <div key={item.label}>
+                      <span style={{ backgroundColor: item.color }} />
+                      <strong>{item.label}</strong>
+                      <b>{item.value}</b>
+                      <small>(%{item.percent})</small>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className="fish-library-panel">
+              <div className="fish-library-panel-head">
+                <h2>Popüler Türler</h2>
+                <a href="/platform/library" onClick={(event) => event.preventDefault()}>Tümünü Gör <ChevronRight size={14} /></a>
               </div>
               <div className="fish-library-popular">
                 {popularSpecies.map((item, index) => (
@@ -566,34 +572,15 @@ export default function SpeciesLibraryWorkspace() {
             </section>
 
             <section className="fish-library-panel">
-              <h2>Tur Etiketleri</h2>
-              <div className="fish-library-tags">
-                {tags.map((tag) => (
-                  <button type="button" className={activeTag === tag ? "is-active" : ""} key={tag} onClick={() => selectTag(tag)}>
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            <section className="fish-library-panel">
-              <h2>Hizli Erisim</h2>
+              <h2>Hızlı Erişim</h2>
               <div className="fish-library-shortcuts">
                 <a href="/platform/library" onClick={(event) => { event.preventDefault(); setFavoriteOnly(true); setActiveTag(null); setPage(1); }}>
                   <Star size={17} />
                   Favori Turlerim ({favoriteCount})
                 </a>
-                <a href="/platform/library" onClick={(event) => event.preventDefault()}>
-                  <Hash size={17} />
-                  Son Goruntulenenler
-                </a>
                 <a href="/platform/analyze">
-                  <BarChart3 size={17} />
-                  Karsilastirma Araci
-                </a>
-                <a href="/platform/library" onClick={(event) => event.preventDefault()}>
-                  <Heart size={17} />
-                  Tur Ekle / Duzenle
+                  <Search size={17} />
+                  Yakın Bölgemdeki Türler
                 </a>
               </div>
             </section>
@@ -605,8 +592,8 @@ export default function SpeciesLibraryWorkspace() {
           <section className="fish-library-modal" role="dialog" aria-modal="true" aria-labelledby="new-species-title" onMouseDown={(event) => event.stopPropagation()}>
             <header>
               <div>
-                <h2 id="new-species-title">Yeni Tur Ekle</h2>
-                <p>Kutuphaneye yeni bir balik turu kaydi olusturun.</p>
+                <h2 id="new-species-title">Yeni Tür Ekle</h2>
+                <p>Kütüphaneye yeni bir balık türü kaydı oluşturun.</p>
               </div>
               <button type="button" aria-label="Kapat" onClick={() => setAddModalOpen(false)}>
                 <X size={18} />
@@ -615,7 +602,7 @@ export default function SpeciesLibraryWorkspace() {
 
             <form onSubmit={submitNewSpecies}>
               <label>
-                <span>Tur Adi</span>
+                <span>Tür Adı</span>
                 <input
                   required
                   value={newSpecies.name}
@@ -645,10 +632,10 @@ export default function SpeciesLibraryWorkspace() {
                 />
               </label>
               <footer>
-                <button type="button" onClick={() => setAddModalOpen(false)}>Vazgec</button>
+                <button type="button" onClick={() => setAddModalOpen(false)}>Vazgeç</button>
                 <button type="submit">
                   <Check size={17} />
-                  Turu Ekle
+                  Türü Ekle
                 </button>
               </footer>
             </form>
@@ -750,40 +737,40 @@ function LibrarySelect({
 
 function getLibraryOptionMeta(label: string, option: string) {
   const meta: Record<string, Record<string, string>> = {
-    "Tur Grubu": {
-      Tumu: "Tum beslenme gruplari",
-      Etcil: "Avci ve protein agirlikli turler",
-      Otcul: "Bitkisel kaynaklarla beslenen turler",
-      "Dip Baligi": "Taban habitatina yakin yasayanlar",
+    "Tür Grubu": {
+      Tümü: "Tüm beslenme grupları",
+      Etçil: "Avcı ve protein agırlıklı turler",
+      Otçul: "Bitkisel kaynaklarla beslenen türler",
+      "Dip Balığı": "Taban habitatına yakın yaşayanlar",
     },
-    "Yasam Alani": {
-      Tumu: "Tum sucul habitatlar",
-      Deniz: "Tuzlu su ve kiyi ekosistemleri",
-      "Tatli Su": "Gol, nehir ve ic sular",
-      "Aci Su": "Nehir agzi ve lagun gecisleri",
+    "Yasam Alanı": {
+      Tümü: "Tüm sucul habitatlar",
+      Deniz: "Tuzlu su ve kıyı ekosistemleri",
+      "Tatlı Su": "Göl, nehir ve iç sular",
+      "Acı Su": "Nehir ağzı ve lagün geçişleri",
     },
-    "Dagilim Bolgesi": {
-      Tumu: "Tum izleme bolgeleri",
-      Akdeniz: "Sicak deniz kusagi",
-      Ege: "Kiyisal ve ada ekosistemi",
-      Karadeniz: "Kuzey kiyilari ve serin sular",
-      "Ic Anadolu": "Ic su kaynaklari",
+    "Dagılım Bölgesi": {
+      Tümü: "Tüm izleme bölgeleri",
+      Akdeniz: "Sıcak deniz kuşağı",
+      Ege: "Kıyısal ve ada ekosistemi",
+      Karadeniz: "Kuzey kıyıları ve serin sular",
+      "İç Anadolu": "İç su kaynakları",
     },
     "Koruma Durumu": {
-      Tumu: "Tum koruma siniflari",
-      Guvenli: "Populasyon riski dusuk",
-      "Koruma Altinda": "Izlemeye ve korumaya tabi",
-      "Nesli Tehlikede": "Hassas tur grubu",
+      Tümü: "Tüm koruma sınıfları",
+      Guvenli: "Popülasyon riski düşük",
+      "Koruma Altında": "İzlemeye ve korumaya tabi",
+      "Nesli Tehlikede": "Hassas tür grubu",
     },
     Sirala: {
-      Populerlik: "En cok incelenen turler",
-      Uygunluk: "Analiz uyum skoruna gore",
-      "Kayit Sayisi": "Veri havuzu buyuklugune gore",
-      "Ada Gore": "Alfabetik listeleme",
+      Populerlik: "En çok incelenen türler",
+      Uygunluk: "Analiz uyum skoruna göre",
+      "Kayıt Sayısı": "Veri havuzu büyüklüğüne göre",
+      "Ada Göre": "Alfabetik listeleme",
     },
   };
 
-  return meta[label]?.[option] ?? "Secimi uygula";
+  return meta[label]?.[option] ?? "Seçimi uygula";
 }
 
 function normalize(value: string) {

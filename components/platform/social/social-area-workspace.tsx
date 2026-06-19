@@ -99,9 +99,9 @@ const feedPosts: SocialPost[] = [
     time: "6 hours ago",
     kind: "poll",
     poll: {
-      question: "Bu hafta sonu nerede balik tutmayi planliyorsunuz?",
+      question: "Bu hafta sonu nerede balık tutmayı planlıyorsunuz?",
       options: [
-        ["Gol", 45],
+        ["Göl", 45],
         ["Nehir", 30],
         ["Deniz", 15],
         ["Fikrim yok", 10],
@@ -109,7 +109,7 @@ const feedPosts: SocialPost[] = [
       votes: 97,
     },
     avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=96&q=80",
-    text: "Hafta sonu icin rota secimi yapiyoruz.",
+    text: "Hafta sonu için rota seçimi yapıyoruz.",
     tags: ["#Poll", "#Weekend", "#FishingPlan"],
     likes: 97,
     comments: 18,
@@ -122,7 +122,7 @@ const feedPosts: SocialPost[] = [
     time: "8 hours ago",
     kind: "video",
     avatar: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80",
-    text: "Bugunku dalis anlarindan kisa bir kesit.",
+    text: "Bugünkü dalış anlarından kısa bir kesit.",
     tags: ["#Diving", "#Underwater", "#OceanLife"],
     likes: 54,
     comments: 5,
@@ -136,7 +136,7 @@ const feedPosts: SocialPost[] = [
     kind: "location",
     location: "Kas, Antalya",
     avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=96&q=80",
-    text: "Bugunku dalis noktasi sakin ve gorus mesafesi cok iyiydi.",
+    text: "Bugünku dalış noktası sakin ve görüş mesafesi çok iyiydi.",
     tags: ["#Location", "#Kas", "#Diving"],
     likes: 64,
     comments: 9,
@@ -149,7 +149,7 @@ const feedPosts: SocialPost[] = [
     time: "7 hours ago",
     kind: "text",
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80",
-    text: "Sabahin bu saatinde denizde olmak bambaska bir huzur veriyor. Doga insana her zaman iyi geliyor.",
+    text: "Sabahın bu saatinde denizde olmak bambaşka bir huzur veriyor. Doğa insana her zaman iyi geliyor.",
     tags: ["#FishingLife", "#MorningVibes", "#Ocean"],
     likes: 46,
     comments: 3,
@@ -162,7 +162,7 @@ const feedPosts: SocialPost[] = [
     time: "10 hours ago",
     kind: "photo",
     avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=96&q=80",
-    text: "Ufak bir yakalama gunlugu. Renkler ve desenler gercekten etkileyici.",
+    text: "Ufak bir yakalama guünlüğü. Renkler ve desenler gerçekten etkileyici.",
     tags: ["#Catch", "#Gallery", "#Trout"],
     likes: 48,
     comments: 7,
@@ -178,9 +178,9 @@ const feedPosts: SocialPost[] = [
     handle: "@danielangler",
     time: "12 hours ago",
     kind: "location",
-    location: "Uzungol, Trabzon",
+    location: "Uzungöl, Trabzon",
     avatar: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=96&q=80",
-    text: "Sisli hava, temiz su ve cok sakin bir rota.",
+    text: "Sisli hava, temiz su ve çok sakin bir rota.",
     tags: ["#Location", "#Uzungol", "#Route"],
     likes: 71,
     comments: 11,
@@ -193,7 +193,7 @@ const feedPosts: SocialPost[] = [
     time: "13 hours ago",
     kind: "video",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80",
-    text: "Gun batiminda kiyidan kisa bir olta denemesi. Isik harikaydi.",
+    text: "Gün batımında kıyıdan kısa bir olta denemesi. Işık harikaydı.",
     tags: ["#SunsetFishing", "#LakeLife", "#Video"],
     likes: 91,
     comments: 14,
@@ -206,7 +206,7 @@ const feedPosts: SocialPost[] = [
     time: "15 hours ago",
     kind: "poll",
     poll: {
-      question: "En sevdiginiz olta takimi hangisi?",
+      question: "En sevdiğiniz olta takımı hangisi?",
       options: [
         ["Spin", 50],
         ["Fly Fishing", 25],
@@ -216,7 +216,7 @@ const feedPosts: SocialPost[] = [
       votes: 120,
     },
     avatar,
-    text: "Yeni ekipman listesi icin topluluk fikri aliyorum.",
+    text: "Yeni ekipman listesi için topluluk fikri alıyorum.",
     tags: ["#Gear", "#Poll", "#Tackle"],
     likes: 120,
     comments: 20,
@@ -229,7 +229,7 @@ const feedPosts: SocialPost[] = [
     time: "16 hours ago",
     kind: "text",
     avatar: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80",
-    text: "Bugun harika bir gun gecirdik! Temiz hava, guzel insanlar ve bol kahkaha. Daha ne olsun?",
+    text: "Bugün harika bir gün geçirdik! Temiz hava, güzel insanlar ve bol kahkaha. Daha ne olsun?",
     tags: ["#GoodVibes", "#Friends", "#Nature"],
     likes: 38,
     comments: 2,
@@ -242,7 +242,7 @@ const feedPosts: SocialPost[] = [
     time: "18 hours ago",
     kind: "photo",
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80",
-    text: "Renkleriyle dikkat ceken guzel bir tur. Kisa bir gozlem notu olarak kaydettim.",
+    text: "Renkleriyle dikkat çeken güzel bir tur. Kısa bir gözlem notu olarak kaydettim.",
     tags: ["#Species", "#Color", "#Observation"],
     likes: 66,
     comments: 6,
@@ -461,21 +461,21 @@ const interactionComments = [
   {
     author: "Lily Edmonds",
     time: "1 saat once",
-    text: "Harika bir kare! Renkler ve netlik muthis.",
+    text: "Harika bir kare! Renkler ve netlik müthiş.",
     likes: 3,
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80",
+    avatar: "https://images.unsplash.com/photo-1494790108ö77-be9c29b29330?auto=format&fit=crop&w=96&q=80",
   },
   {
     author: "James Mitchell",
-    time: "45 dakika once",
-    text: "Bu balik surusu inanilmaz! Nerede dalis yaptiniz?",
+    time: "45 dakika önce",
+    text: "Bu balık sürüsü inanılmaz! Nerede dalış yaptınız?",
     likes: 2,
     avatar,
   },
   {
     author: "Sophia Turner",
-    time: "20 dakika once",
-    text: "Keske orada olabilseydim!",
+    time: "20 dakika önce",
+    text: "Keşke orada olabilseydim!",
     likes: 1,
     avatar: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=96&q=80",
   },
@@ -520,44 +520,44 @@ const modalCopy: Record<Exclude<SocialModal, null>, { title: string; eyebrow: st
   },
   achievement: {
     eyebrow: "Başarı",
-    title: "Yakalama basarisini one cikar",
+    title: "Yakalama başarısını öne cıkar",
     description: "Skor, agirlik veya tur rozeti ekleyerek paylasiminizi daha belirgin hale getirin.",
   },
   notifications: {
     eyebrow: "Bildirimler",
     title: "Son topluluk hareketleri",
-    description: "Yeni yorumlar, arkadas istekleri ve etkinlik hatirlatmalari burada listelenir.",
+    description: "Yeni yorumlar, arkadaş istekleri ve etkinlik hatırlatmaları burada listelenir.",
   },
   comments: {
     eyebrow: "Yorumlar",
-    title: "Gonderi yorumlarini yonet",
-    description: "Kisa bir yorum ekleyin veya mevcut yorum akisindaki geri bildirimleri inceleyin.",
+    title: "Gönderi yorumlarını yönet",
+    description: "Kısa bir yorum ekleyin veya mevcut yorum akışındaki geri bildirimleri inceleyin.",
   },
   share: {
     eyebrow: "Paylaş",
-    title: "Gonderiyi paylasim kanalina gonder",
-    description: "AquaScope icinde, profilinizde veya harici baglanti olarak paylasabilirsiniz.",
+    title: "Gönderiyi paylaşım kanalına gönder",
+    description: "AquaScope içinde, profilinizde veya harici bağlanti olarak paylaşabilirsiniz.",
   },
   friends: {
     eyebrow: "Arkadaşlar",
-    title: "Onerilen kullanicilari incele",
-    description: "Ortak ilgi alanlarina gore onerilen balikcilari takip listenize ekleyin.",
+    title: "Önerilen kullanıcıları incele",
+    description: "Ortak ilgi alanlarina göre önerilen balıkçıları takip listenize ekleyin.",
   },
   topics: {
     eyebrow: "Trendler",
-    title: "Populer konu etiketleri",
-    description: "Sik kullanilan etiketleri inceleyin ve akis filtrelerinize uygulayin.",
+    title: "Popüler konu etiketleri",
+    description: "Sık kullanılan etiketleri inceleyin ve akış filtrelerinize uygulayın.",
   },
   members: {
     eyebrow: "Liderlik",
-    title: "Topluluk siralamasini gor",
-    description: "Bu haftanin en aktif uyelerini ve puan durumlarini takip edin.",
+    title: "Topluluk sıralamasını gör",
+    description: "Bu haftanın en aktif üyelerini ve puan durumlarını takip edin.",
   },
   events: {
     eyebrow: "Etkinlikler",
-    title: "Yaklasan etkinlik akisina katil",
-    description: "Planlanan saha etkinliklerini goruntuleyin ve katilim durumunuzu yonetin.",
-  },
+    title: "Yaklaşan etkinlik akışına katıl",
+    description: "Planlanan saha etkinliklerini göruntüleyin ve katılım durumunuzu yönetin.",
+  }
 };
 
 export default function SocialAreaWorkspace() {
@@ -574,7 +574,7 @@ export default function SocialAreaWorkspace() {
   const [addedFriends, setAddedFriends] = useState<Record<string, boolean>>({});
   const [hiddenFriends, setHiddenFriends] = useState<Record<string, boolean>>({});
   const [joinedEvent, setJoinedEvent] = useState(false);
-  const [notice, setNotice] = useState("Topluluk akisiniz hazir.");
+  const [notice, setNotice] = useState("Topluluk akışınız hazır.");
   const [activeModal, setActiveModal] = useState<SocialModal>(null);
   const [activeFlowPostId, setActiveFlowPostId] = useState<string | null>(null);
   const [activeStoryIndex, setActiveStoryIndex] = useState<number | null>(null);
@@ -604,7 +604,7 @@ export default function SocialAreaWorkspace() {
   const createPost = () => {
     const text = composerText.trim();
     if (!text) {
-      setNotice("Paylasim yapmak icin once bir metin girin.");
+      setNotice("Paylaşım yapmak için önce bir metin girin.");
       return;
     }
 
@@ -612,7 +612,7 @@ export default function SocialAreaWorkspace() {
     setPosts((current) => [
       {
         id: `local-${Date.now()}`,
-        author: "Derya Yilmaz",
+        author: "Derya Yılmaz",
         handle: "@deryayilmaz",
         time: "Just now",
         avatar,
@@ -627,14 +627,14 @@ export default function SocialAreaWorkspace() {
     ]);
     setComposerText("");
     setActiveTab("For You");
-    setNotice(`${audience} icin yeni paylasim yayinlandi.`);
+    setNotice(`${audience} için yeni paylaşım yayınlandı.`);
   };
 
   const toggleAudience = () => {
     setAudience((current) => (current === "Everyone" ? "Followers" : "Everyone"));
   };
 
-  const audienceLabel = audience === "Everyone" ? "Herkese Acik" : "Takipciler";
+  const audienceLabel = audience === "Everyone" ? "Herkese Açık" : "Takipçiler";
 
   const openModal = (modal: Exclude<SocialModal, null>, postId?: string) => {
     setActiveFlowPostId(postId ?? null);
@@ -889,7 +889,7 @@ export default function SocialAreaWorkspace() {
                   </button>
                 </footer>
               </article>
-            )) : <div className="social-empty-state">Aramanizla eslesen paylasim bulunamadi.</div>}
+            )) : <div className="social-empty-state">Aramanızla eşleşen paylaşım bulunamadı.</div>}
           </div>
         </main>
 
@@ -1031,7 +1031,7 @@ export default function SocialAreaWorkspace() {
                 time: "Az once",
                 avatar,
                 kind: modal === "video" ? "video" : "photo",
-                text: composerText.trim() || (modal === "video" ? "Yeni bir av videosu paylasti." : "Yeni bir av gorseli paylasti."),
+                text: composerText.trim() || (modal === "video" ? "Yeni bir av videosu paylaştı." : "Yeni bir av görseli paylaştı."),
                 tags: modal === "video" ? ["#FishingVideo", "#AegeanSea"] : ["#Catch", "#Fishing"],
                 likes: 0,
                 comments: 0,
@@ -1053,7 +1053,7 @@ export default function SocialAreaWorkspace() {
               setCommentCounts((current) => ({ ...current, [targetPostId]: (current[targetPostId] ?? targetPost?.comments ?? 0) + 1 }));
             }
             if (modal === "share") setSharedPosts((current) => ({ ...current, [targetPostId]: true }));
-            setNotice(`${modalCopy[modal].eyebrow} akisi uygulandi.`);
+            setNotice(`${modalCopy[modal].eyebrow} akışı uygulandı.`);
             closeModal();
           }}
           onSaveDraft={() => {
@@ -1592,8 +1592,8 @@ function SocialFlowModal({
                 {modal === "create" ? <Plus size={28} /> : null}
               </div>
               <div>
-                <strong>{isCreate ? "Paylasim taslagi" : "Akis durumu"}</strong>
-                <span>{isCreate ? composerText || "Henuz metin girilmedi." : "Hazir, onay verdiginizde akisa uygulanacak."}</span>
+                <strong>{isCreate ? "Paylaşım taslağı" : "Akış durumu"}</strong>
+                <span>{isCreate ? composerText || "Henüz metin girilmedi." : "Hazır, onay verdiğinizde akışa uygulanacak."}</span>
               </div>
             </div>
 
@@ -1604,7 +1604,7 @@ function SocialFlowModal({
               </article>
               <article>
                 <span>Durum</span>
-                <strong>{isCreate ? "Yayinlanabilir" : "Hazir"}</strong>
+                <strong>{isCreate ? "Yayınlanabilir" : "Hazır"}</strong>
               </article>
             </div>
           </>
@@ -1618,13 +1618,13 @@ function SocialFlowModal({
             </button>
           ) : null}
           <div className="social-flow-footer-actions">
-            <button type="button" onClick={onClose}>{isRichComposer ? "Cancel" : "Vazgec"}</button>
+            <button type="button" onClick={onClose}>{isRichComposer ? "Cancel" : "Vazgeç"}</button>
             <button type="button" onClick={isCreate ? onCreate : () => onApply(modal)}>
               {modal === "media" ? <><Upload size={18} /> Share Post</> : null}
               {modal === "video" ? <><Upload size={18} /> Share Video</> : null}
               {modal === "location" ? <><Navigation size={18} /> Share Location</> : null}
               {modal === "poll" ? <><BarChart3 size={18} /> Publish Poll</> : null}
-              {!isRichComposer ? (isCreate ? "Paylas" : "Akisi Uygula") : null}
+              {!isRichComposer ? (isCreate ? "Paylaş" : "Akışı Uygula") : null}
             </button>
           </div>
         </footer>

@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   BarChart3,
-  Bell,
   ChevronDown,
   ChevronsLeft,
   Fish,
@@ -15,7 +14,6 @@ import {
   LogOut,
   MapPin,
   Settings,
-  Sparkles,
   User,
   Users,
 } from "lucide-react";
@@ -96,63 +94,51 @@ export default function SisyphusSidebar() {
           )}
         </div>
 
-        <nav className="aqua-sidebar__menu aqua-sidebar__menu--top" aria-label="Primary navigation">
-          <SectionTitle title="ANA MENÜ" />
-          {primaryItems.map((item) => {
-            const active = isSidebarItemActive(pathname, item.href, item.rootMatch);
-            return <SidebarItem key={item.label} href={item.href} label={item.label} icon={item.icon} active={active} />;
-          })}
-        </nav>
-
-        <div className="aqua-sidebar__section">
-          <SectionTitle title="ARAÇLAR" />
-
-          <div className="aqua-sidebar__menu aqua-sidebar__menu--org">
-            {lowerItems.map((item) => {
-              const active = isSidebarItemActive(pathname, item.href);
-              return <SidebarItem key={item.label} href={item.href} label={item.label} icon={item.icon} active={active} compact />;
+        <div className="aqua-sidebar__body">
+          <nav className="aqua-sidebar__menu aqua-sidebar__menu--top" aria-label="Primary navigation">
+            <SectionTitle title="ANA MENÜ" />
+            {primaryItems.map((item) => {
+              const active = isSidebarItemActive(pathname, item.href, item.rootMatch);
+              return <SidebarItem key={item.label} href={item.href} label={item.label} icon={item.icon} active={active} />;
             })}
+          </nav>
+
+          <div className="aqua-sidebar__section">
+            <SectionTitle title="ARAÇLAR" />
+
+            <div className="aqua-sidebar__menu aqua-sidebar__menu--org">
+              {lowerItems.map((item) => {
+                const active = isSidebarItemActive(pathname, item.href);
+                return <SidebarItem key={item.label} href={item.href} label={item.label} icon={item.icon} active={active} compact />;
+              })}
+            </div>
           </div>
         </div>
 
-        <div className="aqua-sidebar__spacer" />
+        <div className="aqua-sidebar__footer">
+          <Link href="/platform/profile" className="aqua-sidebar__user">
+            <div className="aqua-sidebar__avatar-wrap">
+              <img
+                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80"
+                alt="Derya Yılmaz"
+              />
+              <span className="aqua-sidebar__status" aria-hidden />
+            </div>
 
-        <Link href="/platform/analyze" className="aqua-sidebar__insight-card">
-          <div>
-            <strong>AI Destekli Analiz</strong>
-            <p>Akıllı analiz ile içgörüleri keşfedin.</p>
-          </div>
-          <Sparkles size={17} />
-        </Link>
+            <div className="aqua-sidebar__user-text">
+              <strong>Derya Yılmaz</strong>
+              <span>derya@aquascope.io</span>
+            </div>
 
-        <button className="aqua-sidebar__notification" type="button" aria-label="Bildirimler">
-          <Bell size={21} />
-          <span>3</span>
-        </button>
+            <span className="aqua-sidebar__settings" aria-hidden>
+              <ChevronDown size={18} />
+            </span>
+          </Link>
 
-        <button className="aqua-sidebar__logout" type="button" onClick={() => setShowLogoutModal(true)}>
-          <LogOut className="aqua-sidebar__logout-icon" size={20} />
-          <span>Cikis Yap</span>
-        </button>
-
-        <Link href="/platform/profile" className="aqua-sidebar__user">
-          <div className="aqua-sidebar__avatar-wrap">
-            <img
-              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80"
-              alt="Derya Yılmaz"
-            />
-            <span className="aqua-sidebar__status" aria-hidden />
-          </div>
-
-          <div className="aqua-sidebar__user-text">
-            <strong>Derya Yılmaz</strong>
-            <span>derya@aquascope.io</span>
-          </div>
-
-          <span className="aqua-sidebar__settings" aria-hidden>
-            <ChevronDown size={18} />
-          </span>
-        </Link>
+          <button className="aqua-sidebar__logout aqua-sidebar__logout--icon" type="button" aria-label="Çıkış Yap" onClick={() => setShowLogoutModal(true)}>
+            <LogOut className="aqua-sidebar__logout-icon" size={20} />
+          </button>
+        </div>
       </div>
 
       {showLogoutModal && portalReady
@@ -162,25 +148,14 @@ export default function SisyphusSidebar() {
                 <span className="logout-modal-icon" aria-hidden>
                   <LogOut size={22} />
                 </span>
-                <span className="logout-modal-kicker">Oturum Onayi</span>
-                <h2 id="logout-modal-title">Cikis yapmak istediginize emin misiniz?</h2>
-                <p>Oturumunuz kapatilacak ve giris ekranina yonlendirileceksiniz.</p>
-                <div className="logout-modal-summary" aria-label="Cikis ozeti">
-                  <span>
-                    <strong>Hesap</strong>
-                    Derya Yilmaz
-                  </span>
-                  <span>
-                    <strong>Durum</strong>
-                    Aktif oturum sonlandirilacak
-                  </span>
-                </div>
+                <span className="logout-modal-kicker">Oturum Onayı</span>
+                <h2 id="logout-modal-title">Çıkış yapmak istediğinize emin misiniz?</h2>
                 <div className="logout-modal-actions">
                   <button className="logout-stay-button" type="button" onClick={() => setShowLogoutModal(false)}>
                     Sayfada Kal
                   </button>
                   <Link className="logout-confirm-button" href="/">
-                    Cikis
+                    Çıkış
                   </Link>
                 </div>
               </div>

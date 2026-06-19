@@ -1,22 +1,23 @@
 "use client";
 
-import type { ChangeEvent, ElementType } from "react";
+import type { ChangeEvent, DragEvent, ElementType } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import FishMorphometricViewer from "../../analysis/FishMorphometricViewer";
+import { Area, AreaChart, PolarAngleAxis, RadialBar, RadialBarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import {
-  ArrowLeft,
-  ArrowRight,
+  AlertCircle,
   BarChart3,
   CalendarDays,
   Camera,
-  CheckCircle2,
   ChevronRight,
+  CloudSun,
+  Database,
   Download,
   Droplets,
   FileText,
   ImageIcon,
   Loader2,
   MapPin,
+  Map as MapIcon,
   Maximize2,
   MoreVertical,
   Plus,
@@ -25,8 +26,10 @@ import {
   ShieldCheck,
   Sparkles,
   Target,
+  TrendingUp,
   Upload,
   Waves,
+  X,
 } from "lucide-react";
 
 type AnalyzeResponse = {
@@ -62,6 +65,7 @@ type SpeciesProfile = {
   commonName: string;
   latin: string;
   description: string;
+  weight?: string;
   location: string;
   coordinates: string;
   environment: {
@@ -87,24 +91,24 @@ const speciesProfiles: Record<string, SpeciesProfile> = {
   levrek: {
     commonName: "Levrek",
     latin: "Dicentrarchus labrax",
-    description: "Akdeniz, Ege ve Karadeniz kiyilarinda yaygin gorulen avci bir deniz balik turudur.",
-    location: "Karadeniz, Sinop Aciklari",
+    description: "Akdeniz, Ege ve Karadeniz kıyılarında yaygın görülen avcı bir deniz balık türüdür.",
+    location: "Karadeniz, Sinop Açıkları",
     coordinates: "41.887 N, 34.868 E",
     environment: {
       temperature: "16.8 C",
       salinity: "18.6 PSU",
       ph: "8.1",
       oxygen: "8.2 mg/L",
-      habitat: "Cok Uygun",
+      habitat: "Çok Uygun",
       habitatScore: 94,
     },
-    colors: ["Gumus %48", "Mavi-Gri %26", "Beyaz %15", "Koyu Gri %8", "Diger %3"],
+    colors: ["Gümüş %48", "Mavi-Gri %26", "Beyaz %15", "Koyu Gri %8", "Diğer %3"],
     distribution: [12, 28, 52, 82, 61, 34, 18],
   },
   cupra: {
     commonName: "Cupra",
     latin: "Sparus aurata",
-    description: "Kiyisal kayalik, kumluk ve deniz cayi alanlarinda gozlenen degerli bir deniz balik turudur.",
+    description: "Kıyısal kayalık, kumluk ve deniz çayı alanlarında gözlenen değerli bir deniz balık türüdür.",
     location: "Kuzey Ege Bolgesi",
     coordinates: "39.2326 N, 26.4412 E",
     environment: {
@@ -156,31 +160,73 @@ const speciesProfiles: Record<string, SpeciesProfile> = {
 
 export default function AnalyzeWorkspace() {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const acceptedTypes = useMemo(() => ["image/jpeg", "image/jpg", "image/png", "image/webp"], []);
+  const acceptedTypes = useMemo(() => ["image/svg+xml", "image/jpeg", "image/jpg", "image/png", "image/gif"], []);
+  const maxSizeMB = 2;
+  const maxSize = maxSizeMB * 1024 * 1024;
   const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>("/login-fish-scene.png");
+  const [previewUrl, setPreviewUrl] = useState<string>("/images/analyze-upload-underwater-bg.png");
+  const [isDragging, setIsDragging] = useState(false);
   const [result, setResult] = useState<AnalyzeResponse | null>(null);
   const [analysisCompletedAt, setAnalysisCompletedAt] = useState<Date | null>(null);
   const [analysisDuration, setAnalysisDuration] = useState<string>("2.34 saniye");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const [isMoreActionsOpen, setIsMoreActionsOpen] = useState(false);
+  const [selectedSizeIndex, setSelectedSizeIndex] = useState(4);
+  const [observationRange, setObservationRange] = useState<"month" | "week">("month");
 
   const detectedSpecies = result?.species ?? "Levrek";
   const confidence = result ? normalizeConfidence(result.confidence) : 95.4;
   const confidenceThreshold = result ? normalizeConfidence(result.confidence_threshold) : 45;
   const isUncertain = Boolean(result?.is_uncertain);
   const confidenceText = `%${confidence.toFixed(1)}`;
-  const scoreLabel = isUncertain ? "Dusuk Guven" : confidence >= 85 ? "Cok Yuksek" : confidence >= 65 ? "Yuksek" : "Orta";
-  const analysisDate = analysisCompletedAt ? analysisCompletedAt.toLocaleString("tr-TR") : "18 Mayis 2024 - 14:32";
+  const scoreLabel = isUncertain ? "Düşük Güven" : confidence >= 85 ? "Çok Yüksek" : confidence >= 65 ? "Yüksek" : "Orta";
+  const analysisDate = analysisCompletedAt ? analysisCompletedAt.toLocaleString("tr-TR") : "18 Mayıs 2024 - 14:32";
   const speciesProfile = getSpeciesProfile(detectedSpecies);
   const displaySpecies = result ? getDisplaySpecies(result, speciesProfile) : "Levrek";
-  const primarySpeciesLabel = isUncertain ? "Emin degilim" : displaySpecies;
+  const primarySpeciesLabel = isUncertain ? "Emin değilim" : displaySpecies;
   const scoreRows = getScoreRows(confidence, result, speciesProfile);
   const measurements = getMeasurementsFromResult(result);
   const topPredictionRows = result?.top_predictions.length ? getTopPredictionRows(result) : getFallbackPredictionRows(detectedSpecies, confidence);
   const analysisId = result && file ? `AAS-${file.name.replace(/\W+/g, "-").slice(0, 18).toUpperCase()}` : "AAS-2024-0518-1247";
   const modelName = result ? "EfficientNet + YOLO Fish_Data" : "AquaScope AI v2.4";
   const imageSet = result ? [previewUrl, ...thumbnails] : thumbnails;
+  const stageImage = file ? imageSet[activeImageIndex] ?? previewUrl : previewUrl;
+  const sizeLabels = ["0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60+"];
+  const selectedSizeLabel = sizeLabels[selectedSizeIndex] ?? "40-50";
+  const selectedSizeValue = speciesProfile.distribution[selectedSizeIndex] ?? 0;
+  const scoreChartData = [{ name: "Genel Skor", value: confidence }];
+  const scoreMetricRows = scoreRows.filter((row) => row.label !== "Tür Doğruluk Skoru");
+  const metricSummaryRows = [
+    { label: "Tahmini Boy", value: measurements[1]?.value ?? "42.3 cm", status: "Standart Boy", icon: TrendingUp },
+    { label: "Tahmini Ağırlık", value: speciesProfile.weight ?? "1.68 kg", status: "Tahmini", icon: BarChart3 },
+    { label: "Su Sıcaklığı", value: speciesProfile.environment.temperature, status: "Uygun", icon: Droplets },
+    { label: "Tuzluluk", value: speciesProfile.environment.salinity, status: "Normal", icon: Waves },
+    { label: "pH Değeri", value: speciesProfile.environment.ph, status: "Normal", icon: Ruler },
+    { label: "Oksijen", value: speciesProfile.environment.oxygen, status: "İdeal", icon: Droplets },
+  ];
+  const observationActivity = [
+    { date: "1 May", value: 6 },
+    { date: "4 May", value: 24 },
+    { date: "8 May", value: 39 },
+    { date: "12 May", value: 44 },
+    { date: "15 May", value: 62 },
+    { date: "18 May", value: 78 },
+    { date: "22 May", value: 51 },
+    { date: "26 May", value: 57 },
+    { date: "29 May", value: 43 },
+  ];
+  const mcpIntegrations = [
+    { label: "Ocean Data", icon: Waves },
+    { label: "Species DB", icon: Database },
+    { label: "Weather API", icon: CloudSun },
+    { label: "Marine Maps", icon: MapIcon },
+    { label: "Water Quality", icon: Droplets },
+    { label: "Conservation AI", icon: MapPin },
+  ];
 
   useEffect(() => {
     return () => {
@@ -188,7 +234,14 @@ export default function AnalyzeWorkspace() {
     };
   }, [previewUrl]);
 
+  useEffect(() => {
+    if (!actionMessage) return;
+    const timer = window.setTimeout(() => setActionMessage(null), 2600);
+    return () => window.clearTimeout(timer);
+  }, [actionMessage]);
+
   function selectFile(selected: File | null) {
+    setIsDragging(false);
     setError(null);
     setResult(null);
     setAnalysisCompletedAt(null);
@@ -197,11 +250,17 @@ export default function AnalyzeWorkspace() {
     if (!selected) return;
 
     if (!acceptedTypes.includes(selected.type)) {
-      setError("Lutfen JPG, PNG veya WEBP formatinda bir balik gorseli secin.");
+      setError("Lütfen SVG, PNG, JPG veya GIF formatında bir görsel seçin.");
+      return;
+    }
+
+    if (selected.size > maxSize) {
+      setError(`Görsel boyutu en fazla ${maxSizeMB} MB olabilir.`);
       return;
     }
 
     setFile(selected);
+    setActiveImageIndex(0);
     setPreviewUrl((current) => {
       if (current.startsWith("blob:")) URL.revokeObjectURL(current);
       return URL.createObjectURL(selected);
@@ -214,9 +273,53 @@ export default function AnalyzeWorkspace() {
     event.target.value = "";
   }
 
+  function handleDragEnter(event: DragEvent<HTMLElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(true);
+  }
+
+  function handleDragLeave(event: DragEvent<HTMLElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (event.currentTarget.contains(event.relatedTarget as Node | null)) {
+      return;
+    }
+
+    setIsDragging(false);
+  }
+
+  function handleDragOver(event: DragEvent<HTMLElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = "copy";
+    setIsDragging(true);
+  }
+
+  function handleDrop(event: DragEvent<HTMLElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+    selectFile(event.dataTransfer.files?.[0] ?? null);
+  }
+
+  function removeSelectedImage() {
+    setFile(null);
+    setResult(null);
+    setAnalysisCompletedAt(null);
+    setAnalysisDuration("2.34 saniye");
+    setError(null);
+    setActiveImageIndex(0);
+    setIsImagePreviewOpen(false);
+    setPreviewUrl((current) => {
+      if (current.startsWith("blob:")) URL.revokeObjectURL(current);
+      return "/images/analyze-upload-underwater-bg.png";
+    });
+  }
+
   async function analyzeImage(targetFile = file) {
     if (!targetFile) {
-      setError("Analiz icin once bir balik gorseli secin.");
+      setError("Analiz için önce bir balık görseli seçin.");
       inputRef.current?.click();
       return;
     }
@@ -237,7 +340,7 @@ export default function AnalyzeWorkspace() {
       const data = await response.json();
 
       if (!response.ok) {
-        const message = data?.details?.detail || data?.details?.error || data?.error || "Analiz sirasinda hata olustu.";
+        const message = data?.details?.detail || data?.details?.error || data?.error || "Analiz sırasında hata oluştu.";
         throw new Error(message);
       }
 
@@ -247,133 +350,143 @@ export default function AnalyzeWorkspace() {
       setAnalysisDuration(`${((performance.now() - startedAt) / 1000).toFixed(2)} saniye`);
     } catch (err) {
       await waitForMinimumDuration(startedAt, 2000);
-      setError(err instanceof Error ? err.message : "Bilinmeyen analiz hatasi olustu.");
+      setError(err instanceof Error ? err.message : "Bilinmeyen analiz hatası oluştu.");
     } finally {
       setLoading(false);
     }
   }
 
+  async function handleShareAnalysis() {
+    const shareText = `${displaySpecies} analizi - ${confidenceText} guven skoru`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "AquaScope Analiz", text: shareText });
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareText);
+        setActionMessage("Analiz ozeti panoya kopyalandi.");
+      } else {
+        setActionMessage("Paylasim ozeti hazirlandi.");
+      }
+    } catch {
+      setActionMessage("Paylasim iptal edildi.");
+    }
+  }
+
+  function handleDownloadImage() {
+    if (!file && !previewUrl.startsWith("blob:")) {
+      setActionMessage("Indirmek icin once bir gorsel secin.");
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.href = previewUrl;
+    link.download = file?.name ? `aquascope-${file.name}` : "aquascope-analysis-image.png";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setActionMessage("Gorsel indirme baslatildi.");
+  }
+
+  function handleCreateReport() {
+    setActionMessage(result ? "Analiz raporu hazirlandi." : "Rapor icin once analiz sonucu gerekli.");
+  }
+
   return (
     <section className="fish-analyze-page">
-      <header className="fish-analyze-topbar">
-        <div>
-          <h1>Balik Analizi</h1>
-          <p>Gorsel yukleyin, analiz edin ve detayli sonuclari kesfedin.</p>
-        </div>
-
-        <div className="fish-analyze-actions">
-          <button type="button" className="fish-action-primary" onClick={() => inputRef.current?.click()}>
-            <Upload size={17} />
-            Yeni Analiz
-          </button>
-          <input
-            ref={inputRef}
-            className="fish-upload-input"
-            type="file"
-            accept="image/png,image/jpeg,image/jpg,image/webp"
-            onChange={handleFileChange}
-          />
-          <button type="button" onClick={() => analyzeImage()} disabled={loading}>
-            {loading ? <Loader2 className="fish-spinner" size={17} /> : <Sparkles size={17} />}
-            {loading ? "Analiz Ediliyor" : "Analiz Et"}
-          </button>
-          <button type="button">
-            <FileText size={17} />
-            Rapor Olustur
-          </button>
-          <button type="button" aria-label="Paylas">
-            <Share2 size={17} />
-          </button>
-          <button type="button" aria-label="Indir">
-            <Download size={17} />
-          </button>
-          <button type="button" aria-label="Daha fazla">
-            <MoreVertical size={17} />
-          </button>
-        </div>
-      </header>
-
-      <div className="fish-analyze-flow">
-        {getFlowSteps({ hasFile: Boolean(file), loading, hasResult: Boolean(result) }).map((step, index) => (
-          <div className="fish-flow-segment" key={step.label}>
-            <div className={`fish-flow-step fish-flow-step--${step.status}`}>
-              <span aria-label={step.label}>
-                <step.icon className="fish-flow-step-icon fish-flow-step-icon--default" size={18} />
-                <CheckCircle2 className="fish-flow-step-icon fish-flow-step-icon--complete" size={18} />
-              </span>
-            </div>
-            {index < 2 ? <span className={`fish-flow-connector fish-flow-connector--${step.status}`} aria-hidden="true" /> : null}
-          </div>
-        ))}
-      </div>
+      <input
+        ref={inputRef}
+        className="fish-upload-input"
+        type="file"
+        accept="image/svg+xml,image/png,image/jpeg,image/jpg,image/gif"
+        aria-label="Upload image file"
+        onChange={handleFileChange}
+      />
 
       <main className="fish-analyze-layout">
         <section className="fish-analyze-main">
           <div className={!file ? "fish-hero-card fish-hero-card--upload" : "fish-hero-card"}>
-            <article className={!file ? "fish-image-stage fish-image-stage--empty" : "fish-image-stage"}>
-              <span className="fish-stage-chip">
-                {!file ? <ImageIcon size={15} /> : null}
-                {file ? "Orijinal" : "JPG, PNG, WEBP"}
-              </span>
+            <article
+              className={`${!file ? "fish-image-stage fish-image-stage--empty" : "fish-image-stage"}${isDragging ? " fish-image-stage--dragging" : ""}`}
+              data-dragging={isDragging || undefined}
+              onClick={() => {
+                if (!file) {
+                  inputRef.current?.click();
+                }
+              }}
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+            >
+              {file ? <span className="fish-stage-chip">Orijinal</span> : null}
               {file ? (
                 <span className="fish-stage-secure">
                   <ShieldCheck size={17} />
-                  Yuklemeleriniz guvenli ve gizlidir
+                  Yüklemeleriniz güvenli ve gizlidir
                 </span>
               ) : null}
-              <img src={previewUrl} alt="Analiz edilen balik" />
-              {!file ? (
-                <>
-                  <div className="fish-upload-panel">
-                    <span className="fish-upload-panel__icon">
-                      <Upload size={46} />
-                    </span>
-                    <h2>Gorsel Yukle</h2>
-                    <p>Dosyalari buraya surukleyip birakin veya cihazinizdan secin.</p>
-                    <button type="button" onClick={() => inputRef.current?.click()}>
-                      <Upload size={17} />
-                      Dosya Sec
-                    </button>
-                    <small>Maksimum 20 MB</small>
-                    <div className="fish-upload-features" aria-label="Yukleme ozellikleri">
-                      <article>
-                        <Sparkles size={19} />
-                        <span>Yuksek cozunurlukte<br />daha iyi analiz</span>
-                      </article>
-                      <article>
-                        <Upload size={19} />
-                        <span>Desteklenen formatlar:<br />JPG, PNG, WEBP</span>
-                      </article>
-                      <article>
-                        <ShieldCheck size={19} />
-                        <span>Maksimum dosya boyutu<br />20 MB</span>
-                      </article>
-                      <article>
-                        <ShieldCheck size={19} />
-                        <span>Guvenli ve gizli<br />veri isleme</span>
-                      </article>
-                    </div>
-                  </div>
-                </>
-              ) : null}
-              {result ? (
-                <button type="button" className="fish-stage-new-analysis" onClick={() => inputRef.current?.click()}>
-                  <Upload size={16} />
-                  Yeni Analiz
+              <img src={stageImage} alt="Analiz edilen balık" />
+              {file ? (
+                <button type="button" className="fish-stage-remove-image" onClick={removeSelectedImage} aria-label="Görseli kaldır">
+                  <X size={16} />
                 </button>
               ) : null}
-              <button type="button" className="fish-stage-nav fish-stage-nav--left" aria-label="Onceki">
-                <ArrowLeft size={18} />
-              </button>
-              <button type="button" className="fish-stage-nav fish-stage-nav--right" aria-label="Sonraki">
-                <ArrowRight size={18} />
-              </button>
-              <button type="button" className="fish-stage-expand" aria-label="Gorseli genislet">
+              {!file ? (
+                <div
+                  className="fish-simple-dropzone"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    inputRef.current?.click();
+                  }}
+                >
+                  <span className="fish-upload-panel__icon" aria-hidden="true">
+                    <ImageIcon size={18} />
+                  </span>
+                  <h2>Drop your image here</h2>
+                  <p>SVG, PNG, JPG or GIF (max. {maxSizeMB}MB)</p>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      inputRef.current?.click();
+                    }}
+                  >
+                    <Upload size={17} />
+                    Select image
+                  </button>
+                  {error ? (
+                    <div className="fish-upload-error" role="alert">
+                      <AlertCircle size={14} />
+                      <span>{error}</span>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+
+
+              <button
+                type="button"
+                className="fish-stage-expand"
+                aria-label="Gorseli genislet"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setIsImagePreviewOpen(true);
+                }}
+              >
                 <Maximize2 size={17} />
               </button>
               <div className="fish-thumbs">
                 {imageSet.slice(0, 4).map((image, index) => (
-                  <button className={index === 0 ? "fish-thumb fish-thumb--active" : "fish-thumb"} type="button" key={image}>
+                  <button
+                    className={index === activeImageIndex ? "fish-thumb fish-thumb--active" : "fish-thumb"}
+                    type="button"
+                    key={image}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setActiveImageIndex(index);
+                    }}
+                  >
                     <img src={image} alt="" />
                     {!file ? <span className="fish-thumb-remove" aria-hidden="true">x</span> : null}
                   </button>
@@ -384,7 +497,96 @@ export default function AnalyzeWorkspace() {
               </div>
             </article>
 
-            <article className="fish-score-card">
+            <article className="fish-score-card fish-score-card--recharts">
+              <div className="fish-score-recharts-layout">
+                <section className="fish-score-recharts-main">
+                  <div className="fish-score-recharts-head">
+                    <div>
+                      <h2>Genel Analiz Skoru</h2>
+                    </div>
+                    <span className="fish-score-info" tabIndex={0} aria-label="Genel analiz skoru aciklamasi">
+                      i
+                      <span className="fish-score-info-tooltip" role="tooltip">
+                        AI modelimiz, gorseli analiz ederek habitat, tur ozellikleri ve veri kalitesini degerlendirdi.
+                      </span>
+                    </span>
+                  </div>
+
+                  <div className="fish-score-chart-wrap">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RadialBarChart
+                        data={scoreChartData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius="74%"
+                        outerRadius="96%"
+                        startAngle={90}
+                        endAngle={-270}
+                      >
+                        <defs>
+                          <linearGradient id="fishScoreRadialGradient" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stopColor="#25f4e6" />
+                            <stop offset="48%" stopColor="#27b5ff" />
+                            <stop offset="100%" stopColor="#2563ff" />
+                          </linearGradient>
+                        </defs>
+                        <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
+                        <RadialBar
+                          dataKey="value"
+                          background={{ fill: "rgba(35, 80, 132, 0.45)" }}
+                          cornerRadius={18}
+                          fill="url(#fishScoreRadialGradient)"
+                          isAnimationActive
+                          animationBegin={120}
+                          animationDuration={1000}
+                          animationEasing="ease-out"
+                        />
+                      </RadialBarChart>
+                    </ResponsiveContainer>
+                    <div className="fish-score-chart-center">
+                      <strong>{confidence.toFixed(1)}</strong>
+                      <span>{scoreLabel}</span>
+                      <small>*****</small>
+                    </div>
+                  </div>
+
+                  <div className="fish-score-mini-meta">
+                    <span><CalendarDays size={15} />{analysisDate}</span>
+                    <span><Sparkles size={15} />{modelName}</span>
+                    <span><ShieldCheck size={15} />{isUncertain ? "Dusuk guven" : "Yuksek guven"}</span>
+                  </div>
+                </section>
+
+                <section className="fish-score-recharts-side">
+                  <div className="fish-score-recharts-metrics">
+                    {scoreMetricRows.map((row) => {
+                      const Icon = row.icon;
+                      const value = row.label === "Tur Dogruluk Skoru" ? Math.round(confidence) : row.value;
+                      const description = "description" in row ? row.description : getScoreDescription(row.label);
+                      return (
+                        <div className="fish-score-recharts-row" key={row.label}>
+                          <span className="fish-score-recharts-icon"><Icon size={20} /></span>
+                          <span className="fish-score-recharts-copy">
+                            <strong>{row.label}</strong>
+                            <small>{description}</small>
+                          </span>
+                          <b>{value} / 100</b>
+                          <i><em style={{ width: `${value}%` }} /></i>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="fish-score-recharts-callout">
+                    <Sparkles size={22} />
+                    <span>
+                      <strong>{isUncertain ? "Daha fazla veri gerekli" : "Harika bir analiz!"}</strong>
+                    </span>
+                    <TrendingUp size={20} />
+                  </div>
+                  {error ? <p className="fish-analyze-error">{error}</p> : null}
+                </section>
+              </div>
               <div className="fish-score-head">
                 <h2>Genel Analiz Skoru</h2>
                 <span>i</span>
@@ -394,20 +596,21 @@ export default function AnalyzeWorkspace() {
                   <div>
                     <strong>{confidence.toFixed(1)}</strong>
                     <span>{scoreLabel}</span>
+                    <small className="fish-score-stars" aria-label="Bes yildizli analiz skoru">★★★★★</small>
                   </div>
                 </div>
                 <div className="fish-score-copy">
                   <p>
                     {result
                       ? isUncertain
-                        ? `Model bu gorsel icin yeterli guvene ulasamadi. En yakin tahmin ${displaySpecies} (${confidenceText}).`
-                        : `${displaySpecies} turu ${confidenceText} guven skoru ile tespit edildi.`
-                      : "Bir balik gorseli secip analiz ettiginde model sonucu burada guncellenir."}
+                        ? `Model bu görsel için yeterli güvene ulaşamadı. En yakın tahmin ${displaySpecies} (${confidenceText}).`
+                        : `${displaySpecies} türü ${confidenceText} güven skoru ile tespit edildi.`
+                      : "Bir balik görseli seçip analiz ettiğinde model sonucu burada güncellenir."}
                   </p>
                   <div className="fish-score-list">
                     {scoreRows.map((row) => {
                       const Icon = row.icon;
-                      const value = row.label === "Tur Dogruluk Skoru" ? Math.round(confidence) : row.value;
+                      const value = row.label === "Tür Doğruluk Skoru" ? Math.round(confidence) : row.value;
                       return (
                         <div className="fish-score-row" key={row.label}>
                           <Icon size={16} />
@@ -424,120 +627,177 @@ export default function AnalyzeWorkspace() {
               <div className="fish-meta-grid">
                 <Metric icon={Target} label="Analiz ID" value={analysisId} />
                 <Metric icon={CalendarDays} label="Analiz Tarihi" value={analysisDate} />
-                <Metric icon={BarChart3} label="Analiz Suresi" value={loading ? "Analiz ediliyor" : analysisDuration} />
+                <Metric icon={BarChart3} label="Analiz Süresi" value={loading ? "Analiz ediliyor" : analysisDuration} />
                 <Metric icon={Sparkles} label="Model" value={modelName} />
               </div>
             </article>
           </div>
 
-          <nav className="fish-tabs" aria-label="Analiz detaylari">
-            {["Detayli Analiz", "Olcumler", "Habitat & Cevre", "Saglik Raporu"].map((tab, index) => (
-              <button className={index === 0 ? "fish-tab fish-tab--active" : "fish-tab"} type="button" key={tab}>{tab}</button>
-            ))}
-          </nav>
-
-          <section className="fish-detail-grid">
-            <article className="fish-panel fish-measure-panel">
-              <h2>Morfometrik Olcumler</h2>
-              <FishMorphometricViewer species={displaySpecies} measurements={measurements} />
-              <p className="fish-panel-note">Olcumler tahmini degerlerdir ve +- %3 hata payi icerebilir.</p>
+          <section className="fish-insights-board" aria-label="Analiz metrikleri">
+            <article className="fish-insight-card fish-metric-summary-card">
+              <h2>Metrik Özeti</h2>
+              <div className="fish-metric-summary-grid">
+                {metricSummaryRows.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div className="fish-metric-summary-item" key={item.label}>
+                      <Icon size={19} />
+                      <span>{item.label}</span>
+                      <strong>{item.value}</strong>
+                      <small>{item.status}</small>
+                    </div>
+                  );
+                })}
+              </div>
             </article>
 
-            <article className="fish-panel fish-color-panel">
-              <h2>Renk Analizi</h2>
-              <div className="fish-color-body">
-                <div className="fish-donut" />
-                <ul>
-                  {speciesProfile.colors.map((item) => (
-                    <li key={item}><span />{item}</li>
+            <div className="fish-insight-mid-grid">
+              <article className="fish-insight-card fish-size-distribution-card">
+                <h2>Boy Dağılımı</h2>
+                <span className="fish-axis-unit">(%)</span>
+                <div className="fish-size-chart">
+                  {speciesProfile.distribution.map((height, index) => (
+                    <button
+                      className={index === selectedSizeIndex ? "fish-size-column fish-size-column--active" : "fish-size-column"}
+                      style={{ height: `${height}%` }}
+                      key={index}
+                      type="button"
+                      onClick={() => setSelectedSizeIndex(index)}
+                      aria-label={`${sizeLabels[index]} cm araligi, yuzde ${height}`}
+                    >
+                      {index === selectedSizeIndex ? <em>{selectedSizeLabel} cm<br /><b>%{selectedSizeValue}</b></em> : null}
+                    </button>
                   ))}
-                </ul>
-              </div>
-            </article>
-
-            <article className="fish-panel fish-bars-panel">
-              <h2>Boy Dagilimi</h2>
-              <div className="fish-bars">
-                {speciesProfile.distribution.map((height, index) => (
-                  <span className={index === 3 ? "fish-bar fish-bar--active" : "fish-bar"} style={{ height: `${height}%` }} key={index} />
-                ))}
-              </div>
-              <div className="fish-bar-labels">
-                {["0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60+"].map((label) => <span key={label}>{label}</span>)}
-              </div>
-              <p>Ortalama Boy: {measurements[1]?.value ?? "38.7 cm"}</p>
-            </article>
-
-            <article className="fish-panel fish-location-panel">
-              <h2>Konum Bilgisi</h2>
-              <div className="fish-location-map">
-                <div className="fish-location-pin">
-                  <MapPin size={18} />
-                  <strong>{speciesProfile.location}</strong>
-                  <span>{speciesProfile.coordinates}</span>
                 </div>
-              </div>
-              <div className="fish-env-grid">
-                <Env icon={Droplets} label="Su Sicakligi" value={speciesProfile.environment.temperature} />
-                <Env icon={Waves} label="Tuzluluk" value={speciesProfile.environment.salinity} />
-                <Env icon={Ruler} label="pH Degeri" value={speciesProfile.environment.ph} />
-                <Env icon={Droplets} label="Oksijen" value={speciesProfile.environment.oxygen} />
-                <div className="fish-habitat-score">
-                  <span>Habitat Uygunlugu</span>
-                  <strong>{speciesProfile.environment.habitat}</strong>
-                  <i><b style={{ width: `${speciesProfile.environment.habitatScore}%` }} /></i>
-                  <small>{speciesProfile.environment.habitatScore} / 100</small>
+                <div className="fish-size-labels">
+                  {sizeLabels.map((label) => <span className={label === selectedSizeLabel ? "fish-size-label--active" : ""} key={label}>{label}</span>)}
+                  <small>(cm)</small>
                 </div>
+              </article>
+
+              <article className="fish-insight-card fish-observation-card">
+                <div className="fish-observation-head">
+                  <h2>Gözlem Aktivitesi</h2>
+                  <button type="button" onClick={() => setObservationRange((current) => current === "month" ? "week" : "month")}>
+                    {observationRange === "month" ? "Bu Ay" : "Bu Hafta"} <ChevronRight size={14} />
+                  </button>
+                </div>
+                <span className="fish-axis-unit">Gözlem Sayısı</span>
+                <div className="fish-observation-chart">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={observationActivity} margin={{ top: 8, right: 10, bottom: 0, left: -18 }}>
+                      <defs>
+                        <linearGradient id="fishObservationGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#16e1db" stopOpacity={0.46} />
+                          <stop offset="100%" stopColor="#16e1db" stopOpacity={0.02} />
+                        </linearGradient>
+                      </defs>
+                      <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: "#8da5c6", fontSize: 10 }} interval={1} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fill: "#8da5c6", fontSize: 10 }} domain={[0, 80]} ticks={[0, 20, 40, 60]} />
+                      <Area
+                        type="monotone"
+                        dataKey="value"
+                        stroke="#17e4de"
+                        strokeWidth={2.2}
+                        fill="url(#fishObservationGradient)"
+                        dot={{ r: 3, fill: "#17e4de", stroke: "#07253e", strokeWidth: 1 }}
+                        activeDot={{ r: 5, fill: "#67fff5", stroke: "#0b3152", strokeWidth: 2 }}
+                        isAnimationActive
+                        animationDuration={900}
+                        animationEasing="ease-out"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </article>
+            </div>
+
+            <article className="fish-insight-card fish-mcp-card">
+              <h2>MCP Entegrasyonları</h2>
+              <div className="fish-mcp-grid">
+                {mcpIntegrations.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div className="fish-mcp-item" key={item.label}>
+                      <Icon size={21} />
+                      <span>{item.label}</span>
+                      <small><i />Aktif</small>
+                    </div>
+                  );
+                })}
               </div>
             </article>
           </section>
         </section>
 
         <aside className="fish-analyze-rail">
+          <div className="fish-rail-actions" aria-label="Analiz aksiyonları">
+            <button type="button" className="fish-action-primary" onClick={() => analyzeImage()} disabled={loading} aria-label={loading ? "Analiz ediliyor" : "Analiz et"}>
+              {loading ? <Loader2 className="fish-spinner" size={17} /> : <Sparkles size={17} />}
+            </button>
+            <button type="button" aria-label="Rapor oluştur" onClick={handleCreateReport}>
+              <FileText size={17} />
+            </button>
+            <button type="button" aria-label="Paylaş" onClick={() => void handleShareAnalysis()}>
+              <Share2 size={17} />
+            </button>
+            <button type="button" aria-label="İndir" onClick={handleDownloadImage}>
+              <Download size={17} />
+            </button>
+            <button type="button" aria-label="Daha fazla" onClick={() => setIsMoreActionsOpen((current) => !current)}>
+              <MoreVertical size={17} />
+            </button>
+            {isMoreActionsOpen ? (
+              <div className="fish-more-actions" role="menu">
+                <button type="button" onClick={() => { setActionMessage("Analiz arsive eklendi."); setIsMoreActionsOpen(false); }}>Arsive ekle</button>
+                <button type="button" onClick={() => { setActionMessage("Karsilastirma listesine eklendi."); setIsMoreActionsOpen(false); }}>Karsilastir</button>
+              </div>
+            ) : null}
+          </div>
           <article className="fish-panel fish-species-card">
             <div className="fish-rail-head">
-              <h2>Tespit Edilen Tur</h2>
-              <span>{loading ? "Analiz Ediliyor" : result ? (isUncertain ? "Dusuk Guven" : "Birincil Eslesme") : "Sonuc Bekleniyor"}</span>
+              <h2>Tespit Edilen Tür</h2>
+              <span>{loading ? "Analiz Ediliyor" : result ? (isUncertain ? "Düşük Güven" : "Birincil Eşleşme") : "Sonuç Bekleniyor"}</span>
             </div>
             <div className={`fish-species-main ${loading ? "fish-species-main--loading" : ""}`}>
               <img src={previewUrl} alt="" />
               <div>
-                <strong>{loading ? "Model calisiyor" : primarySpeciesLabel}</strong>
+                <strong>{loading ? "Model çalışıyor" : primarySpeciesLabel}</strong>
                 <small>{speciesProfile.latin}</small>
                 <em className={isUncertain ? "fish-confidence-low" : ""}>
-                  {loading ? "Analiz suruyor" : isUncertain ? `${confidenceText} dusuk guven` : `${confidenceText} Guven`}
+                  {loading ? "Analiz sürüyor" : isUncertain ? `${confidenceText} düşük güven` : `${confidenceText} Güven`}
                 </em>
               </div>
             </div>
             <p>
               {loading
-                ? "Yuklenen gorsel model tarafindan isleniyor. Tespit sonucu tamamlandiginda bu kart otomatik guncellenecek."
+                ? "Yüklenen görsel model tarafından işleniyor. Tespit sonucu tamamlandığında bu kart otomatik güncellenecek."
                 : result
                 ? isUncertain
-                  ? `Tahmin guveni %${confidenceThreshold.toFixed(0)} esiginin altinda. Sonucu dogrulamak icin alternatif eslesmeleri kontrol edin.`
-                  : `${speciesProfile.description} Ideal boy: ${result.ideal_size}. Onerilen yem: ${result.recommended_baits.join(", ")}.`
+                  ? `Tahmin güveni %${confidenceThreshold.toFixed(0)} esiğinin altında. Sonucu doğrulamak için alternatif eşleşmeleri kontrol edin.`
+                  : `${speciesProfile.description} İdeal boy: ${result.ideal_size}. Önerilen yem: ${result.recommended_baits.join(", ")}.`
                 : speciesProfile.description}
             </p>
             <div className="fish-detection-summary">
               <span>
-                Birincil tur
+                Birincil tür
                 <strong>{loading ? "Bekleniyor" : displaySpecies}</strong>
               </span>
               <span>
-                Guven skoru
+                Güven skoru
                 <strong>{loading ? "-" : confidenceText}</strong>
               </span>
             </div>
             <div className={isUncertain ? "fish-confidence-state fish-confidence-state--low" : "fish-confidence-state"}>
               <span>Karar durumu</span>
-              <strong>{loading ? "Analiz bekleniyor" : isUncertain ? "Emin degilim" : "Yeterli guven"}</strong>
+              <strong>{loading ? "Analiz bekleniyor" : isUncertain ? "Emin değilim" : "Yeterli güven"}</strong>
               <small>
                 {result
-                  ? `Esik %${confidenceThreshold.toFixed(0)} - birincil skor ${confidenceText}`
-                  : "Sonuc geldiginde model karari burada gorunur."}
+                  ? `Eşik %${confidenceThreshold.toFixed(0)} - birincil skor ${confidenceText}`
+                  : "Sonuç geldiğinde model kararı burada görünür."}
               </small>
             </div>
-            <button type="button">Tur Detayina Git <ChevronRight size={17} /></button>
+            <button type="button" onClick={() => setActionMessage(`${displaySpecies} tur detayi acildi.`)}>Tür Detayına Git <ChevronRight size={17} /></button>
 
             <h3>Top-5 Tahminler</h3>
             <div className="fish-alt-list">
@@ -549,40 +809,45 @@ export default function AnalyzeWorkspace() {
                 </div>
               ))}
             </div>
-            <button type="button">Tum Turleri Gor <ChevronRight size={17} /></button>
+            <button type="button" onClick={() => setActionMessage("Tür kütüphanesi bağlantısı hazır.")}>Tüm Türleri Gör <ChevronRight size={17} /></button>
           </article>
         </aside>
       </main>
+
+      {isImagePreviewOpen ? (
+        <div className="fish-preview-modal" role="dialog" aria-modal="true" aria-label="Görsel önizleme" onClick={() => setIsImagePreviewOpen(false)}>
+          <button type="button" className="fish-preview-close" aria-label="Önizlemeyi kapat" onClick={() => setIsImagePreviewOpen(false)}>
+            <X size={18} />
+          </button>
+          <button
+            type="button"
+            className="fish-preview-nav fish-preview-nav--left"
+            aria-label="Önceki görsel"
+            onClick={(event) => {
+              event.stopPropagation();
+              setActiveImageIndex((current) => (current <= 0 ? imageSet.length - 1 : current - 1));
+            }}
+          >
+            <ChevronRight size={20} />
+          </button>
+          <img src={stageImage} alt="Büyük analiz görseli" onClick={(event) => event.stopPropagation()} />
+          <button
+            type="button"
+            className="fish-preview-nav fish-preview-nav--right"
+            aria-label="Sonraki görsel"
+            onClick={(event) => {
+              event.stopPropagation();
+              setActiveImageIndex((current) => (current + 1) % imageSet.length);
+            }}
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+      ) : null}
+
+      {actionMessage ? <div className="fish-action-toast" role="status">{actionMessage}</div> : null}
     </section>
   );
-}
-
-function getFlowSteps({
-  hasFile,
-  loading,
-  hasResult,
-}: {
-  hasFile: boolean;
-  loading: boolean;
-  hasResult: boolean;
-}) {
-  return [
-    {
-      label: "Gorsel Yukleme",
-      status: hasFile ? "completed" : "active",
-      icon: Upload,
-    },
-    {
-      label: "AI Analiz",
-      status: loading ? "active" : hasResult ? "completed" : "pending",
-      icon: Sparkles,
-    },
-    {
-      label: "Sonuclar",
-      status: hasResult ? "active" : "pending",
-      icon: Target,
-    },
-  ];
 }
 
 function waitForMinimumDuration(startedAt: number, minimumMs: number) {
@@ -619,7 +884,7 @@ function normalizeAnalyzeResponse(data: unknown): AnalyzeResponse {
     ideal_size: readString(payload, "ideal_size") || "Bilinmiyor",
     recommended_baits: recommendedBaits.length ? recommendedBaits : ["Bilgi yok"],
     recommended_gear: recommendedGear.length ? recommendedGear : ["Bilgi yok"],
-    region_notes: regionNotes.length ? regionNotes : ["Bolge bilgisi yok"],
+    region_notes: regionNotes.length ? regionNotes : ["Bölge bilgisi yok"],
   };
 }
 
@@ -713,8 +978,8 @@ function getSpeciesProfile(species: string): SpeciesProfile {
   return speciesProfiles[key] ?? {
     commonName: prettifySpeciesName(species),
     latin: "Model tahmini",
-    description: `${species} icin model tarafindan olusturulan birincil eslesme sonucu gosteriliyor.`,
-    location: "Turkiye Denizleri",
+    description: `${species} için model tarafından oluşturulan birincil eşleşme sonucu gösteriliyor.`,
+    location: "Türk Denizleri",
     coordinates: "39.000 N, 35.000 E",
     environment: {
       temperature: "17.8 C",
@@ -724,7 +989,7 @@ function getSpeciesProfile(species: string): SpeciesProfile {
       habitat: "Uygun",
       habitatScore: 86,
     },
-    colors: ["Gumus %44", "Mavi-Gri %23", "Beyaz %16", "Koyu Ton %10", "Diger %7"],
+    colors: ["Gümüş %44", "Mavi-Gri %23", "Beyaz %16", "Koyu Ton %10", "Diğer %7"],
     distribution: [10, 24, 48, 74, 58, 32, 16],
   };
 }
@@ -735,11 +1000,21 @@ function getScoreRows(confidence: number, result: AnalyzeResponse | null, profil
   const healthScore = result?.edible ? Math.max(82, Math.min(98, speciesScore + 1)) : Math.max(62, Math.min(86, speciesScore - 6));
 
   return [
-    { label: "Saglik Durumu", value: healthScore, icon: Droplets, tone: "green" },
-    { label: "Habitat Uygunlugu", value: profile.environment.habitatScore, icon: MapPin, tone: "green" },
-    { label: "Gorsel Kalite", value: visualQuality, icon: Camera, tone: "purple" },
-    { label: "Tur Dogruluk Skoru", value: speciesScore, icon: Target, tone: "blue" },
-  ];
+    { label: "Sağlık Durumu", value: healthScore, icon: Droplets, tone: "green" },
+    { label: "Habitat Uygunluğu", value: profile.environment.habitatScore, icon: MapPin, tone: "green" },
+    { label: "Görsel Kalite", value: visualQuality, icon: Camera, tone: "purple" },
+    ];
+}
+
+function getScoreDescription(label: string) {
+  const descriptions: Record<string, string> = {
+    "Sağlık Durumu": "Kondisyon",
+    "Habitat Uygunluğu": "Yaşam alanı",
+    "Görsel Kalite": "Çözünürlük",
+    "Tür Doğruluk Skoru": "Tur tahmininin dogruluk seviyesi",
+  };
+
+  return descriptions[label] ?? "Analiz metrik degeri";
 }
 
 function getMeasurementsFromResult(result: AnalyzeResponse | null) {
@@ -754,10 +1029,10 @@ function getMeasurementsFromResult(result: AnalyzeResponse | null) {
   return [
     { label: "Toplam Boy", value: formatCm(totalLength), x: 28, y: 40 },
     { label: "Standart Boy", value: formatCm(standardLength), x: 420, y: 40 },
-    { label: "Catal Boy", value: formatCm(forkLength), x: 420, y: 232 },
-    { label: "Vucut Yuksekligi", value: formatCm(bodyHeight), x: 238, y: 70 },
-    { label: "Bas Uzunlugu", value: formatCm(headLength), x: 92, y: 168 },
-    { label: "Goz Capi", value: formatCm(eyeDiameter), x: 103, y: 113 },
+    { label: "Çatal Boy", value: formatCm(forkLength), x: 420, y: 232 },
+    { label: "Vücut Yuksekligi", value: formatCm(bodyHeight), x: 238, y: 70 },
+    { label: "Baş Uzunlugu", value: formatCm(headLength), x: 92, y: 168 },
+    { label: "Göz Çapı", value: formatCm(eyeDiameter), x: 103, y: 113 },
   ];
 }
 
@@ -822,16 +1097,6 @@ function getTopPredictionRows(result: AnalyzeResponse): PredictionDisplay[] {
 function Metric({ icon: Icon, label, value }: { icon: ElementType; label: string; value: string }) {
   return (
     <div className="fish-meta-item">
-      <Icon size={16} />
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
-  );
-}
-
-function Env({ icon: Icon, label, value }: { icon: ElementType; label: string; value: string }) {
-  return (
-    <div className="fish-env-item">
       <Icon size={16} />
       <span>{label}</span>
       <strong>{value}</strong>
