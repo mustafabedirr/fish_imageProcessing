@@ -678,7 +678,7 @@ export default function SocialAreaWorkspace() {
       fetch("/api/posts", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ userId: user.id, body: text, kind: "text", tags }),
+        body: JSON.stringify({ body: text, kind: "text", tags }),
       }).catch(() => setNotice("Paylasim yerel olarak eklendi, backend kaydi daha sonra tekrar denenebilir."));
     }
   };

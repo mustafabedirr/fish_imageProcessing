@@ -36,6 +36,7 @@ export function useCurrentUser() {
   }, []);
 
   const logout = useCallback(() => {
+    fetch("/api/auth", { method: "DELETE" }).catch(() => undefined);
     clearStoredUser();
     setUser(null);
   }, []);

@@ -1,5 +1,6 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createPost, listPosts } from "../../../lib/server/aquascope-db";
+import { requireSessionUser } from "../../../lib/server/auth-session";
 import { validatePostBody } from "../../../lib/validation/post-schema";
 
 export async function GET() {
@@ -16,9 +17,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error }, { status: 400 });
   }
 
+  const sessionUser = await requireSessionUser(request);
+  if (!sessionUser) {
+    return NextResponse.json({ error: "Paylasim yapmak icin oturum acin." }, { status: 401 });
+  }
+
   try {
     const post = await createPost({
-      userId: String(body?.userId ?? ""),
+      userId: sessionUser.id,
       body: postBody,
       kind: body?.kind,
       tags: Array.isArray(body?.tags) ? body.tags.map(String) : [],
