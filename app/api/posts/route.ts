@@ -3,7 +3,19 @@ import { createPost, listPosts } from "../../../lib/server/aquascope-db";
 import { requireSessionUser } from "../../../lib/server/auth-session";
 import { validatePostBody } from "../../../lib/validation/post-schema";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const feed = request.nextUrl.searchParams.get("feed");
+
+  if (feed === "following") {
+    const sessionUser = await requireSessionUser(request);
+    if (!sessionUser) {
+      return NextResponse.json({ error: "Takip ettiklerinizin akisini gormek icin oturum acin." }, { status: 401 });
+    }
+
+    const posts = await listPosts({ viewerId: sessionUser.id, followingOnly: true });
+    return NextResponse.json({ posts });
+  }
+
   const posts = await listPosts();
   return NextResponse.json({ posts });
 }

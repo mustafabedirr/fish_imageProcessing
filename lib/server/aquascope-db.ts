@@ -324,9 +324,15 @@ export async function updateSettings(userId: string, patch: Partial<StoredSettin
   return mapSettings(settings);
 }
 
-export async function listPosts() {
+export async function listPosts(options: { viewerId?: string | null; followingOnly?: boolean } = {}) {
   await ensureSeedData();
+
+  const followedUserIds = options.viewerId && options.followingOnly
+    ? (await prisma.follow.findMany({ where: { followerId: options.viewerId }, select: { followingId: true } })).map((follow) => follow.followingId)
+    : [];
+
   const posts = await prisma.socialPost.findMany({
+    where: options.followingOnly ? { userId: { in: followedUserIds } } : undefined,
     include: { user: { include: { profile: true } } },
     orderBy: { createdAt: "desc" },
   });

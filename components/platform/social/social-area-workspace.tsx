@@ -583,8 +583,8 @@ const interactionComments = [
 const feedTabs = ["For You", "Following", "Popular", "Groups", "Saved"] as const;
 type FeedTab = (typeof feedTabs)[number];
 const feedTabLabels: Record<FeedTab, string> = {
-  "For You": "For You",
-  Following: "Following",
+  "For You": "Tum Gonderiler",
+  Following: "Takip Ettiklerim",
   Popular: "Popular",
   Groups: "Groups",
   Saved: "Saved",
@@ -685,22 +685,30 @@ export default function SocialAreaWorkspace() {
 
   useEffect(() => {
     let cancelled = false;
+    const endpoint = activeTab === "Following" ? "/api/posts?feed=following" : "/api/posts";
 
-    fetch("/api/posts")
+    fetch(endpoint)
       .then(async (response) => {
         const data = await response.json().catch(() => null);
         if (!response.ok) throw new Error(String(data?.error ?? "Feed yuklenemedi."));
         const apiPosts = Array.isArray(data?.posts) ? data.posts.map(mapApiPost) : [];
-        if (!cancelled) setPosts(apiPosts.length ? apiPosts : feedPosts);
+        if (!cancelled) {
+          setPosts(activeTab === "Following" ? apiPosts : (apiPosts.length ? apiPosts : feedPosts));
+          setNotice(activeTab === "Following" && apiPosts.length === 0 ? "Takip ettiginiz kullanicilardan henuz paylasim yok." : "Topluluk akisiniz hazir.");
+        }
       })
       .catch(() => {
-        if (!cancelled) setNotice("Gercek feed verisi alinamadi, demo akisi gosteriliyor.");
+        if (!cancelled) {
+          setNotice(activeTab === "Following" ? "Takip akisini gormek icin oturum acin." : "Gercek feed verisi alinamadi, demo akisi gosteriliyor.");
+          if (activeTab === "Following") setPosts([]);
+          else setPosts(feedPosts);
+        }
       });
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [activeTab]);
 
   const visiblePosts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -708,10 +716,6 @@ export default function SocialAreaWorkspace() {
       if (!query) return true;
       return [post.author, post.handle, post.text, ...post.tags].some((value) => value.toLowerCase().includes(query));
     });
-
-    if (activeTab === "Following") {
-      return searched.filter((post) => ["Lily Edmonds", "James Mitchell"].includes(post.author));
-    }
 
     if (activeTab === "Popular") {
       return [...searched].sort((a, b) => b.likes - a.likes);
