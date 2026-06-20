@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ posts });
   }
 
-  const posts = await listPosts();
+  const sessionUser = await requireSessionUser(request);
+  const posts = await listPosts({ viewerId: sessionUser?.id });
   return NextResponse.json({ posts });
 }
 

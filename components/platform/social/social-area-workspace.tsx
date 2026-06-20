@@ -57,6 +57,8 @@ type SocialPost = {
   tags: string[];
   likes: number;
   comments: number;
+  likedByViewer?: boolean;
+  savedByViewer?: boolean;
   photos: string[];
   location?: string;
   profile?: {
@@ -85,6 +87,8 @@ type ApiFeedPost = {
   region?: string;
   likes: number;
   comments: number;
+  likedByViewer?: boolean;
+  savedByViewer?: boolean;
   createdAt: string;
   author: string;
   handle: string;
@@ -118,6 +122,8 @@ function mapApiPost(post: ApiFeedPost): SocialPost {
     tags: post.tags ?? [],
     likes: post.likes,
     comments: post.comments,
+    likedByViewer: post.likedByViewer,
+    savedByViewer: post.savedByViewer,
     photos: post.mediaUrls ?? [],
     location: post.region,
     profile: post.authorProfile,
@@ -691,9 +697,12 @@ export default function SocialAreaWorkspace() {
       .then(async (response) => {
         const data = await response.json().catch(() => null);
         if (!response.ok) throw new Error(String(data?.error ?? "Feed yuklenemedi."));
-        const apiPosts = Array.isArray(data?.posts) ? data.posts.map(mapApiPost) : [];
+        const rawPosts: ApiFeedPost[] = Array.isArray(data?.posts) ? data.posts : [];
+        const apiPosts = rawPosts.map(mapApiPost);
         if (!cancelled) {
           setPosts(activeTab === "Following" ? apiPosts : (apiPosts.length ? apiPosts : feedPosts));
+          setLikedPosts(Object.fromEntries(rawPosts.filter((post) => post.likedByViewer).map((post) => [post.id, true])));
+          setBookmarkedPosts(Object.fromEntries(rawPosts.filter((post) => post.savedByViewer).map((post) => [post.id, true])));
           setNotice(activeTab === "Following" && apiPosts.length === 0 ? "Takip ettiginiz kullanicilardan henuz paylasim yok." : "Topluluk akisiniz hazir.");
         }
       })
@@ -728,6 +737,57 @@ export default function SocialAreaWorkspace() {
     return [...searched].sort((a, b) => Number(featuredDemoPostIds.has(b.id)) - Number(featuredDemoPostIds.has(a.id)));
   }, [activeTab, bookmarkedPosts, posts, searchQuery]);
 
+
+  const updatePostCount = (postId: string, patch: Partial<Pick<SocialPost, "likes" | "comments">>) => {
+    setPosts((current) => current.map((post) => (post.id === postId ? { ...post, ...patch } : post)));
+  };
+
+  const togglePostLike = (postId: string) => {
+    const nextActive = !likedPosts[postId];
+    const targetPost = posts.find((post) => post.id === postId) ?? visiblePosts.find((post) => post.id === postId);
+    setLikedPosts((current) => ({ ...current, [postId]: nextActive }));
+    if (targetPost) updatePostCount(postId, { likes: Math.max(0, targetPost.likes + (nextActive ? 1 : -1)) });
+    fetch(`/api/posts/${postId}/like`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ active: nextActive }),
+    })
+      .then(async (response) => {
+        const data = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(String(data?.error ?? "Begeni kaydedilemedi."));
+        if (typeof data?.likes === "number") updatePostCount(postId, { likes: data.likes });
+      })
+      .catch(() => setNotice("Begeni kaydedilemedi. Oturumunuzu kontrol edin."));
+  };
+
+  const togglePostSave = (postId: string) => {
+    const nextActive = !bookmarkedPosts[postId];
+    setBookmarkedPosts((current) => ({ ...current, [postId]: nextActive }));
+    fetch(`/api/posts/${postId}/save`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ active: nextActive }),
+    }).catch(() => setNotice("Kaydetme islemi tamamlanamadi. Oturumunuzu kontrol edin."));
+  };
+
+  const submitPostComment = (postId: string, body: string) => {
+    const targetPost = visiblePosts.find((post) => post.id === postId) ?? posts.find((post) => post.id === postId);
+    setCommentCounts((current) => ({ ...current, [postId]: (current[postId] ?? targetPost?.comments ?? 0) + 1 }));
+    fetch(`/api/posts/${postId}/comments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ body }),
+    })
+      .then(async (response) => {
+        const data = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(String(data?.error ?? "Yorum kaydedilemedi."));
+        if (typeof data?.comment?.comments === "number") {
+          setCommentCounts((current) => ({ ...current, [postId]: data.comment.comments }));
+          updatePostCount(postId, { comments: data.comment.comments });
+        }
+      })
+      .catch(() => setNotice("Yorum kaydedilemedi. Oturumunuzu kontrol edin."));
+  };
   const createPost = async () => {
     const text = composerText.trim();
     if (!text) {
@@ -928,7 +988,7 @@ export default function SocialAreaWorkspace() {
                     aria-label="Bookmark post"
                     onClick={(event) => {
                       event.stopPropagation();
-                      setBookmarkedPosts((current) => ({ ...current, [post.id]: !current[post.id] }));
+                      togglePostSave(post.id);
                     }}
                   >
                     <Bookmark size={18} />
@@ -1003,7 +1063,7 @@ export default function SocialAreaWorkspace() {
                     aria-pressed={Boolean(likedPosts[post.id])}
                     onClick={(event) => {
                       event.stopPropagation();
-                      setLikedPosts((current) => ({ ...current, [post.id]: !current[post.id] }));
+                      togglePostLike(post.id);
                     }}
                   >
                     <Heart size={18} />
@@ -1012,7 +1072,7 @@ export default function SocialAreaWorkspace() {
                       <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=48&q=80" alt="" />
                       <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=48&q=80" alt="" />
                     </span>
-                    {post.likes + (likedPosts[post.id] ? 1 : 0)}
+                    {post.likes}
                   </button>
                   <button
                     className="social-post-action"
@@ -1136,24 +1196,25 @@ export default function SocialAreaWorkspace() {
           post={visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]}
           isBookmarked={Boolean(activeFlowPostId && bookmarkedPosts[activeFlowPostId])}
           isLiked={Boolean(activeFlowPostId && likedPosts[activeFlowPostId])}
-          likeCount={(visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).likes + (activeFlowPostId && likedPosts[activeFlowPostId] ? 1 : 0)}
+          likeCount={(visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).likes}
           commentCount={activeFlowPostId ? (commentCounts[activeFlowPostId] ?? (visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).comments) : 0}
+          currentUserName={currentUserName}
+          currentUserAvatar={currentUserAvatar}
           onClose={closeModal}
           onToggleBookmark={() => {
             const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? posts[0]?.id;
             if (!targetPostId) return;
-            setBookmarkedPosts((current) => ({ ...current, [targetPostId]: !current[targetPostId] }));
+            togglePostSave(targetPostId);
           }}
           onToggleLike={() => {
             const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? posts[0]?.id;
             if (!targetPostId) return;
-            setLikedPosts((current) => ({ ...current, [targetPostId]: !current[targetPostId] }));
+            togglePostLike(targetPostId);
           }}
-          onSubmitComment={() => {
+          onSubmitComment={(comment) => {
             const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? posts[0]?.id;
             if (!targetPostId) return;
-            const targetPost = visiblePosts.find((post) => post.id === targetPostId) ?? posts.find((post) => post.id === targetPostId);
-            setCommentCounts((current) => ({ ...current, [targetPostId]: (current[targetPostId] ?? targetPost?.comments ?? 0) + 1 }));
+            submitPostComment(targetPostId, comment);
           }}
         />
       ) : activeModal ? (
@@ -1483,6 +1544,8 @@ function PostInteractionModal({
   isLiked,
   likeCount,
   commentCount,
+  currentUserName,
+  currentUserAvatar,
   onClose,
   onToggleBookmark,
   onToggleLike,
@@ -1493,10 +1556,12 @@ function PostInteractionModal({
   isLiked: boolean;
   likeCount: number;
   commentCount: number;
+  currentUserName: string;
+  currentUserAvatar: string;
   onClose: () => void;
   onToggleBookmark: () => void;
   onToggleLike: () => void;
-  onSubmitComment: () => void;
+  onSubmitComment: (comment: string) => void;
 }) {
   const [comment, setComment] = useState("");
   const primaryPhoto = post.photos[0];
@@ -1505,7 +1570,7 @@ function PostInteractionModal({
 
   const handleSubmit = () => {
     if (!comment.trim()) return;
-    onSubmitComment();
+    onSubmitComment(comment.trim());
     setComment("");
   };
 

@@ -46,6 +46,8 @@ export type StoredSocialPost = {
   species?: string;
   likes: number;
   comments: number;
+  likedByViewer?: boolean;
+  savedByViewer?: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -123,6 +125,38 @@ function mapUser(user: User, profile?: Profile | null): AquaScopeUser {
   };
 }
 
+
+async function ensureInteractionTables() {
+  await prisma.$executeRawUnsafe(`CREATE TABLE IF NOT EXISTS "post_likes" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "postId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "post_likes_postId_fkey" FOREIGN KEY ("postId") REFERENCES "SocialPost" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "post_likes_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+  )`);
+  await prisma.$executeRawUnsafe(`CREATE TABLE IF NOT EXISTS "post_comments" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "postId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "post_comments_postId_fkey" FOREIGN KEY ("postId") REFERENCES "SocialPost" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "post_comments_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+  )`);
+  await prisma.$executeRawUnsafe(`CREATE TABLE IF NOT EXISTS "post_saves" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "postId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "post_saves_postId_fkey" FOREIGN KEY ("postId") REFERENCES "SocialPost" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "post_saves_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+  )`);
+  await prisma.$executeRawUnsafe(`CREATE UNIQUE INDEX IF NOT EXISTS "post_likes_postId_userId_key" ON "post_likes"("postId", "userId")`);
+  await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "post_comments_postId_createdAt_idx" ON "post_comments"("postId", "createdAt")`);
+  await prisma.$executeRawUnsafe(`CREATE UNIQUE INDEX IF NOT EXISTS "post_saves_postId_userId_key" ON "post_saves"("postId", "userId")`);
+}
 function mapSettings(settings: UserSettings): StoredSettings {
   return {
     id: settings.id,
@@ -137,6 +171,7 @@ function mapSettings(settings: UserSettings): StoredSettings {
 }
 
 async function ensureSeedData() {
+  await ensureInteractionTables();
   const count = await prisma.user.count();
   if (count > 0) return;
 
@@ -337,6 +372,12 @@ export async function listPosts(options: { viewerId?: string | null; followingOn
     orderBy: { createdAt: "desc" },
   });
 
+  const postIds = posts.map((post) => post.id);
+  const viewerLikeRows = options.viewerId ? await prisma.$queryRawUnsafe<{ postId: string }[]>("SELECT postId FROM post_likes WHERE userId = ?", options.viewerId) : [];
+  const viewerLikes = new Set(viewerLikeRows.map((item) => item.postId).filter((postId) => postIds.includes(postId)));
+  const viewerSaveRows = options.viewerId ? await prisma.$queryRawUnsafe<{ postId: string }[]>("SELECT postId FROM post_saves WHERE userId = ?", options.viewerId) : [];
+  const viewerSaves = new Set(viewerSaveRows.map((item) => item.postId).filter((postId) => postIds.includes(postId)));
+
   return posts.map((post) => ({
     id: post.id,
     userId: post.userId,
@@ -348,6 +389,8 @@ export async function listPosts(options: { viewerId?: string | null; followingOn
     species: post.species ?? undefined,
     likes: post.likes,
     comments: post.comments,
+    likedByViewer: viewerLikes.has(post.id),
+    savedByViewer: viewerSaves.has(post.id),
     createdAt: post.createdAt.toISOString(),
     updatedAt: post.updatedAt.toISOString(),
     author: post.user.name,
@@ -402,4 +445,83 @@ export async function setFollow(followerId: string, followingId: string, active:
   }
 
   return prisma.follow.findMany({ where: { followerId } });
+}
+
+export async function setPostLike(postId: string, userId: string, active: boolean) {
+  await ensureSeedData();
+  const post = await prisma.socialPost.findUnique({ where: { id: postId } });
+  if (!post) throw new Error("Paylasim bulunamadi.");
+
+  const existingRows = await prisma.$queryRawUnsafe<{ id: string }[]>(
+    "SELECT id FROM post_likes WHERE postId = ? AND userId = ? LIMIT 1",
+    postId,
+    userId
+  );
+  const wasLiked = existingRows.length > 0;
+
+  if (active) {
+    await prisma.$executeRawUnsafe(
+      "INSERT OR IGNORE INTO post_likes (id, postId, userId, createdAt) VALUES (?, ?, ?, CURRENT_TIMESTAMP)",
+      id("like"),
+      postId,
+      userId
+    );
+  } else {
+    await prisma.$executeRawUnsafe("DELETE FROM post_likes WHERE postId = ? AND userId = ?", postId, userId);
+  }
+
+  const nextLikes = active && !wasLiked ? post.likes + 1 : !active && wasLiked ? Math.max(0, post.likes - 1) : post.likes;
+  await prisma.socialPost.update({ where: { id: postId }, data: { likes: nextLikes } });
+  return { postId, liked: active, likes: nextLikes };
+}
+export async function setPostSave(postId: string, userId: string, active: boolean) {
+  await ensureSeedData();
+  const post = await prisma.socialPost.findUnique({ where: { id: postId } });
+  if (!post) throw new Error("Paylasim bulunamadi.");
+
+  if (active) {
+    await prisma.$executeRawUnsafe(
+      "INSERT OR IGNORE INTO post_saves (id, postId, userId, createdAt) VALUES (?, ?, ?, CURRENT_TIMESTAMP)",
+      id("save"),
+      postId,
+      userId
+    );
+  } else {
+    await prisma.$executeRawUnsafe("DELETE FROM post_saves WHERE postId = ? AND userId = ?", postId, userId);
+  }
+
+  return { postId, saved: active };
+}
+export async function addPostComment(postId: string, userId: string, body: string) {
+  await ensureSeedData();
+  const content = body.trim();
+  if (!content) throw new Error("Yorum bos olamaz.");
+  const post = await prisma.socialPost.findUnique({ where: { id: postId } });
+  if (!post) throw new Error("Paylasim bulunamadi.");
+
+  const commentId = id("comment");
+  await prisma.$executeRawUnsafe(
+    "INSERT INTO post_comments (id, postId, userId, body, createdAt, updatedAt) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
+    commentId,
+    postId,
+    userId,
+    content
+  );
+  const rows = await prisma.$queryRawUnsafe<{ count: number }[]>("SELECT COUNT(*) as count FROM post_comments WHERE postId = ?", postId);
+  const commentCount = Number(rows[0]?.count ?? 0);
+  const nextComments = Math.max(post.comments + 1, commentCount);
+  await prisma.socialPost.update({ where: { id: postId }, data: { comments: nextComments } });
+  const user = await prisma.user.findUnique({ where: { id: userId }, include: { profile: true } });
+
+  return {
+    id: commentId,
+    postId,
+    userId,
+    body: content,
+    createdAt: new Date().toISOString(),
+    author: user?.name ?? "AquaScope User",
+    handle: user?.profile?.handle ?? "@aquascope",
+    avatar: user?.profile?.avatarUrl ?? undefined,
+    comments: nextComments,
+  };
 }
