@@ -24,10 +24,11 @@ type SidebarNavItem = {
   label: string;
   icon: ElementType;
   rootMatch?: string;
+  hidden?: boolean;
 };
 
 const primaryItems: SidebarNavItem[] = [
-  { href: "/platform/dashboard", label: "Dashboard", icon: LayoutDashboard, rootMatch: "/platform" },
+  { href: "/platform/dashboard", label: "Dashboard", icon: LayoutDashboard, rootMatch: "/platform", hidden: true },
   { href: "/platform/analyze", label: "Analiz", icon: BarChart3 },
   { href: "/platform/map", label: "Harita", icon: MapPin },
   { href: "/platform/library", label: "Tür Kütüphanesi", icon: Fish },
@@ -110,7 +111,7 @@ export default function SisyphusSidebar() {
         <div className="aqua-sidebar__body">
           <nav className="aqua-sidebar__menu aqua-sidebar__menu--top" aria-label="Primary navigation">
             <SectionTitle title="ANA MENÜ" />
-            {primaryItems.map((item) => {
+            {primaryItems.filter((item) => !item.hidden).map((item) => {
               const active = isSidebarItemActive(pathname, item.href, item.rootMatch);
               return <SidebarItem key={item.label} href={item.href} label={item.label} icon={item.icon} active={active} />;
             })}
