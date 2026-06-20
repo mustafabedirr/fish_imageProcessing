@@ -60,3 +60,7 @@ uvicorn
 uvicorn)
 fastapi)
 tensorflow)
+
+# Prisma SQLite local database
+prisma/dev.db
+prisma/dev.db-journal
