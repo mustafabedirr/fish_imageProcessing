@@ -59,12 +59,70 @@ type SocialPost = {
   comments: number;
   photos: string[];
   location?: string;
+  profile?: {
+    userId: string;
+    name: string;
+    handle: string;
+    avatarUrl?: string;
+    coverUrl?: string;
+    region?: string;
+    level?: string;
+    bio?: string;
+  };
   poll?: {
     question: string;
     options: [string, number][];
     votes: number;
   };
 };
+
+type ApiFeedPost = {
+  id: string;
+  kind?: SocialPostKind;
+  body: string;
+  tags?: string[];
+  mediaUrls?: string[];
+  region?: string;
+  likes: number;
+  comments: number;
+  createdAt: string;
+  author: string;
+  handle: string;
+  avatar?: string;
+  authorProfile?: SocialPost["profile"];
+};
+
+function formatFeedTime(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  const diff = Math.max(0, Date.now() - date.getTime());
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hours ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} days ago`;
+}
+
+function mapApiPost(post: ApiFeedPost): SocialPost {
+  const kind = post.kind ?? "text";
+  return {
+    id: post.id,
+    author: post.author,
+    handle: post.handle,
+    time: formatFeedTime(post.createdAt),
+    avatar: post.avatar ?? post.authorProfile?.avatarUrl ?? avatar,
+    kind,
+    text: post.body,
+    tags: post.tags ?? [],
+    likes: post.likes,
+    comments: post.comments,
+    photos: post.mediaUrls ?? [],
+    location: post.region,
+    profile: post.authorProfile,
+  };
+}
 
 const feedPosts: SocialPost[] = [
   {
@@ -625,6 +683,25 @@ export default function SocialAreaWorkspace() {
   const [activeStoryIndex, setActiveStoryIndex] = useState<number | null>(null);
   const storyRailRef = useRef<HTMLElement | null>(null);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch("/api/posts")
+      .then(async (response) => {
+        const data = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(String(data?.error ?? "Feed yuklenemedi."));
+        const apiPosts = Array.isArray(data?.posts) ? data.posts.map(mapApiPost) : [];
+        if (!cancelled) setPosts(apiPosts.length ? apiPosts : feedPosts);
+      })
+      .catch(() => {
+        if (!cancelled) setNotice("Gercek feed verisi alinamadi, demo akisi gosteriliyor.");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const visiblePosts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     const searched = posts.filter((post) => {
@@ -679,7 +756,16 @@ export default function SocialAreaWorkspace() {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ body: text, kind: "text", tags }),
-      }).catch(() => setNotice("Paylasim yerel olarak eklendi, backend kaydi daha sonra tekrar denenebilir."));
+      })
+        .then(async (response) => {
+          const data = await response.json().catch(() => null);
+          if (!response.ok) throw new Error(String(data?.error ?? "Paylasim kaydedilemedi."));
+          if (data?.post) {
+            const persistedPost = mapApiPost(data.post);
+            setPosts((current) => current.map((post) => (post.id === optimisticPost.id ? persistedPost : post)));
+          }
+        })
+        .catch(() => setNotice("Paylasim yerel olarak eklendi, backend kaydi daha sonra tekrar denenebilir."));
     }
   };
 

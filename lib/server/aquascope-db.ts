@@ -338,7 +338,7 @@ export async function listPosts() {
     body: post.body,
     tags: fromJsonArray(post.tags),
     mediaUrls: fromJsonArray(post.mediaUrls),
-    region: post.region ?? undefined,
+    region: post.region ?? post.user.profile?.region ?? undefined,
     species: post.species ?? undefined,
     likes: post.likes,
     comments: post.comments,
@@ -347,6 +347,16 @@ export async function listPosts() {
     author: post.user.name,
     handle: post.user.profile?.handle ?? "@aquascope",
     avatar: post.user.profile?.avatarUrl ?? undefined,
+    authorProfile: {
+      userId: post.userId,
+      name: post.user.name,
+      handle: post.user.profile?.handle ?? "@aquascope",
+      avatarUrl: post.user.profile?.avatarUrl ?? undefined,
+      coverUrl: post.user.profile?.coverUrl ?? undefined,
+      region: post.user.profile?.region ?? undefined,
+      level: post.user.profile?.level ?? undefined,
+      bio: post.user.profile?.bio ?? undefined,
+    },
   }));
 }
 
