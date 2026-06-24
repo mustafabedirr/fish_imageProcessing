@@ -31751,35 +31751,77 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 
 .fish-score-mini-meta {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0;
-  overflow: hidden;
-  border: 1px solid rgba(78, 140, 198, 0.15);
-  border-radius: 12px;
-  background: rgba(3, 18, 36, 0.56);
+  grid-template-columns: repeat(3, 34px);
+  justify-content: center;
+  gap: 8px;
+  overflow: visible;
 }
 
 .fish-score-mini-meta span {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  min-width: 0;
-  padding: 9px 10px;
-  overflow: hidden;
-  border-right: 1px solid rgba(88, 132, 178, 0.16);
-  color: rgba(203, 213, 225, 0.9);
-  font-size: 10px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(78, 140, 198, 0.2);
+  border-radius: 10px;
+  background: rgba(3, 18, 36, 0.64);
+  color: #35d8ff;
+  outline: none;
 }
 
-.fish-score-mini-meta span:last-child {
-  border-right: 0;
+.fish-score-mini-meta span:hover,
+.fish-score-mini-meta span:focus-visible {
+  border-color: rgba(41, 226, 224, 0.55);
+  background: rgba(7, 35, 61, 0.88);
 }
 
 .fish-score-mini-meta svg {
-  flex: 0 0 auto;
-  color: #35d8ff;
+  width: 16px;
+  height: 16px;
+  color: currentColor;
+}
+
+.fish-score-mini-meta small {
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 9px);
+  z-index: 8;
+  min-width: max-content;
+  max-width: 220px;
+  padding: 7px 9px;
+  border: 1px solid rgba(78, 140, 198, 0.28);
+  border-radius: 8px;
+  background: rgba(4, 18, 34, 0.96);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+  color: rgba(233, 246, 255, 0.96);
+  font-size: 10px;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, 4px);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.fish-score-mini-meta small::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 8px;
+  height: 8px;
+  border-right: 1px solid rgba(78, 140, 198, 0.28);
+  border-bottom: 1px solid rgba(78, 140, 198, 0.28);
+  background: rgba(4, 18, 34, 0.96);
+  transform: translate(-50%, -4px) rotate(45deg);
+}
+
+.fish-score-mini-meta span:hover small,
+.fish-score-mini-meta span:focus-visible small {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 
 .fish-score-recharts-side {

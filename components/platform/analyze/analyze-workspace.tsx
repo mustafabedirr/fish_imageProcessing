@@ -586,9 +586,18 @@ export default function AnalyzeWorkspace() {
                   </div>
 
                   <div className="fish-score-mini-meta">
-                    <span><CalendarDays size={15} />{analysisDate}</span>
-                    <span><Sparkles size={15} />{modelName}</span>
-                    <span><ShieldCheck size={15} />{isUncertain ? "Dusuk guven" : "Yuksek guven"}</span>
+                    <span tabIndex={0} aria-label={`Analiz tarihi: ${analysisDate}`}>
+                      <CalendarDays size={15} />
+                      <small role="tooltip">Analiz tarihi: {analysisDate}</small>
+                    </span>
+                    <span tabIndex={0} aria-label={`Model: ${modelName}`}>
+                      <Sparkles size={15} />
+                      <small role="tooltip">Model: {modelName}</small>
+                    </span>
+                    <span tabIndex={0} aria-label={`Guven durumu: ${isUncertain ? "Dusuk guven" : "Yuksek guven"}`}>
+                      <ShieldCheck size={15} />
+                      <small role="tooltip">Guven durumu: {isUncertain ? "Dusuk guven" : "Yuksek guven"}</small>
+                    </span>
                   </div>
                 </section>
 
