@@ -28433,10 +28433,14 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 }
 
 .social-story-viewer {
+  isolation: isolate;
   display: grid;
   grid-template-columns: 240px minmax(360px, 620px) 88px;
+  grid-template-rows: minmax(0, 1fr);
+  align-items: stretch;
   width: min(980px, calc(100vw - 42px));
   height: min(760px, calc(100vh - 42px));
+  min-height: 0;
   overflow: hidden;
   border: 1px solid rgba(48, 178, 232, 0.36);
   border-radius: 28px;
@@ -28581,6 +28585,9 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 .social-story-stage {
   position: relative;
   min-width: 0;
+  min-height: 0;
+  align-self: stretch;
+  max-height: 100%;
   overflow: hidden;
   background: #020b14;
 }
@@ -28589,6 +28596,7 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 1;
   pointer-events: none;
   background:
     linear-gradient(180deg, rgba(2, 9, 18, 0.72), transparent 24%, transparent 63%, rgba(2, 9, 18, 0.82)),
@@ -28598,6 +28606,7 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 .social-story-stage figure {
   position: absolute;
   inset: 0;
+  z-index: 0;
   margin: 0;
 }
 
@@ -28714,8 +28723,10 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
   position: absolute;
   z-index: 2;
   left: 56px;
-  bottom: 90px;
-  max-width: 270px;
+  bottom: 88px;
+  max-width: min(310px, calc(100% - 112px));
+  max-height: calc(100% - 206px);
+  overflow: auto;
   padding: 16px 18px;
   border-radius: 18px;
   background: rgba(2, 10, 18, 0.56);
@@ -28788,8 +28799,11 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
   display: grid;
   align-content: center;
   justify-items: center;
-  gap: 28px;
-  padding: 72px 0 42px;
+  min-height: 0;
+  align-self: stretch;
+  max-height: 100%;
+  gap: clamp(14px, 2.2vh, 22px);
+  padding: 64px 0 28px;
   border-left: 1px solid rgba(74, 139, 197, 0.2);
   background: rgba(3, 18, 34, 0.78);
 }
@@ -28797,7 +28811,7 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 .social-story-actions button {
   display: grid;
   justify-items: center;
-  gap: 8px;
+  gap: 6px;
   min-width: 42px;
   border: 0;
   color: #f5fbff;
@@ -28806,8 +28820,8 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 }
 
 .social-story-actions button:not(.social-story-close) svg {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   padding: 9px;
   border-radius: 999px;
   background: rgba(8, 29, 51, 0.72);
@@ -28822,9 +28836,9 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 
 .social-story-close {
   position: absolute;
-  top: 28px;
-  width: 52px;
-  height: 52px;
+  top: 18px;
+  width: 48px;
+  height: 48px;
   border: 1px solid rgba(200, 225, 250, 0.24) !important;
   border-radius: 999px;
   background: rgba(7, 25, 47, 0.7) !important;
@@ -28846,18 +28860,97 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     border-radius: 20px;
   }
 
+  .social-story-progress {
+    left: 20px;
+    right: 76px;
+    top: 20px;
+  }
+
   .social-story-actions {
     position: absolute;
     right: 10px;
     top: 0;
     bottom: 0;
+    z-index: 10;
+    width: 52px;
+    gap: 16px;
+    padding: 82px 0 24px;
     border-left: 0;
     background: transparent;
   }
 
+  .social-story-actions button:not(.social-story-close) svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .social-story-close {
+    top: 16px;
+    width: 46px;
+    height: 46px;
+  }
+
   .social-story-stage header {
-    left: 24px;
-    width: calc(100% - 86px);
+    left: 20px;
+    top: 58px;
+    width: calc(100% - 96px);
+  }
+
+  .social-story-nav {
+    width: 40px;
+    height: 40px;
+  }
+
+  .social-story-nav--previous {
+    left: 14px;
+  }
+
+  .social-story-nav--next {
+    right: 72px;
+  }
+
+  .social-story-caption {
+    left: 20px;
+    right: 76px;
+    bottom: 82px;
+    max-width: none;
+    max-height: calc(100% - 212px);
+    padding: 13px 14px;
+  }
+
+  .social-story-reply {
+    left: 20px;
+    right: 76px;
+    bottom: 18px;
+  }
+
+  .social-story-tap-zones {
+    inset: 114px 70px 196px 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .social-story-viewer-backdrop {
+    padding: 10px;
+  }
+
+  .social-story-caption p {
+    font-size: 0.86rem;
+  }
+
+  .social-story-actions {
+    right: 6px;
+    width: 46px;
+  }
+
+  .social-story-progress,
+  .social-story-caption,
+  .social-story-reply {
+    right: 62px;
+  }
+
+  .social-story-nav--next {
+    right: 60px;
   }
 }
 
@@ -29399,7 +29492,7 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 
 /* Social story fluid content behavior */
 .social-story-stage .social-story-progress {
-  z-index: 5;
+  z-index: 7;
   grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
@@ -29443,8 +29536,8 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 
 .social-story-tap-zones {
   position: absolute;
-  z-index: 2;
-  inset: 0;
+  z-index: 3;
+  inset: 122px 0 196px;
   display: grid;
   grid-template-columns: 38% 62%;
 }
@@ -29464,7 +29557,7 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 .social-story-caption,
 .social-story-reply,
 .social-story-nav {
-  z-index: 6;
+  z-index: 8;
 }
 
 @keyframes socialStoryMediaIn {
