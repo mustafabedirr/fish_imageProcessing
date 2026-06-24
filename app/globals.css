@@ -33298,3 +33298,321 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     justify-content: center;
   }
 }
+
+.social-area-page .social-search-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.social-area-page .social-user-search-results {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: 16px;
+  background: rgba(4, 18, 35, 0.96);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(18px);
+}
+
+.social-area-page .social-user-search-results article {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  padding: 8px;
+  border-radius: 12px;
+  color: #eaf6ff;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.social-area-page .social-user-search-results article:hover {
+  background: rgba(30, 144, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.social-area-page .social-user-search-results img {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.social-area-page .social-user-search-results strong,
+.social-area-page .social-user-search-results span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.social-area-page .social-user-search-results strong {
+  font-size: 0.82rem;
+}
+
+.social-area-page .social-user-search-results span {
+  color: rgba(190, 214, 238, 0.72);
+  font-size: 0.72rem;
+}
+
+.social-area-page .social-user-search-results button {
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 999px;
+  background: rgba(24, 112, 255, 0.14);
+  color: #7dd3fc;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.social-area-page .social-user-search-results button:hover,
+.social-area-page .social-user-search-results button.is-active {
+  border-color: rgba(45, 212, 191, 0.55);
+  background: rgba(20, 184, 166, 0.16);
+  color: #2dd4bf;
+}
+/* Social notification popover anchored below the icon button */
+.social-area-page .social-side-actions [class*="wrap"]:has(.social-bell) {
+  position: relative !important;
+  display: inline-flex !important;
+  overflow: visible !important;
+}
+
+.social-area-page .social-side-actions [class*="wrap"]:has(.social-bell) .social-notification-panel {
+  top: calc(100% + 10px) !important;
+  right: 0 !important;
+  left: auto !important;
+  transform-origin: top right !important;
+  width: min(300px, calc(100vw - 40px)) !important;
+  max-width: min(300px, calc(100vw - 40px)) !important;
+  max-height: min(360px, calc(100vh - 120px)) !important;
+}
+
+.social-area-page .social-side-actions [class*="wrap"]:has(.social-bell) .social-notification-panel::before {
+  right: 18px !important;
+  left: auto !important;
+}
+.fish-library-photo-count {
+  position: absolute;
+  right: 62px;
+  top: 22px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(84, 190, 255, 0.34);
+  background: rgba(4, 17, 35, 0.78);
+  color: #d8f3ff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.26);
+}
+
+.fish-library-gallery-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(1, 8, 18, 0.72);
+  backdrop-filter: blur(18px);
+}
+
+.fish-library-gallery {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  grid-template-rows: auto 1fr;
+  gap: 16px;
+  width: min(1040px, 94vw);
+  max-height: min(760px, 88vh);
+  overflow: hidden;
+  padding: 18px;
+  border: 1px solid rgba(64, 180, 255, 0.28);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(0, 212, 255, 0.16), transparent 38%),
+    linear-gradient(145deg, rgba(5, 20, 42, 0.96), rgba(2, 11, 24, 0.98));
+  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.fish-library-gallery-close {
+  position: absolute;
+  right: 18px;
+  top: 18px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(127, 205, 255, 0.24);
+  border-radius: 14px;
+  background: rgba(8, 26, 52, 0.82);
+  color: #eaf7ff;
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.fish-library-gallery-close:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0, 212, 255, 0.56);
+  background: rgba(16, 48, 88, 0.92);
+}
+
+.fish-library-gallery-hero {
+  position: relative;
+  min-height: 360px;
+  overflow: hidden;
+  border: 1px solid rgba(82, 188, 255, 0.2);
+  border-radius: 20px;
+  background: rgba(4, 15, 32, 0.82);
+}
+
+.fish-library-gallery-hero > img {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  object-fit: cover;
+  display: block;
+}
+
+.fish-library-gallery-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 38%, rgba(1, 8, 20, 0.86));
+  pointer-events: none;
+}
+
+.fish-library-gallery-hero > div {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  bottom: 20px;
+  z-index: 2;
+}
+
+.fish-library-gallery-hero span {
+  color: #25d7ff;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.fish-library-gallery-hero h2 {
+  margin: 6px 0 2px;
+  color: #fff;
+  font-size: clamp(1.8rem, 3vw, 3.2rem);
+  line-height: 0.95;
+}
+
+.fish-library-gallery-hero p {
+  margin: 0;
+  color: #b9cde2;
+  font-size: 1rem;
+}
+
+.fish-library-gallery aside {
+  align-self: stretch;
+  padding: 70px 18px 18px;
+  border: 1px solid rgba(82, 188, 255, 0.16);
+  border-radius: 20px;
+  background: rgba(6, 21, 43, 0.72);
+}
+
+.fish-library-gallery aside > strong {
+  display: block;
+  color: #1ff2ad;
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+}
+
+.fish-library-gallery aside > span {
+  color: #aabdd3;
+  font-size: 0.9rem;
+}
+
+.fish-library-gallery-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.fish-library-gallery-tags em {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(20, 104, 180, 0.22);
+  color: #77d9ff;
+  font-style: normal;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.fish-library-gallery-grid {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 2px;
+  scrollbar-width: none;
+}
+
+.fish-library-gallery-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.fish-library-gallery-grid img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border: 1px solid rgba(82, 188, 255, 0.16);
+  border-radius: 14px;
+  background: rgba(4, 15, 32, 0.8);
+  transition: transform 180ms ease, border-color 180ms ease, filter 180ms ease;
+}
+
+.fish-library-gallery-grid img:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 212, 255, 0.52);
+  filter: saturate(1.08) brightness(1.05);
+}
+
+@media (max-width: 780px) {
+  .fish-library-gallery {
+    grid-template-columns: 1fr;
+    width: min(520px, 94vw);
+    overflow: auto;
+    scrollbar-width: none;
+  }
+
+  .fish-library-gallery::-webkit-scrollbar {
+    display: none;
+  }
+
+  .fish-library-gallery aside {
+    padding-top: 18px;
+  }
+
+  .fish-library-gallery-hero,
+  .fish-library-gallery-hero > img {
+    min-height: 300px;
+  }
+}

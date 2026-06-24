@@ -48,6 +48,19 @@ export type StoredSocialPost = {
   comments: number;
   likedByViewer?: boolean;
   savedByViewer?: boolean;
+  authorFollowedByViewer?: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+export type StoredLibraryArchiveItem = {
+  id: string;
+  userId: string;
+  species: string;
+  latin: string;
+  score: number;
+  records: number;
+  photos: string[];
+  tags: string[];
   createdAt: string;
   updatedAt: string;
 };
@@ -157,6 +170,22 @@ async function ensureInteractionTables() {
   await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "post_comments_postId_createdAt_idx" ON "post_comments"("postId", "createdAt")`);
   await prisma.$executeRawUnsafe(`CREATE UNIQUE INDEX IF NOT EXISTS "post_saves_postId_userId_key" ON "post_saves"("postId", "userId")`);
 }
+async function ensureLibraryArchiveTable() {
+  await prisma.$executeRawUnsafe(`CREATE TABLE IF NOT EXISTS "species_archive" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    "species" TEXT NOT NULL,
+    "latin" TEXT NOT NULL,
+    "score" REAL NOT NULL DEFAULT 0,
+    "records" INTEGER NOT NULL DEFAULT 0,
+    "photos" TEXT NOT NULL DEFAULT '[]',
+    "tags" TEXT NOT NULL DEFAULT '[]',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "species_archive_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+  )`);
+  await prisma.$executeRawUnsafe(`CREATE UNIQUE INDEX IF NOT EXISTS "species_archive_userId_species_key" ON "species_archive"("userId", "species")`);
+}
 function mapSettings(settings: UserSettings): StoredSettings {
   return {
     id: settings.id,
@@ -172,6 +201,7 @@ function mapSettings(settings: UserSettings): StoredSettings {
 
 async function ensureSeedData() {
   await ensureInteractionTables();
+  await ensureLibraryArchiveTable();
   const count = await prisma.user.count();
   if (count > 0) return;
 
@@ -377,6 +407,8 @@ export async function listPosts(options: { viewerId?: string | null; followingOn
   const viewerLikes = new Set(viewerLikeRows.map((item) => item.postId).filter((postId) => postIds.includes(postId)));
   const viewerSaveRows = options.viewerId ? await prisma.$queryRawUnsafe<{ postId: string }[]>("SELECT postId FROM post_saves WHERE userId = ?", options.viewerId) : [];
   const viewerSaves = new Set(viewerSaveRows.map((item) => item.postId).filter((postId) => postIds.includes(postId)));
+  const viewerFollowRows = options.viewerId ? await prisma.follow.findMany({ where: { followerId: options.viewerId }, select: { followingId: true } }) : [];
+  const viewerFollows = new Set(viewerFollowRows.map((item) => item.followingId));
 
   return posts.map((post) => ({
     id: post.id,
@@ -391,6 +423,7 @@ export async function listPosts(options: { viewerId?: string | null; followingOn
     comments: post.comments,
     likedByViewer: viewerLikes.has(post.id),
     savedByViewer: viewerSaves.has(post.id),
+    authorFollowedByViewer: viewerFollows.has(post.userId),
     createdAt: post.createdAt.toISOString(),
     updatedAt: post.updatedAt.toISOString(),
     author: post.user.name,
@@ -492,6 +525,31 @@ export async function setPostSave(postId: string, userId: string, active: boolea
 
   return { postId, saved: active };
 }
+
+export async function listPostComments(postId: string) {
+  await ensureSeedData();
+  const post = await prisma.socialPost.findUnique({ where: { id: postId } });
+  if (!post) throw new Error("Paylasim bulunamadi.");
+
+  return prisma.$queryRawUnsafe<{
+    id: string;
+    postId: string;
+    userId: string;
+    body: string;
+    createdAt: string;
+    author: string | null;
+    handle: string | null;
+    avatar: string | null;
+  }[]>(
+    `SELECT pc.id, pc.postId, pc.userId, pc.body, pc.createdAt, u.name as author, p.handle as handle, p.avatarUrl as avatar
+     FROM post_comments pc
+     LEFT JOIN User u ON u.id = pc.userId
+     LEFT JOIN Profile p ON p.userId = pc.userId
+     WHERE pc.postId = ?
+     ORDER BY pc.createdAt ASC`,
+    postId
+  );
+}
 export async function addPostComment(postId: string, userId: string, body: string) {
   await ensureSeedData();
   const content = body.trim();
@@ -524,4 +582,141 @@ export async function addPostComment(postId: string, userId: string, body: strin
     avatar: user?.profile?.avatarUrl ?? undefined,
     comments: nextComments,
   };
+}
+
+function mapArchiveRow(row: {
+  id: string;
+  userId: string;
+  species: string;
+  latin: string;
+  score: number;
+  records: number;
+  photos: string;
+  tags: string;
+  createdAt: string;
+  updatedAt: string;
+}): StoredLibraryArchiveItem {
+  return {
+    id: row.id,
+    userId: row.userId,
+    species: row.species,
+    latin: row.latin,
+    score: Number(row.score ?? 0),
+    records: Number(row.records ?? 0),
+    photos: fromJsonArray(row.photos),
+    tags: fromJsonArray(row.tags),
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+}
+
+export async function listLibraryArchive(userId: string) {
+  await ensureSeedData();
+  const rows = await prisma.$queryRawUnsafe<{
+    id: string;
+    userId: string;
+    species: string;
+    latin: string;
+    score: number;
+    records: number;
+    photos: string;
+    tags: string;
+    createdAt: string;
+    updatedAt: string;
+  }[]>(
+    `SELECT id, userId, species, latin, score, records, photos, tags, createdAt, updatedAt
+     FROM species_archive
+     WHERE userId = ?
+     ORDER BY updatedAt DESC`,
+    userId
+  );
+  return rows.map(mapArchiveRow);
+}
+
+export async function archiveAnalyzedSpecies(input: {
+  userId: string;
+  species: string;
+  latin?: string;
+  score?: number;
+  imageUrl?: string;
+  tags?: string[];
+}) {
+  await ensureSeedData();
+  const species = input.species.trim();
+  if (!species) throw new Error("Tur adi bos olamaz.");
+
+  const latin = input.latin?.trim() || "Bilimsel ad bekleniyor";
+  const score = Math.max(0, Math.min(100, Number(input.score ?? 0)));
+  const tags = input.tags?.filter(Boolean).length ? input.tags!.filter(Boolean) : ["Analiz", "Arsiv"];
+  const existingRows = await prisma.$queryRawUnsafe<{
+    id: string;
+    userId: string;
+    species: string;
+    latin: string;
+    score: number;
+    records: number;
+    photos: string;
+    tags: string;
+    createdAt: string;
+    updatedAt: string;
+  }[]>(
+    `SELECT id, userId, species, latin, score, records, photos, tags, createdAt, updatedAt
+     FROM species_archive
+     WHERE userId = ? AND species = ?
+     LIMIT 1`,
+    input.userId,
+    species
+  );
+
+  const existing = existingRows[0];
+  if (existing) {
+    const photos = fromJsonArray(existing.photos);
+    const nextPhotos = input.imageUrl && !photos.includes(input.imageUrl) ? [input.imageUrl, ...photos].slice(0, 12) : photos;
+    const nextTags = Array.from(new Set([...fromJsonArray(existing.tags), ...tags]));
+    const nextScore = score > 0 ? Math.max(Number(existing.score ?? 0), score) : Number(existing.score ?? 0);
+
+    await prisma.$executeRawUnsafe(
+      `UPDATE species_archive
+       SET latin = ?, score = ?, records = records + 1, photos = ?, tags = ?, updatedAt = CURRENT_TIMESTAMP
+       WHERE id = ?`,
+      latin,
+      nextScore,
+      toJson(nextPhotos),
+      toJson(nextTags),
+      existing.id
+    );
+  } else {
+    await prisma.$executeRawUnsafe(
+      `INSERT INTO species_archive (id, userId, species, latin, score, records, photos, tags, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, 1, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+      id("archive"),
+      input.userId,
+      species,
+      latin,
+      score,
+      toJson(input.imageUrl ? [input.imageUrl] : []),
+      toJson(tags)
+    );
+  }
+
+  const rows = await prisma.$queryRawUnsafe<{
+    id: string;
+    userId: string;
+    species: string;
+    latin: string;
+    score: number;
+    records: number;
+    photos: string;
+    tags: string;
+    createdAt: string;
+    updatedAt: string;
+  }[]>(
+    `SELECT id, userId, species, latin, score, records, photos, tags, createdAt, updatedAt
+     FROM species_archive
+     WHERE userId = ? AND species = ?
+     LIMIT 1`,
+    input.userId,
+    species
+  );
+  return rows[0] ? mapArchiveRow(rows[0]) : null;
 }

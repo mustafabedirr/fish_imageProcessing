@@ -75,7 +75,7 @@ export default function LoginCard({ mode = "login", onModeChange }: LoginCardPro
 
       setShowLaunchOverlay(true);
       window.setTimeout(() => {
-        router.push(data?.nextStep === "onboarding" ? "/onboarding" : "/platform");
+        router.push(data?.nextStep === "onboarding" ? "/onboarding" : "/platform/analyze");
       }, 1850);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error.");

@@ -18,3 +18,16 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     return NextResponse.json({ error: error instanceof Error ? error.message : "Begeni kaydedilemedi." }, { status: 400 });
   }
 }
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  const sessionUser = await requireSessionUser(request);
+  if (!sessionUser) {
+    return NextResponse.json({ error: "Begeniyi kaldirmak icin oturum acin." }, { status: 401 });
+  }
+
+  try {
+    const result = await setPostLike(params.id, sessionUser.id, false);
+    return NextResponse.json(result);
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Begeni kaldirilamadi." }, { status: 400 });
+  }
+}

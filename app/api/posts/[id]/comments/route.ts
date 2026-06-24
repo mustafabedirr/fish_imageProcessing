@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { addPostComment } from "../../../../../lib/server/aquascope-db";
+import { addPostComment, listPostComments } from "../../../../../lib/server/aquascope-db";
 import { requireSessionUser } from "../../../../../lib/server/auth-session";
 
+
+export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const comments = await listPostComments(params.id);
+    return NextResponse.json({ comments });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Yorumlar yuklenemedi." }, { status: 400 });
+  }
+}
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   const sessionUser = await requireSessionUser(request);
   if (!sessionUser) {

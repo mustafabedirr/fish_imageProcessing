@@ -3,40 +3,762 @@
     "name_tr": "Mavi Trevally",
     "edible": true,
     "ideal_size": "40+ cm",
-    "recommended_baits": ["Canlı yem", "Sahte jig"],
-    "recommended_gear": ["Spin", "Heavy jigging"],
-    "region_notes": ["Tropikal okyanuslar", "Resif bölgeleri"]
+    "recommended_baits": [
+      "Canlı yem",
+      "Sahte jig"
+    ],
+    "recommended_gear": [
+      "Spin",
+      "Heavy jigging"
+    ],
+    "region_notes": [
+      "Tropikal okyanuslar",
+      "Resif bölgeleri"
+    ]
   },
   "oxymonacanthus_longirostris": {
     "name_tr": "Uzun Burunlu Filefish",
     "edible": false,
     "ideal_size": "Avlanmaz",
-    "recommended_baits": ["—"],
-    "recommended_gear": ["—"],
-    "region_notes": ["Mercan resifleri", "Hint-Pasifik"]
+    "recommended_baits": [
+      "—"
+    ],
+    "recommended_gear": [
+      "—"
+    ],
+    "region_notes": [
+      "Mercan resifleri",
+      "Hint-Pasifik"
+    ]
   },
   "cantherhines_pardalis": {
     "name_tr": "Benekli Filefish",
     "edible": true,
     "ideal_size": "25+ cm",
-    "recommended_baits": ["Karides", "Yumuşak yemler"],
-    "recommended_gear": ["Light spin"],
-    "region_notes": ["Resifler", "Tropikal sular"]
+    "recommended_baits": [
+      "Karides",
+      "Yumuşak yemler"
+    ],
+    "recommended_gear": [
+      "Light spin"
+    ],
+    "region_notes": [
+      "Resifler",
+      "Tropikal sular"
+    ]
   },
   "halichoeres_melanurus": {
     "name_tr": "Melanurus Wrasse",
     "edible": false,
     "ideal_size": "Avlanmaz",
-    "recommended_baits": ["—"],
-    "recommended_gear": ["—"],
-    "region_notes": ["Resif çevresi", "Kumluk alanlar"]
+    "recommended_baits": [
+      "—"
+    ],
+    "recommended_gear": [
+      "—"
+    ],
+    "region_notes": [
+      "Resif çevresi",
+      "Kumluk alanlar"
+    ]
   },
   "lethrinus_nebulosus": {
     "name_tr": "İmparator Balığı",
     "edible": true,
     "ideal_size": "35+ cm",
-    "recommended_baits": ["Karides", "Küçük balık"],
-    "recommended_gear": ["Dip oltası", "Tekne avı"],
-    "region_notes": ["Hint Okyanusu", "Kıyı resifleri"]
+    "recommended_baits": [
+      "Karides",
+      "Küçük balık"
+    ],
+    "recommended_gear": [
+      "Dip oltası",
+      "Tekne avı"
+    ],
+    "region_notes": [
+      "Hint Okyanusu",
+      "Kıyı resifleri"
+    ]
+  },
+  "dicentrarchus_labrax": {
+    "name_tr": "Levrek",
+    "edible": true,
+    "ideal_size": "30+ cm",
+    "recommended_baits": [
+      "Silikon",
+      "Canli yem",
+      "Sardalya serit"
+    ],
+    "recommended_gear": [
+      "Spin takim",
+      "LRF",
+      "Sahte yem"
+    ],
+    "region_notes": [
+      "Ege",
+      "Akdeniz",
+      "Marmara",
+      "Karadeniz"
+    ]
+  },
+  "sparus_aurata": {
+    "name_tr": "Çipura",
+    "edible": true,
+    "ideal_size": "20+ cm",
+    "recommended_baits": [
+      "Karides",
+      "Mamun",
+      "Madya"
+    ],
+    "recommended_gear": [
+      "Dip oltasi",
+      "Surf casting"
+    ],
+    "region_notes": [
+      "Ege",
+      "Akdeniz",
+      "Marmara"
+    ]
+  },
+  "engraulis_encrasicolus": {
+    "name_tr": "Hamsi",
+    "edible": true,
+    "ideal_size": "9+ cm",
+    "recommended_baits": [
+      "Planktonik yem",
+      "Dogal suru takibi"
+    ],
+    "recommended_gear": [
+      "Serpme/ag verisi",
+      "Gozlem amacli"
+    ],
+    "region_notes": [
+      "Karadeniz",
+      "Marmara"
+    ]
+  },
+  "sardina_pilchardus": {
+    "name_tr": "Sardalya",
+    "edible": true,
+    "ideal_size": "11+ cm",
+    "recommended_baits": [
+      "Planktonik yem",
+      "Kucuk yem parcalari"
+    ],
+    "recommended_gear": [
+      "Capari",
+      "Gozlem amacli"
+    ],
+    "region_notes": [
+      "Ege",
+      "Akdeniz",
+      "Marmara",
+      "Karadeniz"
+    ]
+  },
+  "trachurus_mediterraneus": {
+    "name_tr": "İstavrit",
+    "edible": true,
+    "ideal_size": "13+ cm",
+    "recommended_baits": [
+      "Capari",
+      "Kucuk silikon"
+    ],
+    "recommended_gear": [
+      "Capari",
+      "LRF"
+    ],
+    "region_notes": [
+      "Karadeniz",
+      "Marmara",
+      "Ege",
+      "Akdeniz"
+    ]
+  },
+  "trachurus_trachurus": {
+    "name_tr": "Karagöz İstavrit",
+    "edible": true,
+    "ideal_size": "13+ cm",
+    "recommended_baits": [
+      "Capari",
+      "Kucuk silikon"
+    ],
+    "recommended_gear": [
+      "Capari",
+      "LRF"
+    ],
+    "region_notes": [
+      "Karadeniz",
+      "Marmara",
+      "Ege"
+    ]
+  },
+  "scomber_scombrus": {
+    "name_tr": "Uskumru",
+    "edible": true,
+    "ideal_size": "20+ cm",
+    "recommended_baits": [
+      "Capari",
+      "Sardalya",
+      "Kasik"
+    ],
+    "recommended_gear": [
+      "Capari",
+      "Sirti",
+      "Spin"
+    ],
+    "region_notes": [
+      "Karadeniz",
+      "Marmara",
+      "Ege"
+    ]
+  },
+  "scomber_colias": {
+    "name_tr": "Kolyoz",
+    "edible": true,
+    "ideal_size": "20+ cm",
+    "recommended_baits": [
+      "Capari",
+      "Kucuk balik",
+      "Kasik"
+    ],
+    "recommended_gear": [
+      "Capari",
+      "Spin"
+    ],
+    "region_notes": [
+      "Ege",
+      "Akdeniz",
+      "Marmara"
+    ]
+  },
+  "sarda_sarda": {
+    "name_tr": "Palamut",
+    "edible": true,
+    "ideal_size": "25+ cm",
+    "recommended_baits": [
+      "Sardalya",
+      "Zargana",
+      "Kasik"
+    ],
+    "recommended_gear": [
+      "Spin",
+      "Sirti",
+      "Jig"
+    ],
+    "region_notes": [
+      "Karadeniz",
+      "Marmara",
+      "Ege",
+      "Akdeniz"
+    ]
+  },
+  "pomatomus_saltatrix": {
+    "name_tr": "Lüfer",
+    "edible": true,
+    "ideal_size": "18+ cm",
+    "recommended_baits": [
+      "Zargana",
+      "Sardalya",
+      "Sahte yem"
+    ],
+    "recommended_gear": [
+      "Spin",
+      "Sirti"
+    ],
+    "region_notes": [
+      "Karadeniz",
+      "Marmara",
+      "Ege"
+    ]
+  },
+  "mugil_cephalus": {
+    "name_tr": "Kefal",
+    "edible": true,
+    "ideal_size": "20+ cm",
+    "recommended_baits": [
+      "Ekmek",
+      "Hamur",
+      "Alg bazli yem"
+    ],
+    "recommended_gear": [
+      "Samandirali takim",
+      "Kiyi oltasi"
+    ],
+    "region_notes": [
+      "Karadeniz",
+      "Marmara",
+      "Ege",
+      "Akdeniz"
+    ]
+  },
+  "mullus_barbatus": {
+    "name_tr": "Barbun",
+    "edible": true,
+    "ideal_size": "13+ cm",
+    "recommended_baits": [
+      "Kurt",
+      "Karides",
+      "Mamun"
+    ],
+    "recommended_gear": [
+      "Dip oltasi",
+      "Tekne avi"
+    ],
+    "region_notes": [
+      "Karadeniz",
+      "Marmara",
+      "Ege",
+      "Akdeniz"
+    ]
+  },
+  "mullus_surmuletus": {
+    "name_tr": "Tekir",
+    "edible": true,
+    "ideal_size": "13+ cm",
+    "recommended_baits": [
+      "Kurt",
+      "Karides",
+      "Mamun"
+    ],
+    "recommended_gear": [
+      "Dip oltasi",
+      "Tekne avi"
+    ],
+    "region_notes": [
+      "Marmara",
+      "Ege",
+      "Akdeniz"
+    ]
+  },
+  "merluccius_merluccius": {
+    "name_tr": "Mezgit",
+    "edible": true,
+    "ideal_size": "25+ cm",
+    "recommended_baits": [
+      "Sardalya",
+      "Hamsi",
+      "Kalamar"
+    ],
+    "recommended_gear": [
+      "Dip oltasi",
+      "Tekne avi"
+    ],
+    "region_notes": [
+      "Karadeniz",
+      "Marmara",
+      "Ege",
+      "Akdeniz"
+    ]
+  },
+  "scophthalmus_maximus": {
+    "name_tr": "Kalkan",
+    "edible": true,
+    "ideal_size": "45+ cm",
+    "recommended_baits": [
+      "Istavrit",
+      "Hamsi",
+      "Canli yem"
+    ],
+    "recommended_gear": [
+      "Dip oltasi",
+      "Tekne avi"
+    ],
+    "region_notes": [
+      "Karadeniz",
+      "Marmara"
+    ]
+  },
+  "scophthalmus_maeoticus": {
+    "name_tr": "Karadeniz Kalkanı",
+    "edible": true,
+    "ideal_size": "45+ cm",
+    "recommended_baits": [
+      "Istavrit",
+      "Hamsi",
+      "Canli yem"
+    ],
+    "recommended_gear": [
+      "Dip oltasi",
+      "Tekne avi"
+    ],
+    "region_notes": [
+      "Karadeniz"
+    ]
+  },
+  "diplodus_sargus": {
+    "name_tr": "Sargoz",
+    "edible": true,
+    "ideal_size": "21+ cm",
+    "recommended_baits": [
+      "Karides",
+      "Mamun",
+      "Madya"
+    ],
+    "recommended_gear": [
+      "Dip oltasi",
+      "Surf casting"
+    ],
+    "region_notes": [
+      "Ege",
+      "Akdeniz",
+      "Marmara"
+    ]
+  },
+  "diplodus_vulgaris": {
+    "name_tr": "Karagöz",
+    "edible": true,
+    "ideal_size": "18+ cm",
+    "recommended_baits": [
+      "Karides",
+      "Mamun",
+      "Madya"
+    ],
+    "recommended_gear": [
+      "Dip oltasi",
+      "Surf casting"
+    ],
+    "region_notes": [
+      "Ege",
+      "Akdeniz",
+      "Marmara"
+    ]
+  },
+  "pagellus_erythrinus": {
+    "name_tr": "Kırma Mercan",
+    "edible": true,
+    "ideal_size": "15+ cm",
+    "recommended_baits": [
+      "Karides",
+      "Mamun",
+      "Kurt"
+    ],
+    "recommended_gear": [
+      "Dip oltasi",
+      "Tekne avi"
+    ],
+    "region_notes": [
+      "Ege",
+      "Akdeniz",
+      "Marmara"
+    ]
+  },
+  "lithognathus_mormyrus": {
+    "name_tr": "Mırmır",
+    "edible": true,
+    "ideal_size": "20+ cm",
+    "recommended_baits": [
+      "Mamun",
+      "Kurt",
+      "Karides"
+    ],
+    "recommended_gear": [
+      "Surf casting",
+      "Dip oltasi"
+    ],
+    "region_notes": [
+      "Ege",
+      "Akdeniz",
+      "Marmara"
+    ]
+  },
+  "boops_boops": {
+    "name_tr": "Kupes",
+    "edible": true,
+    "ideal_size": "13+ cm",
+    "recommended_baits": [
+      "Capari",
+      "Karides",
+      "Hamur"
+    ],
+    "recommended_gear": [
+      "Capari",
+      "Hafif takim"
+    ],
+    "region_notes": [
+      "Ege",
+      "Akdeniz",
+      "Marmara"
+    ]
+  },
+  "spicara_maena": {
+    "name_tr": "İzmarit",
+    "edible": true,
+    "ideal_size": "12+ cm",
+    "recommended_baits": [
+      "Capari",
+      "Karides",
+      "Kurt"
+    ],
+    "recommended_gear": [
+      "Capari",
+      "Hafif takim"
+    ],
+    "region_notes": [
+      "Karadeniz",
+      "Marmara",
+      "Ege",
+      "Akdeniz"
+    ]
+  },
+  "belone_belone": {
+    "name_tr": "Zargana",
+    "edible": true,
+    "ideal_size": "25+ cm",
+    "recommended_baits": [
+      "Ipek",
+      "Kucuk sahte",
+      "Karides"
+    ],
+    "recommended_gear": [
+      "Zargana takimi",
+      "Spin"
+    ],
+    "region_notes": [
+      "Karadeniz",
+      "Marmara",
+      "Ege",
+      "Akdeniz"
+    ]
+  },
+  "zeus_faber": {
+    "name_tr": "Dülger",
+    "edible": true,
+    "ideal_size": "25+ cm",
+    "recommended_baits": [
+      "Sardalya",
+      "Kalamar",
+      "Canli yem"
+    ],
+    "recommended_gear": [
+      "Dip oltasi",
+      "Tekne avi"
+    ],
+    "region_notes": [
+      "Marmara",
+      "Ege",
+      "Akdeniz",
+      "Karadeniz"
+    ]
+  },
+  "solea_solea": {
+    "name_tr": "Dil Balığı",
+    "edible": true,
+    "ideal_size": "20+ cm",
+    "recommended_baits": [
+      "Kurt",
+      "Karides",
+      "Mamun"
+    ],
+    "recommended_gear": [
+      "Dip oltasi",
+      "Kumluk alan takimi"
+    ],
+    "region_notes": [
+      "Marmara",
+      "Ege",
+      "Akdeniz",
+      "Karadeniz"
+    ]
+  },
+  "dentex_dentex": {
+    "name_tr": "Sinarit",
+    "edible": true,
+    "ideal_size": "35+ cm",
+    "recommended_baits": [
+      "Canli kalamar",
+      "Sardalya",
+      "Jig"
+    ],
+    "recommended_gear": [
+      "Jigging",
+      "Sirti",
+      "Tekne avi"
+    ],
+    "region_notes": [
+      "Ege",
+      "Akdeniz"
+    ]
+  },
+  "pagrus_pagrus": {
+    "name_tr": "Fangri",
+    "edible": true,
+    "ideal_size": "30+ cm",
+    "recommended_baits": [
+      "Karides",
+      "Kalamar",
+      "Canli yem"
+    ],
+    "recommended_gear": [
+      "Dip oltasi",
+      "Jigging"
+    ],
+    "region_notes": [
+      "Ege",
+      "Akdeniz"
+    ]
+  },
+  "sciaena_umbra": {
+    "name_tr": "Eşkina",
+    "edible": true,
+    "ideal_size": "25+ cm",
+    "recommended_baits": [
+      "Karides",
+      "Yengec",
+      "Canli yem"
+    ],
+    "recommended_gear": [
+      "Dip oltasi",
+      "Kayalik alan takimi"
+    ],
+    "region_notes": [
+      "Marmara",
+      "Ege",
+      "Akdeniz"
+    ]
+  },
+  "umbrina_cirrosa": {
+    "name_tr": "Minekop",
+    "edible": true,
+    "ideal_size": "25+ cm",
+    "recommended_baits": [
+      "Kurt",
+      "Karides",
+      "Mamun"
+    ],
+    "recommended_gear": [
+      "Surf casting",
+      "Dip oltasi"
+    ],
+    "region_notes": [
+      "Marmara",
+      "Ege",
+      "Akdeniz",
+      "Karadeniz"
+    ]
+  },
+  "seriola_dumerili": {
+    "name_tr": "Akya",
+    "edible": true,
+    "ideal_size": "40+ cm",
+    "recommended_baits": [
+      "Canli yem",
+      "Jig",
+      "Sahte balik"
+    ],
+    "recommended_gear": [
+      "Jigging",
+      "Spin",
+      "Sirti"
+    ],
+    "region_notes": [
+      "Ege",
+      "Akdeniz",
+      "Marmara"
+    ]
+  },
+  "coryphaena_hippurus": {
+    "name_tr": "Lambuka",
+    "edible": true,
+    "ideal_size": "50+ cm",
+    "recommended_baits": [
+      "Sahte balik",
+      "Jig",
+      "Canli yem"
+    ],
+    "recommended_gear": [
+      "Sirti",
+      "Spin",
+      "Jigging"
+    ],
+    "region_notes": [
+      "Ege",
+      "Akdeniz"
+    ]
+  },
+  "siganus_rivulatus": {
+    "name_tr": "Sokar",
+    "edible": true,
+    "ideal_size": "18+ cm",
+    "recommended_baits": [
+      "Alg",
+      "Ot",
+      "Hamur"
+    ],
+    "recommended_gear": [
+      "Samandirali takim",
+      "Kiyi oltasi"
+    ],
+    "region_notes": [
+      "Akdeniz",
+      "Ege"
+    ]
+  },
+  "siganus_luridus": {
+    "name_tr": "Esmer Sokar",
+    "edible": true,
+    "ideal_size": "18+ cm",
+    "recommended_baits": [
+      "Alg",
+      "Ot",
+      "Hamur"
+    ],
+    "recommended_gear": [
+      "Samandirali takim",
+      "Kiyi oltasi"
+    ],
+    "region_notes": [
+      "Akdeniz",
+      "Ege"
+    ]
+  },
+  "lagocephalus_sceleratus": {
+    "name_tr": "Balon Balığı",
+    "edible": false,
+    "ideal_size": "Avlanmaz",
+    "recommended_baits": [
+      "Yem onerilmez"
+    ],
+    "recommended_gear": [
+      "Yakalanirsa dikkatli uzaklastirma"
+    ],
+    "region_notes": [
+      "Akdeniz",
+      "Ege"
+    ]
+  },
+  "epinephelus_marginatus": {
+    "name_tr": "Orfoz",
+    "edible": false,
+    "ideal_size": "Koruma altinda / avlanmaz",
+    "recommended_baits": [
+      "Yem onerilmez"
+    ],
+    "recommended_gear": [
+      "Gozlem amacli"
+    ],
+    "region_notes": [
+      "Ege",
+      "Akdeniz"
+    ]
+  },
+  "chelidonichthys_lucerna": {
+    "name_tr": "Kırlangıç Balığı",
+    "edible": true,
+    "ideal_size": "18+ cm",
+    "recommended_baits": [
+      "Karides",
+      "Kurt",
+      "Kucuk balik"
+    ],
+    "recommended_gear": [
+      "Dip oltasi",
+      "Tekne avi"
+    ],
+    "region_notes": [
+      "Karadeniz",
+      "Marmara",
+      "Ege",
+      "Akdeniz"
+    ]
   }
 }

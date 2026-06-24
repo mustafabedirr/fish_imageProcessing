@@ -69,6 +69,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--epochs", type=int, default=35)
     parser.add_argument("--fine-tune-epochs", type=int, default=15)
     parser.add_argument("--fine-tune-layers", type=int, default=55)
+    parser.add_argument("--initial-model", type=Path, default=None, help="Optional Keras model/checkpoint to continue training from.")
     parser.add_argument(
         "--min-images-per-class",
         type=int,
@@ -210,6 +211,19 @@ def resolve_weights(choice: str) -> str | None:
     return "imagenet"
 
 
+def set_last_layers_trainable(model: tf.keras.Model, trainable_layer_count: int) -> None:
+    model.trainable = True
+    trainable_candidates = [
+        layer
+        for layer in model.layers
+        if not isinstance(layer, tf.keras.layers.BatchNormalization)
+    ]
+    for layer in model.layers:
+        layer.trainable = False
+    for layer in trainable_candidates[-trainable_layer_count:]:
+        layer.trainable = True
+
+
 def compile_model(model: tf.keras.Model, learning_rate: float) -> None:
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
@@ -224,10 +238,14 @@ def compile_model(model: tf.keras.Model, learning_rate: float) -> None:
 def main() -> None:
     args = parse_args()
 
-    if not args.dataset_zip.exists():
-        raise FileNotFoundError(f"Dataset zip not found: {args.dataset_zip}")
-
-    safe_extract(args.dataset_zip, args.extract_dir, args.clean_extract)
+    if args.dataset_zip.exists():
+        safe_extract(args.dataset_zip, args.extract_dir, args.clean_extract)
+    elif not args.extract_dir.exists():
+        raise FileNotFoundError(
+            f"Dataset zip not found and extract dir is missing: {args.dataset_zip}, {args.extract_dir}"
+        )
+    else:
+        print(f"Dataset zip not found; using existing extract dir: {args.extract_dir}")
     raw_dataset_root = find_dataset_root(args)
     dataset_root, filter_summary = prepare_training_root(args, raw_dataset_root)
     class_names = write_class_names(dataset_root, args.class_names_out)
@@ -245,21 +263,28 @@ def main() -> None:
 
     train_ds, val_ds = build_datasets(args, dataset_root)
 
-    try:
-        model, base_model = build_model(
-            class_count=len(class_names),
-            image_size=args.image_size,
-            weights=resolve_weights(args.weights),
-        )
-    except Exception:
-        if args.weights != "auto":
-            raise
-        print("ImageNet weights unavailable; retrying with random EfficientNetB0 weights.")
-        model, base_model = build_model(
-            class_count=len(class_names),
-            image_size=args.image_size,
-            weights=None,
-        )
+    base_model = None
+    if args.initial_model is not None:
+        if not args.initial_model.exists():
+            raise FileNotFoundError(f"Initial model not found: {args.initial_model}")
+        print(f"Loading initial model: {args.initial_model}")
+        model = tf.keras.models.load_model(args.initial_model)
+    else:
+        try:
+            model, base_model = build_model(
+                class_count=len(class_names),
+                image_size=args.image_size,
+                weights=resolve_weights(args.weights),
+            )
+        except Exception:
+            if args.weights != "auto":
+                raise
+            print("ImageNet weights unavailable; retrying with random EfficientNetB0 weights.")
+            model, base_model = build_model(
+                class_count=len(class_names),
+                image_size=args.image_size,
+                weights=None,
+            )
 
     args.model_out.parent.mkdir(parents=True, exist_ok=True)
     checkpoint_path = args.model_out.with_suffix(".best.keras")
@@ -297,9 +322,12 @@ def main() -> None:
     )
 
     if args.fine_tune_epochs > 0:
-        base_model.trainable = True
-        for layer in base_model.layers[:-args.fine_tune_layers]:
-            layer.trainable = False
+        if base_model is not None:
+            base_model.trainable = True
+            for layer in base_model.layers[:-args.fine_tune_layers]:
+                layer.trainable = False
+        else:
+            set_last_layers_trainable(model, args.fine_tune_layers)
 
         compile_model(model, learning_rate=1e-5)
         fine_history = model.fit(

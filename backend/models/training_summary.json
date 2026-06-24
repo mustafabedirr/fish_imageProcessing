@@ -1,59 +1,25 @@
-{
-  "dataset_zip": "C:\\Users\\Mustafa\\Downloads\\archive.zip",
-  "raw_dataset_root": "C:\\aquascope_project\\aquascope\\backend\\training_runs\\prepared_classification",
-  "dataset_root": "C:\\aquascope_project\\aquascope\\backend\\training_runs\\filtered_classification",
-  "image_sources": [
-    "cropped",
-    "raw_images"
-  ],
-  "linked_by_source": {
-    "cropped": 4411,
-    "raw_images": 4396
-  },
-  "filter_summary": {
-    "source_class_count": 483,
-    "source_image_count": 8807,
-    "filtered_class_count": 193,
-    "filtered_image_count": 5475,
-    "min_images_per_class": 20,
-    "class_name_pattern": "^[A-Za-z][A-Za-z_]+$",
-    "dropped_class_count": 290,
-    "reused_existing": false
-  },
-  "class_count": 193,
-  "image_size": 224,
-  "batch_size": 24,
-  "epochs_completed": 14,
-  "model_out": "C:\\aquascope_project\\aquascope\\backend\\models\\fish_model.best.keras",
-  "class_names_out": "C:\\aquascope_project\\aquascope\\backend\\data\\class_names.json",
-  "best_val_accuracy": {
-    "epoch": "11",
-    "accuracy": "0.9550228118896484",
-    "learning_rate": "0.0010000000474974513",
-    "loss": "0.16198064386844635",
-    "top5_accuracy": "0.9979451894760132",
-    "val_accuracy": "0.9726027250289917",
-    "val_loss": "0.12744247913360596",
-    "val_top5_accuracy": "0.9954338073730469"
-  },
-  "best_val_top5_accuracy": {
-    "epoch": "9",
-    "accuracy": "0.9557077884674072",
-    "learning_rate": "0.0010000000474974513",
-    "loss": "0.17460940778255463",
-    "top5_accuracy": "0.9977169036865234",
-    "val_accuracy": "0.9643835425376892",
-    "val_loss": "0.15584251284599304",
-    "val_top5_accuracy": "0.9963470101356506"
-  },
-  "last_epoch": {
-    "epoch": "13",
-    "accuracy": "0.9618721604347229",
-    "learning_rate": "0.0010000000474974513",
-    "loss": "0.13411813974380493",
-    "top5_accuracy": "0.9984018206596375",
-    "val_accuracy": "0.96712327003479",
-    "val_loss": "0.13224205374717712",
-    "val_top5_accuracy": "0.9954338073730469"
-  }
+﻿{
+    "retrained_at":  "2026-06-24T19:09:29",
+    "dataset_root":  "backend/training_runs/filtered_combined_classification",
+    "combined_dataset_root":  "backend/training_runs/combined_classification",
+    "turkey_seed":  "backend/data/turkey_species_seed.json",
+    "class_count":  226,
+    "image_size":  224,
+    "batch_size":  16,
+    "min_images_per_class":  20,
+    "filtered_image_count":  8813,
+    "dropped_class_count":  3,
+    "model_out":  "backend/models/fish_model.best.keras",
+    "class_names_out":  "backend/data/class_names.json",
+    "note":  "Retrained from checkpoint on native Windows TensorFlow CPU; TensorFlow GPU was unavailable in this environment.",
+    "best_val_accuracy":  {
+                              "epoch":  "5",
+                              "accuracy":  "0.9316409230232239",
+                              "learning_rate":  "9.999999747378752e-06",
+                              "loss":  "0.10970913618803024",
+                              "top5_accuracy":  "0.9936179518699646",
+                              "val_accuracy":  "0.8938705921173096",
+                              "val_loss":  "0.44006022810935974",
+                              "val_top5_accuracy\r":  "0.9801362156867981\r"
+                          }
 }

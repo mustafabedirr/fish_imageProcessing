@@ -59,6 +59,7 @@ type SocialPost = {
   comments: number;
   likedByViewer?: boolean;
   savedByViewer?: boolean;
+  authorFollowedByViewer?: boolean;
   photos: string[];
   location?: string;
   profile?: {
@@ -89,6 +90,7 @@ type ApiFeedPost = {
   comments: number;
   likedByViewer?: boolean;
   savedByViewer?: boolean;
+  authorFollowedByViewer?: boolean;
   createdAt: string;
   author: string;
   handle: string;
@@ -96,6 +98,27 @@ type ApiFeedPost = {
   authorProfile?: SocialPost["profile"];
 };
 
+
+
+type SocialSearchUser = {
+  id: string;
+  name: string;
+  handle: string;
+  avatarUrl?: string;
+  region?: string;
+  level?: string;
+};
+type ApiPostComment = {
+  id: string;
+  postId?: string;
+  userId?: string;
+  body: string;
+  createdAt: string;
+  author?: string | null;
+  handle?: string | null;
+  avatar?: string | null;
+  comments?: number;
+};
 function formatFeedTime(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
@@ -124,6 +147,7 @@ function mapApiPost(post: ApiFeedPost): SocialPost {
     comments: post.comments,
     likedByViewer: post.likedByViewer,
     savedByViewer: post.savedByViewer,
+    authorFollowedByViewer: post.authorFollowedByViewer,
     photos: post.mediaUrls ?? [],
     location: post.region,
     profile: post.authorProfile,
@@ -589,8 +613,8 @@ const interactionComments = [
 const feedTabs = ["For You", "Following", "Popular", "Groups", "Saved"] as const;
 type FeedTab = (typeof feedTabs)[number];
 const feedTabLabels: Record<FeedTab, string> = {
-  "For You": "Tum Gonderiler",
-  Following: "Takip Ettiklerim",
+  "For You": "For you",
+  Following: "Following",
   Popular: "Popular",
   Groups: "Groups",
   Saved: "Saved",
@@ -673,6 +697,7 @@ export default function SocialAreaWorkspace() {
   const [posts, setPosts] = useState(feedPosts);
   const [activeTab, setActiveTab] = useState<FeedTab>("For You");
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchUsers, setSearchUsers] = useState<SocialSearchUser[]>([]);
   const [composerText, setComposerText] = useState("");
   const [audience, setAudience] = useState("Everyone");
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -680,7 +705,9 @@ export default function SocialAreaWorkspace() {
   const [sharedPosts, setSharedPosts] = useState<Record<string, boolean>>({});
   const [bookmarkedPosts, setBookmarkedPosts] = useState<Record<string, boolean>>({});
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
+  const [postComments, setPostComments] = useState<Record<string, ApiPostComment[]>>({});
   const [addedFriends, setAddedFriends] = useState<Record<string, boolean>>({});
+  const [followedUsers, setFollowedUsers] = useState<Record<string, boolean>>({});
   const [hiddenFriends, setHiddenFriends] = useState<Record<string, boolean>>({});
   const [joinedEvent, setJoinedEvent] = useState(false);
   const [notice, setNotice] = useState("Topluluk akışınız hazır.");
@@ -689,6 +716,16 @@ export default function SocialAreaWorkspace() {
   const [activeStoryIndex, setActiveStoryIndex] = useState<number | null>(null);
   const storyRailRef = useRef<HTMLElement | null>(null);
 
+
+  useEffect(() => {
+    fetch("/api/users")
+      .then(async (response) => {
+        const data = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(String(data?.error ?? "Kullanicilar yuklenemedi."));
+        setSearchUsers(Array.isArray(data?.users) ? data.users : []);
+      })
+      .catch(() => setSearchUsers([]));
+  }, []);
   useEffect(() => {
     let cancelled = false;
     const endpoint = activeTab === "Following" ? "/api/posts?feed=following" : "/api/posts";
@@ -703,6 +740,10 @@ export default function SocialAreaWorkspace() {
           setPosts(activeTab === "Following" ? apiPosts : (apiPosts.length ? apiPosts : feedPosts));
           setLikedPosts(Object.fromEntries(rawPosts.filter((post) => post.likedByViewer).map((post) => [post.id, true])));
           setBookmarkedPosts(Object.fromEntries(rawPosts.filter((post) => post.savedByViewer).map((post) => [post.id, true])));
+          setFollowedUsers((current) => ({
+            ...current,
+            ...Object.fromEntries(rawPosts.filter((post) => post.authorFollowedByViewer && post.authorProfile?.userId).map((post) => [post.authorProfile!.userId, true])),
+          }));
           setNotice(activeTab === "Following" && apiPosts.length === 0 ? "Takip ettiginiz kullanicilardan henuz paylasim yok." : "Topluluk akisiniz hazir.");
         }
       })
@@ -719,6 +760,28 @@ export default function SocialAreaWorkspace() {
     };
   }, [activeTab]);
 
+  const commentsLoadedForPost = activeModal === "comments" ? activeFlowPostId : null;
+  useEffect(() => {
+    if (!commentsLoadedForPost || postComments[commentsLoadedForPost]) return;
+
+    fetch(`/api/posts/${commentsLoadedForPost}/comments`)
+      .then(async (response) => {
+        const data = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(String(data?.error ?? "Yorumlar yuklenemedi."));
+        const comments: ApiPostComment[] = Array.isArray(data?.comments) ? data.comments : [];
+        setPostComments((current) => ({ ...current, [commentsLoadedForPost]: comments }));
+      })
+      .catch(() => setNotice("Yorumlar yuklenemedi."));
+  }, [commentsLoadedForPost, postComments]);
+
+  const userSearchResults = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (query.length < 2) return [];
+    return searchUsers
+      .filter((item) => item.id !== user?.id)
+      .filter((item) => item.name.toLowerCase().includes(query) || item.handle.toLowerCase().includes(query))
+      .slice(0, 6);
+  }, [searchQuery, searchUsers, user?.id]);
   const visiblePosts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     const searched = posts.filter((post) => {
@@ -747,11 +810,7 @@ export default function SocialAreaWorkspace() {
     const targetPost = posts.find((post) => post.id === postId) ?? visiblePosts.find((post) => post.id === postId);
     setLikedPosts((current) => ({ ...current, [postId]: nextActive }));
     if (targetPost) updatePostCount(postId, { likes: Math.max(0, targetPost.likes + (nextActive ? 1 : -1)) });
-    fetch(`/api/posts/${postId}/like`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ active: nextActive }),
-    })
+    fetch(`/api/posts/${postId}/like`, nextActive ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ active: true }) } : { method: "DELETE" })
       .then(async (response) => {
         const data = await response.json().catch(() => null);
         if (!response.ok) throw new Error(String(data?.error ?? "Begeni kaydedilemedi."));
@@ -772,7 +831,20 @@ export default function SocialAreaWorkspace() {
 
   const submitPostComment = (postId: string, body: string) => {
     const targetPost = visiblePosts.find((post) => post.id === postId) ?? posts.find((post) => post.id === postId);
+    const localId = `local-comment-${Date.now()}`;
+    const optimisticComment: ApiPostComment = {
+      id: localId,
+      postId,
+      body,
+      createdAt: new Date().toISOString(),
+      author: currentUserName,
+      handle: currentUserHandle,
+      avatar: currentUserAvatar,
+    };
+
+    setPostComments((current) => ({ ...current, [postId]: [...(current[postId] ?? []), optimisticComment] }));
     setCommentCounts((current) => ({ ...current, [postId]: (current[postId] ?? targetPost?.comments ?? 0) + 1 }));
+
     fetch(`/api/posts/${postId}/comments`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -781,12 +853,32 @@ export default function SocialAreaWorkspace() {
       .then(async (response) => {
         const data = await response.json().catch(() => null);
         if (!response.ok) throw new Error(String(data?.error ?? "Yorum kaydedilemedi."));
+        if (data?.comment) {
+          setPostComments((current) => ({
+            ...current,
+            [postId]: (current[postId] ?? []).map((comment) => comment.id === localId ? data.comment : comment),
+          }));
+        }
         if (typeof data?.comment?.comments === "number") {
           setCommentCounts((current) => ({ ...current, [postId]: data.comment.comments }));
           updatePostCount(postId, { comments: data.comment.comments });
         }
       })
       .catch(() => setNotice("Yorum kaydedilemedi. Oturumunuzu kontrol edin."));
+  };
+
+  const toggleAuthorFollow = (userId?: string) => {
+    if (!userId) return;
+    const nextActive = !followedUsers[userId];
+    setFollowedUsers((current) => ({ ...current, [userId]: nextActive }));
+    fetch("/api/follows", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ followingId: userId, active: nextActive }),
+    }).catch(() => {
+      setFollowedUsers((current) => ({ ...current, [userId]: !nextActive }));
+      setNotice("Takip islemi tamamlanamadi. Oturumunuzu kontrol edin.");
+    });
   };
   const createPost = async () => {
     const text = composerText.trim();
@@ -1104,15 +1196,33 @@ export default function SocialAreaWorkspace() {
 
         <aside className="social-interactions-panel">
           <div className="social-side-toolbar">
-            <label className="social-search">
-              <Search size={16} />
-              <input
-                type="search"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-              />
-            </label>
+            <div className="social-search-wrap">
+              <label className="social-search">
+                <Search size={16} />
+                <input
+                  type="search"
+                  placeholder="Search users, posts..."
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                />
+              </label>
+              {userSearchResults.length ? (
+                <div className="social-user-search-results">
+                  {userSearchResults.map((item) => (
+                    <article key={item.id}>
+                      <img src={item.avatarUrl ?? avatar} alt={item.name} />
+                      <div>
+                        <strong>{item.name}</strong>
+                        <span>{item.handle} · {item.region ?? item.level ?? "AquaScope"}</span>
+                      </div>
+                      <button type="button" className={followedUsers[item.id] ? "is-active" : ""} onClick={() => toggleAuthorFollow(item.id)}>
+                        {followedUsers[item.id] ? "Takipte" : "Takip Et"}
+                      </button>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
+            </div>
             <div className="social-side-actions">
               <NotificationPopover buttonClassName="social-bell" panelClassName="social-notification-panel" iconSize={17} label="Notifications" />
               <FriendRequestsPopover
@@ -1198,6 +1308,8 @@ export default function SocialAreaWorkspace() {
           isLiked={Boolean(activeFlowPostId && likedPosts[activeFlowPostId])}
           likeCount={(visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).likes}
           commentCount={activeFlowPostId ? (commentCounts[activeFlowPostId] ?? (visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).comments) : 0}
+          comments={activeFlowPostId ? (postComments[activeFlowPostId] ?? []) : []}
+          isFollowing={Boolean((visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).profile?.userId && followedUsers[(visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).profile!.userId])}
           currentUserName={currentUserName}
           currentUserAvatar={currentUserAvatar}
           onClose={closeModal}
@@ -1211,6 +1323,7 @@ export default function SocialAreaWorkspace() {
             if (!targetPostId) return;
             togglePostLike(targetPostId);
           }}
+          onToggleFollow={() => toggleAuthorFollow((visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).profile?.userId)}
           onSubmitComment={(comment) => {
             const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? posts[0]?.id;
             if (!targetPostId) return;
@@ -1318,7 +1431,6 @@ function FriendRequestsPopover({
   const [open, setOpen] = useState(false);
   const popoverRef = useRef<HTMLDivElement | null>(null);
   const visibleFriends = suggestedFriends.filter(([name]) => !hiddenFriends[name]);
-
   useEffect(() => {
     if (!open) return undefined;
 
@@ -1399,12 +1511,10 @@ function StoryViewer({
   const [isPaused, setIsPaused] = useState(false);
   const progressRef = useRef(0);
   const storyDurationMs = 5200;
-
   useEffect(() => {
     progressRef.current = 0;
     setProgress(0);
   }, [activeIndex]);
-
   useEffect(() => {
     if (isPaused) return;
     const startedAt = performance.now() - (progressRef.current / 100) * storyDurationMs;
@@ -1425,8 +1535,7 @@ function StoryViewer({
 
     animationFrame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(animationFrame);
-  }, [activeIndex, isPaused, onNext]);
-
+  }, [activeIndex, isPaused, onNext]);
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowRight") onNext();
@@ -1544,11 +1653,14 @@ function PostInteractionModal({
   isLiked,
   likeCount,
   commentCount,
+  comments,
+  isFollowing,
   currentUserName,
   currentUserAvatar,
   onClose,
   onToggleBookmark,
   onToggleLike,
+  onToggleFollow,
   onSubmitComment,
 }: {
   post: (typeof feedPosts)[number];
@@ -1556,11 +1668,14 @@ function PostInteractionModal({
   isLiked: boolean;
   likeCount: number;
   commentCount: number;
+  comments: ApiPostComment[];
+  isFollowing: boolean;
   currentUserName: string;
   currentUserAvatar: string;
   onClose: () => void;
   onToggleBookmark: () => void;
   onToggleLike: () => void;
+  onToggleFollow: () => void;
   onSubmitComment: (comment: string) => void;
 }) {
   const [comment, setComment] = useState("");
@@ -1636,9 +1751,9 @@ function PostInteractionModal({
               <strong>{post.author}</strong>
               <span>{post.time}</span>
             </div>
-            <button type="button" className="social-detail-follow">
+            <button type="button" className={isFollowing ? "social-detail-follow is-active" : "social-detail-follow"} onClick={onToggleFollow}>
               <Users size={15} />
-              Follow
+              {isFollowing ? "Following" : "Follow"}
             </button>
             <button type="button" className="social-detail-more" aria-label="Post options">
               <MoreVertical size={19} />
@@ -1686,7 +1801,13 @@ function PostInteractionModal({
                 <ChevronDown size={14} />
               </button>
             </div>
-            {interactionComments.map((item) => (
+            {(comments.length ? comments.map((comment) => ({
+              author: comment.author ?? "AquaScope User",
+              time: formatFeedTime(comment.createdAt),
+              text: comment.body,
+              likes: 0,
+              avatar: comment.avatar ?? avatar,
+            })) : interactionComments).map((item) => (
               <article key={`${item.author}-${item.time}`}>
                 <img src={item.avatar} alt={item.author} />
                 <div>

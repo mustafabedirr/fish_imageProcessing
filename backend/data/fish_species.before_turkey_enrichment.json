@@ -1,0 +1,82 @@
+{
+  "caranx_melampygus": {
+    "name_tr": "Mavi Trevally",
+    "edible": true,
+    "ideal_size": "40+ cm",
+    "recommended_baits": [
+      "Canlı yem",
+      "Sahte jig"
+    ],
+    "recommended_gear": [
+      "Spin",
+      "Heavy jigging"
+    ],
+    "region_notes": [
+      "Tropikal okyanuslar",
+      "Resif bölgeleri"
+    ]
+  },
+  "oxymonacanthus_longirostris": {
+    "name_tr": "Uzun Burunlu Filefish",
+    "edible": false,
+    "ideal_size": "Avlanmaz",
+    "recommended_baits": [
+      "—"
+    ],
+    "recommended_gear": [
+      "—"
+    ],
+    "region_notes": [
+      "Mercan resifleri",
+      "Hint-Pasifik"
+    ]
+  },
+  "cantherhines_pardalis": {
+    "name_tr": "Benekli Filefish",
+    "edible": true,
+    "ideal_size": "25+ cm",
+    "recommended_baits": [
+      "Karides",
+      "Yumuşak yemler"
+    ],
+    "recommended_gear": [
+      "Light spin"
+    ],
+    "region_notes": [
+      "Resifler",
+      "Tropikal sular"
+    ]
+  },
+  "halichoeres_melanurus": {
+    "name_tr": "Melanurus Wrasse",
+    "edible": false,
+    "ideal_size": "Avlanmaz",
+    "recommended_baits": [
+      "—"
+    ],
+    "recommended_gear": [
+      "—"
+    ],
+    "region_notes": [
+      "Resif çevresi",
+      "Kumluk alanlar"
+    ]
+  },
+  "lethrinus_nebulosus": {
+    "name_tr": "İmparator Balığı",
+    "edible": true,
+    "ideal_size": "35+ cm",
+    "recommended_baits": [
+      "Karides",
+      "Küçük balık"
+    ],
+    "recommended_gear": [
+      "Dip oltası",
+      "Tekne avı"
+    ],
+    "region_notes": [
+      "Hint Okyanusu",
+      "Kıyı resifleri"
+    ]
+  }
+}

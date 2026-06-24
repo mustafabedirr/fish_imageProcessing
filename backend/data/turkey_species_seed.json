@@ -1,0 +1,526 @@
+{
+    "schema_version":  1,
+    "purpose":  "Turkey-focused fish species candidates for extending the AquaScope image classifier.",
+    "image_source_policy":  {
+                                "primary_source":  "iNaturalist observations API",
+                                "query_template":  "https://api.inaturalist.org/v1/observations?taxon_name={scientific_name}\u0026photos=true\u0026quality_grade=research\u0026licensed=true\u0026photo_license=cc0,cc-by,cc-by-sa",
+                                "quality_grade":  "research",
+                                "requires_photos":  true,
+                                "requires_licensed_media":  true,
+                                "accepted_photo_licenses":  [
+                                                                "cc0",
+                                                                "cc-by",
+                                                                "cc-by-sa"
+                                                            ],
+                                "recommended_min_images_per_class":  80,
+                                "preferred_images_per_class":  200
+                            },
+    "species":  [
+                    {
+                        "class_name":  "dicentrarchus_labrax",
+                        "scientific_name":  "Dicentrarchus labrax",
+                        "name_tr":  "Levrek",
+                        "regions_tr":  [
+                                           "Ege",
+                                           "Akdeniz",
+                                           "Marmara",
+                                           "Karadeniz"
+                                       ],
+                        "priority":  "high",
+                        "edible":  true,
+                        "licensed_research_photo_count":  228,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "sparus_aurata",
+                        "scientific_name":  "Sparus aurata",
+                        "name_tr":  "Çipura",
+                        "regions_tr":  [
+                                           "Ege",
+                                           "Akdeniz",
+                                           "Marmara"
+                                       ],
+                        "priority":  "high",
+                        "edible":  true,
+                        "licensed_research_photo_count":  214,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "engraulis_encrasicolus",
+                        "scientific_name":  "Engraulis encrasicolus",
+                        "name_tr":  "Hamsi",
+                        "regions_tr":  [
+                                           "Karadeniz",
+                                           "Marmara"
+                                       ],
+                        "priority":  "high",
+                        "edible":  true,
+                        "licensed_research_photo_count":  20,
+                        "training_status":  "needs_more_sources"
+                    },
+                    {
+                        "class_name":  "sardina_pilchardus",
+                        "scientific_name":  "Sardina pilchardus",
+                        "name_tr":  "Sardalya",
+                        "regions_tr":  [
+                                           "Ege",
+                                           "Akdeniz",
+                                           "Marmara",
+                                           "Karadeniz"
+                                       ],
+                        "priority":  "high",
+                        "edible":  true,
+                        "licensed_research_photo_count":  29,
+                        "training_status":  "needs_more_sources"
+                    },
+                    {
+                        "class_name":  "trachurus_mediterraneus",
+                        "scientific_name":  "Trachurus mediterraneus",
+                        "name_tr":  "İstavrit",
+                        "regions_tr":  [
+                                           "Karadeniz",
+                                           "Marmara",
+                                           "Ege",
+                                           "Akdeniz"
+                                       ],
+                        "priority":  "high",
+                        "edible":  true,
+                        "licensed_research_photo_count":  6,
+                        "training_status":  "needs_more_sources"
+                    },
+                    {
+                        "class_name":  "trachurus_trachurus",
+                        "scientific_name":  "Trachurus trachurus",
+                        "name_tr":  "Karagöz İstavrit",
+                        "regions_tr":  [
+                                           "Karadeniz",
+                                           "Marmara",
+                                           "Ege"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  186,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "scomber_scombrus",
+                        "scientific_name":  "Scomber scombrus",
+                        "name_tr":  "Uskumru",
+                        "regions_tr":  [
+                                           "Karadeniz",
+                                           "Marmara",
+                                           "Ege"
+                                       ],
+                        "priority":  "high",
+                        "edible":  true,
+                        "licensed_research_photo_count":  85,
+                        "training_status":  "usable"
+                    },
+                    {
+                        "class_name":  "scomber_colias",
+                        "scientific_name":  "Scomber colias",
+                        "name_tr":  "Kolyoz",
+                        "regions_tr":  [
+                                           "Ege",
+                                           "Akdeniz",
+                                           "Marmara"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  22,
+                        "training_status":  "needs_more_sources"
+                    },
+                    {
+                        "class_name":  "sarda_sarda",
+                        "scientific_name":  "Sarda sarda",
+                        "name_tr":  "Palamut",
+                        "regions_tr":  [
+                                           "Karadeniz",
+                                           "Marmara",
+                                           "Ege",
+                                           "Akdeniz"
+                                       ],
+                        "priority":  "high",
+                        "edible":  true,
+                        "licensed_research_photo_count":  2152,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "pomatomus_saltatrix",
+                        "scientific_name":  "Pomatomus saltatrix",
+                        "name_tr":  "Lüfer",
+                        "regions_tr":  [
+                                           "Karadeniz",
+                                           "Marmara",
+                                           "Ege"
+                                       ],
+                        "priority":  "high",
+                        "edible":  true,
+                        "licensed_research_photo_count":  151,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "mugil_cephalus",
+                        "scientific_name":  "Mugil cephalus",
+                        "name_tr":  "Kefal",
+                        "regions_tr":  [
+                                           "Karadeniz",
+                                           "Marmara",
+                                           "Ege",
+                                           "Akdeniz"
+                                       ],
+                        "priority":  "high",
+                        "edible":  true,
+                        "licensed_research_photo_count":  553,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "mullus_barbatus",
+                        "scientific_name":  "Mullus barbatus",
+                        "name_tr":  "Barbun",
+                        "regions_tr":  [
+                                           "Karadeniz",
+                                           "Marmara",
+                                           "Ege",
+                                           "Akdeniz"
+                                       ],
+                        "priority":  "high",
+                        "edible":  true,
+                        "licensed_research_photo_count":  95,
+                        "training_status":  "usable"
+                    },
+                    {
+                        "class_name":  "mullus_surmuletus",
+                        "scientific_name":  "Mullus surmuletus",
+                        "name_tr":  "Tekir",
+                        "regions_tr":  [
+                                           "Marmara",
+                                           "Ege",
+                                           "Akdeniz"
+                                       ],
+                        "priority":  "high",
+                        "edible":  true,
+                        "licensed_research_photo_count":  374,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "merluccius_merluccius",
+                        "scientific_name":  "Merluccius merluccius",
+                        "name_tr":  "Mezgit",
+                        "regions_tr":  [
+                                           "Karadeniz",
+                                           "Marmara",
+                                           "Ege",
+                                           "Akdeniz"
+                                       ],
+                        "priority":  "high",
+                        "edible":  true,
+                        "licensed_research_photo_count":  33,
+                        "training_status":  "needs_more_sources"
+                    },
+                    {
+                        "class_name":  "scophthalmus_maximus",
+                        "scientific_name":  "Scophthalmus maximus",
+                        "name_tr":  "Kalkan",
+                        "regions_tr":  [
+                                           "Karadeniz",
+                                           "Marmara"
+                                       ],
+                        "priority":  "high",
+                        "edible":  true,
+                        "licensed_research_photo_count":  15,
+                        "training_status":  "needs_more_sources"
+                    },
+                    {
+                        "class_name":  "scophthalmus_maeoticus",
+                        "scientific_name":  "Scophthalmus maeoticus",
+                        "name_tr":  "Karadeniz Kalkanı",
+                        "regions_tr":  [
+                                           "Karadeniz"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  2,
+                        "training_status":  "needs_more_sources"
+                    },
+                    {
+                        "class_name":  "diplodus_sargus",
+                        "scientific_name":  "Diplodus sargus",
+                        "name_tr":  "Sargoz",
+                        "regions_tr":  [
+                                           "Ege",
+                                           "Akdeniz",
+                                           "Marmara"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  909,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "diplodus_vulgaris",
+                        "scientific_name":  "Diplodus vulgaris",
+                        "name_tr":  "Karagöz",
+                        "regions_tr":  [
+                                           "Ege",
+                                           "Akdeniz",
+                                           "Marmara"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  762,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "pagellus_erythrinus",
+                        "scientific_name":  "Pagellus erythrinus",
+                        "name_tr":  "Kırma Mercan",
+                        "regions_tr":  [
+                                           "Ege",
+                                           "Akdeniz",
+                                           "Marmara"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  55,
+                        "training_status":  "usable"
+                    },
+                    {
+                        "class_name":  "lithognathus_mormyrus",
+                        "scientific_name":  "Lithognathus mormyrus",
+                        "name_tr":  "Mırmır",
+                        "regions_tr":  [
+                                           "Ege",
+                                           "Akdeniz",
+                                           "Marmara"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  281,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "boops_boops",
+                        "scientific_name":  "Boops boops",
+                        "name_tr":  "Kupes",
+                        "regions_tr":  [
+                                           "Ege",
+                                           "Akdeniz",
+                                           "Marmara"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  209,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "spicara_maena",
+                        "scientific_name":  "Spicara maena",
+                        "name_tr":  "İzmarit",
+                        "regions_tr":  [
+                                           "Karadeniz",
+                                           "Marmara",
+                                           "Ege",
+                                           "Akdeniz"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  34,
+                        "training_status":  "needs_more_sources"
+                    },
+                    {
+                        "class_name":  "belone_belone",
+                        "scientific_name":  "Belone belone",
+                        "name_tr":  "Zargana",
+                        "regions_tr":  [
+                                           "Karadeniz",
+                                           "Marmara",
+                                           "Ege",
+                                           "Akdeniz"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  4686,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "zeus_faber",
+                        "scientific_name":  "Zeus faber",
+                        "name_tr":  "Dülger",
+                        "regions_tr":  [
+                                           "Marmara",
+                                           "Ege",
+                                           "Akdeniz",
+                                           "Karadeniz"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  51,
+                        "training_status":  "usable"
+                    },
+                    {
+                        "class_name":  "solea_solea",
+                        "scientific_name":  "Solea solea",
+                        "name_tr":  "Dil Balığı",
+                        "regions_tr":  [
+                                           "Marmara",
+                                           "Ege",
+                                           "Akdeniz",
+                                           "Karadeniz"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  745,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "dentex_dentex",
+                        "scientific_name":  "Dentex dentex",
+                        "name_tr":  "Sinarit",
+                        "regions_tr":  [
+                                           "Ege",
+                                           "Akdeniz"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  311,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "pagrus_pagrus",
+                        "scientific_name":  "Pagrus pagrus",
+                        "name_tr":  "Fangri",
+                        "regions_tr":  [
+                                           "Ege",
+                                           "Akdeniz"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  452,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "sciaena_umbra",
+                        "scientific_name":  "Sciaena umbra",
+                        "name_tr":  "Eşkina",
+                        "regions_tr":  [
+                                           "Marmara",
+                                           "Ege",
+                                           "Akdeniz"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  49,
+                        "training_status":  "needs_more_sources"
+                    },
+                    {
+                        "class_name":  "umbrina_cirrosa",
+                        "scientific_name":  "Umbrina cirrosa",
+                        "name_tr":  "Minekop",
+                        "regions_tr":  [
+                                           "Marmara",
+                                           "Ege",
+                                           "Akdeniz",
+                                           "Karadeniz"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  9,
+                        "training_status":  "needs_more_sources"
+                    },
+                    {
+                        "class_name":  "seriola_dumerili",
+                        "scientific_name":  "Seriola dumerili",
+                        "name_tr":  "Akya",
+                        "regions_tr":  [
+                                           "Ege",
+                                           "Akdeniz",
+                                           "Marmara"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  88,
+                        "training_status":  "usable"
+                    },
+                    {
+                        "class_name":  "coryphaena_hippurus",
+                        "scientific_name":  "Coryphaena hippurus",
+                        "name_tr":  "Lambuka",
+                        "regions_tr":  [
+                                           "Ege",
+                                           "Akdeniz"
+                                       ],
+                        "priority":  "low",
+                        "edible":  true,
+                        "licensed_research_photo_count":  87,
+                        "training_status":  "usable"
+                    },
+                    {
+                        "class_name":  "siganus_rivulatus",
+                        "scientific_name":  "Siganus rivulatus",
+                        "name_tr":  "Sokar",
+                        "regions_tr":  [
+                                           "Akdeniz",
+                                           "Ege"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  153,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "siganus_luridus",
+                        "scientific_name":  "Siganus luridus",
+                        "name_tr":  "Esmer Sokar",
+                        "regions_tr":  [
+                                           "Akdeniz",
+                                           "Ege"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  153,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "lagocephalus_sceleratus",
+                        "scientific_name":  "Lagocephalus sceleratus",
+                        "name_tr":  "Balon Balığı",
+                        "regions_tr":  [
+                                           "Akdeniz",
+                                           "Ege"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  false,
+                        "licensed_research_photo_count":  18,
+                        "training_status":  "needs_more_sources"
+                    },
+                    {
+                        "class_name":  "epinephelus_marginatus",
+                        "scientific_name":  "Epinephelus marginatus",
+                        "name_tr":  "Orfoz",
+                        "regions_tr":  [
+                                           "Ege",
+                                           "Akdeniz"
+                                       ],
+                        "priority":  "low",
+                        "edible":  false,
+                        "licensed_research_photo_count":  330,
+                        "training_status":  "ready"
+                    },
+                    {
+                        "class_name":  "chelidonichthys_lucerna",
+                        "scientific_name":  "Chelidonichthys lucerna",
+                        "name_tr":  "Kırlangıç Balığı",
+                        "regions_tr":  [
+                                           "Karadeniz",
+                                           "Marmara",
+                                           "Ege",
+                                           "Akdeniz"
+                                       ],
+                        "priority":  "medium",
+                        "edible":  true,
+                        "licensed_research_photo_count":  47,
+                        "training_status":  "needs_more_sources"
+                    }
+                ]
+}

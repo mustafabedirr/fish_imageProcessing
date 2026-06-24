@@ -16,7 +16,6 @@ from tensorflow.keras.models import load_model
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_CANDIDATES = (
     BASE_DIR / "models" / "fish_model.best.keras",
-    BASE_DIR / "models" / "fish_model.h5",
 )
 CLASS_NAMES_PATH = BASE_DIR / "data" / "class_names.json"
 FISH_INFO_PATH = BASE_DIR / "data" / "fish_species.json"

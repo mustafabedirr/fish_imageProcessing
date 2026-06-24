@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent, ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Check,
@@ -21,6 +21,15 @@ import {
   X,
 } from "lucide-react";
 
+type ArchivedSpeciesItem = {
+  id: string;
+  species: string;
+  latin: string;
+  score: number;
+  records: number;
+  photos: string[];
+  tags: string[];
+};
 type FishSpecies = {
   id: string;
   name: string;
@@ -34,6 +43,7 @@ type FishSpecies = {
   records: number;
   image: string;
   favorite: boolean;
+  photos?: string[];
 };
 
 const initialSpeciesCards: FishSpecies[] = [
@@ -371,7 +381,22 @@ export default function SpeciesLibraryWorkspace() {
   const [favoriteOnly, setFavoriteOnly] = useState(false);
   const [favorites, setFavorites] = useState(() => new Set(initialSpeciesCards.filter((fish) => fish.favorite).map((fish) => fish.id)));
   const [page, setPage] = useState(1);
+  const [galleryFish, setGalleryFish] = useState<FishSpecies | null>(null);
 
+
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/library/archive")
+      .then((response) => response.json())
+      .then((data) => {
+        if (!alive || !Array.isArray(data?.items)) return;
+        setSpeciesList((current) => mergeArchivedSpecies(current, data.items));
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, []);
   const filteredSpecies = useMemo(() => {
     const normalizedQuery = normalize(query);
     const result = speciesList.filter((fish) => {
@@ -518,9 +543,10 @@ export default function SpeciesLibraryWorkspace() {
             <section className={viewMode === "grid" ? "fish-library-grid" : "fish-library-grid fish-library-grid--list"} aria-label="Balik turleri">
               {pagedSpecies.length ? (
                 pagedSpecies.map((fish) => (
-                  <article className="fish-library-card" key={fish.id}>
+                  <article className="fish-library-card" key={fish.id} role="button" tabIndex={0} onClick={() => setGalleryFish(fish)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setGalleryFish(fish); }}>
                     <img src={fish.image} alt={fish.name} />
-                    <button type="button" className={`fish-library-favorite${favorites.has(fish.id) ? " is-active" : ""}`} aria-label={`${fish.name} favori`} onClick={() => toggleFavorite(fish.id)}>
+                    {fish.photos?.length ? <span className="fish-library-photo-count">+{fish.photos.length}</span> : null}
+                    <button type="button" className={`fish-library-favorite${favorites.has(fish.id) ? " is-active" : ""}`} aria-label={`${fish.name} favori`} onClick={(event) => { event.stopPropagation(); toggleFavorite(fish.id); }}>
                       <Star size={18} fill={favorites.has(fish.id) ? "currentColor" : "none"} />
                     </button>
                     <div className="fish-library-card-shade" />
@@ -654,6 +680,35 @@ export default function SpeciesLibraryWorkspace() {
           </aside>
         </div>
       </div>
+      {galleryFish ? (
+        <div className="fish-library-gallery-backdrop" role="presentation" onMouseDown={() => setGalleryFish(null)}>
+          <section className="fish-library-gallery" role="dialog" aria-modal="true" aria-label={`${galleryFish.name} foto galeri`} onMouseDown={(event) => event.stopPropagation()}>
+            <button type="button" className="fish-library-gallery-close" aria-label="Galeriyi kapat" onClick={() => setGalleryFish(null)}>
+              <X size={18} />
+            </button>
+            <div className="fish-library-gallery-hero">
+              <img src={(galleryFish.photos?.[0] ?? galleryFish.image)} alt={galleryFish.name} />
+              <div>
+                <span>Arsiv Galerisi</span>
+                <h2>{galleryFish.name}</h2>
+                <p>{galleryFish.latin}</p>
+              </div>
+            </div>
+            <aside>
+              <strong>%{galleryFish.score.toFixed(1)} uygunluk</strong>
+              <span>{galleryFish.records.toLocaleString("tr-TR")} analiz kaydi</span>
+              <div className="fish-library-gallery-tags">
+                {galleryFish.tags.slice(0, 5).map((tag) => <em key={tag}>{tag}</em>)}
+              </div>
+            </aside>
+            <div className="fish-library-gallery-grid">
+              {([...(galleryFish.photos ?? []), galleryFish.image].filter(Boolean)).slice(0, 12).map((photo, index) => (
+                <img src={photo} alt={`${galleryFish.name} arsiv ${index + 1}`} key={`${photo}-${index}`} />
+              ))}
+            </div>
+          </section>
+        </div>
+      ) : null}
       {addModalOpen ? (
         <div className="fish-library-modal-backdrop" role="presentation" onMouseDown={() => setAddModalOpen(false)}>
           <section className="fish-library-modal" role="dialog" aria-modal="true" aria-labelledby="new-species-title" onMouseDown={(event) => event.stopPropagation()}>
@@ -849,4 +904,48 @@ function normalize(value: string) {
     .replaceAll("ö", "o")
     .replaceAll("ş", "s")
     .replaceAll("ü", "u");
+}
+
+function mergeArchivedSpecies(current: FishSpecies[], archiveItems: ArchivedSpeciesItem[]) {
+  const next = [...current];
+
+  for (const item of archiveItems) {
+    const speciesName = item.species?.trim();
+    if (!speciesName) continue;
+
+    const index = next.findIndex((fish) => normalize(fish.name) === normalize(speciesName));
+    const photos = item.photos?.length ? item.photos : [];
+
+    if (index >= 0) {
+      const existing = next[index];
+      const mergedPhotos = Array.from(new Set([...(photos ?? []), ...(existing.photos ?? [])]));
+      next[index] = {
+        ...existing,
+        latin: item.latin || existing.latin,
+        score: item.score > 0 ? Math.max(existing.score, item.score) : existing.score,
+        records: existing.records + Math.max(0, item.records),
+        image: mergedPhotos[0] ?? existing.image,
+        photos: mergedPhotos,
+        tags: Array.from(new Set([...existing.tags, ...(item.tags ?? [])])),
+      };
+    } else {
+      next.unshift({
+        id: `archive-${item.id}`,
+        name: speciesName,
+        latin: item.latin || "Bilimsel ad bekleniyor",
+        group: "Analiz",
+        habitat: item.tags?.[0] ?? "Deniz",
+        region: "AquaScope Arsivi",
+        protection: "Guvenli",
+        tags: item.tags?.length ? item.tags : ["Analiz"],
+        score: item.score || 80,
+        records: Math.max(1, item.records || 1),
+        image: photos[0] ?? "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=900&q=80",
+        favorite: false,
+        photos,
+      });
+    }
+  }
+
+  return next;
 }

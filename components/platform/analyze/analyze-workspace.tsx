@@ -32,10 +32,29 @@ import {
   X,
 } from "lucide-react";
 
+type AnalysisMetric = {
+  label: string;
+  value: number;
+  status: string;
+};
+
+type SizeDistributionBucket = {
+  label: string;
+  value: number;
+};
+
+type ObservationActivityPoint = {
+  date: string;
+  value: number;
+};
+
 type AnalyzeResponse = {
   species: string;
   confidence: number;
   top_predictions: TopPrediction[];
+  analysis_metrics: AnalysisMetric[];
+  size_distribution: SizeDistributionBucket[];
+  observation_activity: ObservationActivityPoint[];
   confidence_threshold: number;
   is_uncertain: boolean;
   name_tr?: string;
@@ -195,30 +214,14 @@ export default function AnalyzeWorkspace() {
   const modelName = result ? "EfficientNet + YOLO Fish_Data" : "AquaScope AI v2.4";
   const imageSet = result ? [previewUrl, ...thumbnails] : thumbnails;
   const stageImage = file ? imageSet[activeImageIndex] ?? previewUrl : previewUrl;
-  const sizeLabels = ["0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60+"];
-  const selectedSizeLabel = sizeLabels[selectedSizeIndex] ?? "40-50";
-  const selectedSizeValue = speciesProfile.distribution[selectedSizeIndex] ?? 0;
+  const sizeDistribution = result?.size_distribution.length ? result.size_distribution : toSizeDistribution(speciesProfile.distribution);
+  const selectedSizeBucket = sizeDistribution[selectedSizeIndex] ?? sizeDistribution[0];
+  const selectedSizeLabel = selectedSizeBucket?.label ?? "40-50";
+  const selectedSizeValue = selectedSizeBucket?.value ?? 0;
   const scoreChartData = [{ name: "Genel Skor", value: confidence }];
   const scoreMetricRows = scoreRows.filter((row) => row.label !== "Tür Doğruluk Skoru");
-  const metricSummaryRows = [
-    { label: "Tahmini Boy", value: measurements[1]?.value ?? "42.3 cm", status: "Standart Boy", icon: TrendingUp },
-    { label: "Tahmini Ağırlık", value: speciesProfile.weight ?? "1.68 kg", status: "Tahmini", icon: BarChart3 },
-    { label: "Su Sıcaklığı", value: speciesProfile.environment.temperature, status: "Uygun", icon: Droplets },
-    { label: "Tuzluluk", value: speciesProfile.environment.salinity, status: "Normal", icon: Waves },
-    { label: "pH Değeri", value: speciesProfile.environment.ph, status: "Normal", icon: Ruler },
-    { label: "Oksijen", value: speciesProfile.environment.oxygen, status: "İdeal", icon: Droplets },
-  ];
-  const observationActivity = [
-    { date: "1 May", value: 6 },
-    { date: "4 May", value: 24 },
-    { date: "8 May", value: 39 },
-    { date: "12 May", value: 44 },
-    { date: "15 May", value: 62 },
-    { date: "18 May", value: 78 },
-    { date: "22 May", value: 51 },
-    { date: "26 May", value: 57 },
-    { date: "29 May", value: 43 },
-  ];
+  const metricSummaryRows = getMetricSummaryRows(result, measurements, speciesProfile);
+  const observationActivity = result?.observation_activity.length ? result.observation_activity : getFallbackObservationActivity(confidence);
   const mcpIntegrations = [
     { label: "Ocean Data", icon: Waves },
     { label: "Species DB", icon: Database },
@@ -392,6 +395,38 @@ export default function AnalyzeWorkspace() {
     setActionMessage(result ? "Analiz raporu hazırlandı." : "Rapor için önce analiz sonucu gerekli.");
   }
 
+  async function handleArchiveAnalysis() {
+    if (!result) {
+      setActionMessage("Arsive eklemek icin once analiz sonucu gerekli.");
+      return;
+    }
+
+    try {
+      const imageUrl = file ? await readFileAsDataUrl(file) : previewUrl;
+      const response = await fetch("/api/library/archive", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          species: displaySpecies,
+          latin: speciesProfile.latin,
+          score: confidence,
+          imageUrl,
+          tags: [speciesProfile.location ?? "Deniz", "Analiz"],
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Arsive ekleme sirasinda hata olustu.");
+      }
+
+      setActionMessage(`${displaySpecies} tur kutuphanesine eklendi.`);
+    } catch (err) {
+      setActionMessage(err instanceof Error ? err.message : "Arsive ekleme basarisiz oldu.");
+    } finally {
+      setIsMoreActionsOpen(false);
+    }
+  }
   return (
     <section className="fish-analyze-page">
       <input
@@ -562,7 +597,7 @@ export default function AnalyzeWorkspace() {
                     {scoreMetricRows.map((row) => {
                       const Icon = row.icon;
                       const value = row.label === "Tür Doğruluk Skoru" ? Math.round(confidence) : row.value;
-                      const description = "description" in row ? row.description : getScoreDescription(row.label);
+                      const description = "description" in row ? String(row.description) : getScoreDescription(row.label);
                       return (
                         <div className="fish-score-recharts-row" key={row.label}>
                           <span className="fish-score-recharts-icon"><Icon size={20} /></span>
@@ -656,21 +691,21 @@ export default function AnalyzeWorkspace() {
                 <h2>Boy Dağılımı</h2>
                 <span className="fish-axis-unit">(%)</span>
                 <div className="fish-size-chart">
-                  {speciesProfile.distribution.map((height, index) => (
+                  {sizeDistribution.map((bucket, index) => (
                     <button
                       className={index === selectedSizeIndex ? "fish-size-column fish-size-column--active" : "fish-size-column"}
-                      style={{ height: `${height}%` }}
+                      style={{ height: `${bucket.value}%` }}
                       key={index}
                       type="button"
                       onClick={() => setSelectedSizeIndex(index)}
-                      aria-label={`${sizeLabels[index]} cm araligi, yuzde ${height}`}
+                      aria-label={`${bucket.label} cm araligi, yuzde ${bucket.value}`}
                     >
                       {index === selectedSizeIndex ? <em>{selectedSizeLabel} cm<br /><b>%{selectedSizeValue}</b></em> : null}
                     </button>
                   ))}
                 </div>
                 <div className="fish-size-labels">
-                  {sizeLabels.map((label) => <span className={label === selectedSizeLabel ? "fish-size-label--active" : ""} key={label}>{label}</span>)}
+                  {sizeDistribution.map((bucket) => <span className={bucket.label === selectedSizeLabel ? "fish-size-label--active" : ""} key={bucket.label}>{bucket.label}</span>)}
                   <small>(cm)</small>
                 </div>
               </article>
@@ -693,7 +728,7 @@ export default function AnalyzeWorkspace() {
                         </linearGradient>
                       </defs>
                       <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: "#8da5c6", fontSize: 10 }} interval={1} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fill: "#8da5c6", fontSize: 10 }} domain={[0, 80]} ticks={[0, 20, 40, 60]} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fill: "#8da5c6", fontSize: 10 }} domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} />
                       <Area
                         type="monotone"
                         dataKey="value"
@@ -749,7 +784,7 @@ export default function AnalyzeWorkspace() {
             </button>
             {isMoreActionsOpen ? (
               <div className="fish-more-actions" role="menu">
-                <button type="button" onClick={() => { setActionMessage("Analiz arşive eklendi."); setIsMoreActionsOpen(false); }}>Arsive ekle</button>
+                <button type="button" onClick={() => void handleArchiveAnalysis()}>Arsive ekle</button>
                 <button type="button" onClick={() => { setActionMessage("Karşılaştırma listesine eklendi."); setIsMoreActionsOpen(false); }}>Karsilastir</button>
               </div>
             ) : null}
@@ -876,6 +911,9 @@ function normalizeAnalyzeResponse(data: unknown): AnalyzeResponse {
     species,
     confidence,
     top_predictions: readTopPredictions(payload),
+    analysis_metrics: readAnalysisMetrics(payload, "analysis_metrics"),
+    size_distribution: readSizeDistribution(payload, "size_distribution"),
+    observation_activity: readObservationActivity(payload, "observation_activity"),
     confidence_threshold: confidenceThreshold,
     is_uncertain: readBoolean(payload, "is_uncertain") ?? normalizedConfidence < normalizedThreshold,
     name_tr: readString(payload, "name_tr"),
@@ -888,6 +926,91 @@ function normalizeAnalyzeResponse(data: unknown): AnalyzeResponse {
   };
 }
 
+function readAnalysisMetrics(payload: Record<string, unknown>, key: string): AnalysisMetric[] {
+  const value = payload[key];
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item) => {
+      if (!isRecord(item)) return null;
+      const label = readString(item, "label");
+      const metricValue = readNumber(item, "value");
+      if (!label || metricValue === null) return null;
+      return {
+        label,
+        value: Math.round(Math.max(0, Math.min(100, metricValue))),
+        status: readString(item, "status") || getMetricStatus(metricValue),
+      };
+    })
+    .filter((item): item is AnalysisMetric => item !== null);
+}
+
+function readSizeDistribution(payload: Record<string, unknown>, key: string): SizeDistributionBucket[] {
+  const value = payload[key];
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item) => {
+      if (!isRecord(item)) return null;
+      const label = readString(item, "label");
+      const bucketValue = readNumber(item, "value");
+      if (!label || bucketValue === null) return null;
+      return { label, value: Math.round(Math.max(0, Math.min(100, bucketValue))) };
+    })
+    .filter((item): item is SizeDistributionBucket => item !== null);
+}
+
+function readObservationActivity(payload: Record<string, unknown>, key: string): ObservationActivityPoint[] {
+  const value = payload[key];
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item) => {
+      if (!isRecord(item)) return null;
+      const date = readString(item, "date");
+      const pointValue = readNumber(item, "value");
+      if (!date || pointValue === null) return null;
+      return { date, value: Math.round(Math.max(0, Math.min(100, pointValue))) };
+    })
+    .filter((item): item is ObservationActivityPoint => item !== null);
+}
+
+function toSizeDistribution(values: number[]): SizeDistributionBucket[] {
+  const labels = ["0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60+"];
+  return labels.map((label, index) => ({ label, value: Math.round(Math.max(0, Math.min(100, values[index] ?? 0))) }));
+}
+
+function getMetricSummaryRows(result: AnalyzeResponse | null, measurements: ReturnType<typeof getMeasurementsFromResult>, profile: SpeciesProfile) {
+  const iconMap = [Target, Camera, MapPin, BarChart3];
+  const apiRows = result?.analysis_metrics.map((metric, index) => ({
+    label: metric.label,
+    value: `${metric.value} / 100`,
+    status: metric.status,
+    icon: iconMap[index % iconMap.length],
+  })) ?? [];
+
+  if (apiRows.length) return apiRows;
+
+  return [
+    { label: "Tahmini Boy", value: measurements[1]?.value ?? "42.3 cm", status: "Standart Boy", icon: TrendingUp },
+    { label: "Tahmini Agirlik", value: profile.weight ?? "1.68 kg", status: "Tahmini", icon: BarChart3 },
+    { label: "Su Sicakligi", value: profile.environment.temperature, status: "Uygun", icon: Droplets },
+    { label: "Tuzluluk", value: profile.environment.salinity, status: "Normal", icon: Waves },
+  ];
+}
+
+function getFallbackObservationActivity(confidence: number): ObservationActivityPoint[] {
+  const labels = ["1 May", "4 May", "8 May", "12 May", "15 May", "18 May", "22 May", "26 May", "29 May"];
+  const base = Math.max(10, Math.round(confidence * 0.52));
+  return labels.map((date, index) => ({ date, value: Math.max(4, Math.min(96, base + ((index * 13) % 29) - 8)) }));
+}
+
+function getMetricStatus(value: number) {
+  if (value >= 85) return "Cok Yuksek";
+  if (value >= 70) return "Yuksek";
+  if (value >= 50) return "Orta";
+  return "Dusuk";
+}
 function unwrapAnalyzePayload(data: unknown): Record<string, unknown> {
   if (!isRecord(data)) return {};
 
@@ -961,6 +1084,14 @@ function prettifySpeciesName(species: string) {
     .replace(/\b\w/g, (letter) => letter.toLocaleUpperCase("tr-TR"));
 }
 
+function formatScientificName(species: string) {
+  const words = species.replace(/[_-]+/g, " ").trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return "Model tahmini";
+  return words
+    .map((word, index) => index === 0 ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : word.toLowerCase())
+    .join(" ");
+}
+
 function normalizeSpeciesKey(species: string) {
   return species
     .toLocaleLowerCase("tr-TR")
@@ -977,7 +1108,7 @@ function getSpeciesProfile(species: string): SpeciesProfile {
   const key = normalizeSpeciesKey(species);
   return speciesProfiles[key] ?? {
     commonName: prettifySpeciesName(species),
-    latin: "Model tahmini",
+    latin: formatScientificName(species),
     description: `${species} için model tarafından oluşturulan birincil eşleşme sonucu gösteriliyor.`,
     location: "Türk Denizleri",
     coordinates: "39.000 N, 35.000 E",
@@ -1102,4 +1233,13 @@ function Metric({ icon: Icon, label, value }: { icon: ElementType; label: string
       <strong>{value}</strong>
     </div>
   );
+}
+
+function readFileAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(new Error("Gorsel arsiv icin okunamadi."));
+    reader.readAsDataURL(file);
+  });
 }
