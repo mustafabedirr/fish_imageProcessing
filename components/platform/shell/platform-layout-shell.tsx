@@ -42,7 +42,7 @@ export default function PlatformLayoutShell({ children }: { children: ReactNode 
       <SisyphusSidebar />
       <div>
         <MobilePlatformNav />
-        <main className="platform-main">{children}</main>
+        <main key={pathname} className="platform-main platform-main--route-transition">{children}</main>
       </div>
     </div>
   );
