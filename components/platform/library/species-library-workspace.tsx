@@ -4,13 +4,16 @@ import type { CSSProperties, FormEvent, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  CalendarDays,
   Check,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   Fish,
   Grid2X2,
+  Layers,
   List,
+  Maximize2,
   Plus,
   Search,
   Shield,
@@ -446,6 +449,7 @@ export default function SpeciesLibraryWorkspace() {
 
   const groupDistribution = useMemo(() => buildGroupDistribution(speciesList), [speciesList]);
   const distributionBackground = useMemo(() => buildDistributionGradient(groupDistribution), [groupDistribution]);
+  const galleryPhotos = galleryFish ? buildGalleryPhotos(galleryFish) : [];
 
   function toggleFavorite(id: string) {
     setFavorites((current) => {
@@ -693,26 +697,68 @@ export default function SpeciesLibraryWorkspace() {
             <button type="button" className="fish-library-gallery-close" aria-label="Galeriyi kapat" onClick={() => setGalleryFish(null)}>
               <X size={18} />
             </button>
-            <div className="fish-library-gallery-hero">
-              <img src={(galleryFish.photos?.[0] ?? galleryFish.image)} alt={galleryFish.name} />
-              <div>
-                <span>Arsiv Galerisi</span>
+
+            <header className="fish-library-gallery-header">
+              <div className="fish-library-gallery-orbit">
+                <img src={galleryPhotos[0]} alt={galleryFish.name} />
+              </div>
+              <div className="fish-library-gallery-title">
+                <span>Tur Galerisi</span>
                 <h2>{galleryFish.name}</h2>
-                <p>{galleryFish.latin}</p>
+                <p>{galleryFish.region} <i /> {galleryFish.habitat} <i /> {galleryFish.group}</p>
+                <div className="fish-library-gallery-stats">
+                  <article>
+                    <Fish size={18} />
+                    <small>Toplam Gorsel</small>
+                    <strong>{galleryPhotos.length}</strong>
+                  </article>
+                  <article>
+                    <CalendarDays size={18} />
+                    <small>Analiz Kaydi</small>
+                    <strong>{galleryFish.records.toLocaleString("tr-TR")}</strong>
+                  </article>
+                  <article>
+                    <TrendingUp size={18} />
+                    <small>Dogrulama Orani</small>
+                    <strong>%{galleryFish.score.toFixed(1)}</strong>
+                  </article>
+                </div>
               </div>
+              <img className="fish-library-gallery-feature" src={galleryPhotos[0]} alt="" aria-hidden="true" />
+            </header>
+
+            <div className="fish-library-gallery-toolbar" aria-label="Galeri filtreleri">
+              <label>
+                <Search size={18} />
+                <input type="search" placeholder="Gorsellerde ara..." />
+              </label>
+              <button type="button"><CalendarDays size={18} />Tum Zamanlar<ChevronDown size={16} /></button>
+              <button type="button"><Layers size={18} />Tum Kaynaklar<ChevronDown size={16} /></button>
+              <button type="button"><Star size={18} />Tum Kaliteler<ChevronDown size={16} /></button>
+              <button type="button" className="fish-library-gallery-sort"><SlidersHorizontal size={18} />En Yeniler<ChevronDown size={16} /></button>
             </div>
-            <aside>
-              <strong>%{galleryFish.score.toFixed(1)} uygunluk</strong>
-              <span>{galleryFish.records.toLocaleString("tr-TR")} analiz kaydi</span>
-              <div className="fish-library-gallery-tags">
-                {galleryFish.tags.slice(0, 5).map((tag) => <em key={tag}>{tag}</em>)}
-              </div>
-            </aside>
+
             <div className="fish-library-gallery-grid">
-              {([...(galleryFish.photos ?? []), galleryFish.image].filter(Boolean)).slice(0, 12).map((photo, index) => (
-                <img src={photo} alt={`${galleryFish.name} arsiv ${index + 1}`} key={`${photo}-${index}`} />
+              {galleryPhotos.map((photo, index) => (
+                <button type="button" className={index === 0 ? "is-selected" : ""} key={`${photo}-${index}`} aria-label={`${galleryFish.name} arsiv ${index + 1}`}>
+                  <img src={photo} alt="" />
+                  {index === 0 ? <span className="fish-library-gallery-check"><Check size={18} /></span> : null}
+                  <em><Star size={12} /> %{galleryFish.score.toFixed(0)}</em>
+                </button>
               ))}
             </div>
+
+            <footer className="fish-library-gallery-footer">
+              <strong>{galleryPhotos.length} gorsel</strong>
+              <div>
+                <button type="button" aria-label="Onceki sayfa"><ChevronLeft size={17} /></button>
+                {[1, 2, 3, 4, 5].map((pageNumber) => (
+                  <button type="button" className={pageNumber === 1 ? "is-active" : ""} key={pageNumber}>{pageNumber}</button>
+                ))}
+                <button type="button" aria-label="Sonraki sayfa"><ChevronRight size={17} /></button>
+              </div>
+              <button type="button" className="fish-library-gallery-fullscreen"><Maximize2 size={17} />Tam Ekran</button>
+            </footer>
           </section>
         </div>
       ) : null}
@@ -911,6 +957,13 @@ type GroupDistributionItem = {
 
 const distributionColors = ["#168fff", "#7c5cff", "#dc8b8b", "#f39c28"];
 
+function buildGalleryPhotos(fish: FishSpecies) {
+  const source = [...(fish.photos ?? []), fish.image].filter(Boolean);
+  const photos = source.length ? source : [fish.image];
+  const targetLength = Math.max(12, photos.length);
+
+  return Array.from({ length: targetLength }, (_, index) => photos[index % photos.length]);
+}
 function buildGroupDistribution(species: FishSpecies[]): GroupDistributionItem[] {
   const total = species.length;
   if (!total) {
