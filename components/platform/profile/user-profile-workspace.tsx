@@ -32,6 +32,40 @@ import { useCurrentUser } from "../../../hooks/use-current-user";
 import AnimatedTabBar from "../../ui/animated-tab-bar";
 
 const avatar = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=180&q=80";
+type ProfileFeedPost = {
+  id: string;
+  userId?: string;
+  body: string;
+  tags?: string[];
+  mediaUrls?: string[];
+  likes: number;
+  comments: number;
+  createdAt: string;
+  author: string;
+  handle: string;
+  avatar?: string;
+  authorProfile?: {
+    userId: string;
+    name: string;
+    handle: string;
+    avatarUrl?: string;
+  };
+};
+
+const defaultPostImage = "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1400&q=85";
+
+function formatProfilePostTime(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  const diff = Math.max(0, Date.now() - date.getTime());
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hours ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} days ago`;
+}
 
 const badges = [
   ["Lunker Hunter", "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=140&q=80"],
@@ -76,83 +110,6 @@ const recentPhotos = [
   "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=320&q=80",
   "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=320&q=80",
   "https://images.unsplash.com/photo-1439066615861-d1af74d74000?auto=format&fit=crop&w=320&q=80",
-];
-
-const posts = [
-  {
-    id: "catch-bass",
-    text: "Last weekend's catch! Managed to reel in this 6.4 lb Largemouth Bass from Lake Sammamish.",
-    time: "5 days ago",
-    tags: ["#LargemouthBass", "#WeekendFishing"],
-    image: "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=1400&q=85",
-    weight: "6.4 lb",
-    likes: 64,
-    comments: 17,
-  },
-  {
-    id: "lake-washington",
-    text: "Beautiful morning at Lake Washington.",
-    time: "2 weeks ago",
-    tags: [],
-    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=85",
-    likes: 48,
-    comments: 12,
-  },
-  {
-    id: "reef-dive",
-    text: "Clear visibility near the reef today. Spotted a dense school moving along the current line.",
-    time: "3 weeks ago",
-    tags: ["#ReefDive", "#Underwater", "#FishSchool"],
-    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1400&q=85",
-    likes: 92,
-    comments: 21,
-  },
-  {
-    id: "shore-scout",
-    text: "Scouted a quiet rocky shoreline before sunrise. Water was calm, baitfish activity was high.",
-    time: "1 month ago",
-    tags: ["#ShoreFishing", "#Sunrise", "#Scouting"],
-    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=85",
-    likes: 71,
-    comments: 9,
-  },
-  {
-    id: "fresh-catch",
-    text: "Logged today's catch details and saved the measurements for the next habitat comparison.",
-    time: "1 month ago",
-    tags: ["#CatchLog", "#Measurements"],
-    image: "https://images.unsplash.com/photo-1544943910-4c1dc44aab44?auto=format&fit=crop&w=1400&q=85",
-    weight: "4.8 lb",
-    likes: 58,
-    comments: 14,
-  },
-  {
-    id: "deep-blue",
-    text: "Deep blue water, strong light shafts, and a steady current. Perfect conditions for a clean survey.",
-    time: "2 months ago",
-    tags: ["#MarineSurvey", "#BlueWater"],
-    image: "https://images.unsplash.com/photo-1559825481-12a05cc00344?auto=format&fit=crop&w=1400&q=85",
-    likes: 86,
-    comments: 18,
-  },
-  {
-    id: "trail-lake",
-    text: "A short hike led to a quiet lake pocket with promising cover and plenty of surface movement.",
-    time: "2 months ago",
-    tags: ["#LakeLife", "#Freshwater", "#Trail"],
-    image: "https://images.unsplash.com/photo-1439066615861-d1af74d74000?auto=format&fit=crop&w=1400&q=85",
-    likes: 66,
-    comments: 11,
-  },
-  {
-    id: "species-study",
-    text: "Reviewed color patterns and fin shapes from the latest session. The details were clearer than expected.",
-    time: "3 months ago",
-    tags: ["#SpeciesStudy", "#Morphometrics"],
-    image: "https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=1400&q=85",
-    likes: 77,
-    comments: 16,
-  },
 ];
 
 const galleryItems = [
@@ -288,6 +245,8 @@ export default function UserProfileWorkspace() {
     bio: "Diving is my therapy, the ocean is my home.",
   });
   const [draftProfile, setDraftProfile] = useState(profile);
+  const [profilePosts, setProfilePosts] = useState<ProfileFeedPost[]>([]);
+  const [profilePostsLoading, setProfilePostsLoading] = useState(true);
   const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -302,13 +261,40 @@ export default function UserProfileWorkspace() {
     if (user.avatarUrl) setAvatarSrc(user.avatarUrl);
   }, [user]);
 
+  useEffect(() => {
+    let cancelled = false;
+    setProfilePostsLoading(true);
+
+    fetch("/api/posts")
+      .then(async (response) => {
+        const data = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(String(data?.error ?? "Gonderiler yuklenemedi."));
+        const apiPosts: ProfileFeedPost[] = Array.isArray(data?.posts) ? data.posts : [];
+        const viewerPosts = apiPosts.filter((post) => {
+          const authorId = post.userId ?? post.authorProfile?.userId;
+          return authorId === user?.id || post.handle === user?.handle || post.author === user?.name;
+        });
+
+        if (!cancelled) setProfilePosts(viewerPosts);
+      })
+      .catch(() => {
+        if (!cancelled) setProfilePosts([]);
+      })
+      .finally(() => {
+        if (!cancelled) setProfilePostsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.handle, user?.id, user?.name]);
 
   const [sharedPosts, setSharedPosts] = useState<Record<string, boolean>>({});
 
   const postStats = useMemo(
     () =>
       Object.fromEntries(
-        posts.map((post) => [
+        profilePosts.map((post) => [
           post.id,
           {
             likes: post.likes + (likedPosts[post.id] ? 1 : 0),
@@ -316,7 +302,7 @@ export default function UserProfileWorkspace() {
           },
         ])
       ),
-    [likedPosts, sharedPosts]
+    [likedPosts, profilePosts, sharedPosts]
   ) as Record<string, { likes: number; shared: boolean }>;
 
   const openEditProfile = () => {
@@ -461,62 +447,80 @@ export default function UserProfileWorkspace() {
             <div className="profile-primary-column">
               {activeTab === "posts" ? (
                 <div className="profile-feed" onScroll={handleProfileScroll}>
-                  {posts.map((post) => (
-                    <article className="profile-post-card" key={post.text}>
-                      <header>
-                        <img src={avatarSrc} alt={profile.name} />
-                        <div>
-                          <strong>{profile.name}</strong>
-                          <span>{post.time}</span>
-                          <small>Public</small>
-                        </div>
-                        <MoreHorizontal size={19} />
-                      </header>
+                  {profilePostsLoading ? (
+                    <div className="profile-empty-state">
+                      <strong>Gonderiler yukleniyor</strong>
+                      <span>Sosyal akis verisi kontrol ediliyor.</span>
+                    </div>
+                  ) : profilePosts.length ? (
+                    profilePosts.map((post) => {
+                      const postImage = post.mediaUrls?.[0] ?? defaultPostImage;
+                      const tags = post.tags ?? [];
 
-                      <p>{post.text}</p>
+                      return (
+                        <article className="profile-post-card" key={post.id}>
+                          <header>
+                            <img src={post.avatar ?? post.authorProfile?.avatarUrl ?? avatarSrc} alt={post.author} />
+                            <div>
+                              <strong>{post.author}</strong>
+                              <span>{formatProfilePostTime(post.createdAt)}</span>
+                              <small>Public</small>
+                            </div>
+                            <MoreHorizontal size={19} />
+                          </header>
 
-                      {post.tags.length > 0 ? (
-                        <div className="profile-post-tags">
-                          {post.tags.map((tag) => (
-                            <span key={tag}>{tag}</span>
-                          ))}
-                        </div>
-                      ) : null}
+                          <p>{post.body}</p>
 
-                      <figure className="profile-post-image">
-                        <img src={post.image} alt="" />
-                        {post.weight ? <figcaption>{post.weight}</figcaption> : null}
-                      </figure>
+                          {tags.length > 0 ? (
+                            <div className="profile-post-tags">
+                              {tags.map((tag) => (
+                                <span key={tag}>{tag}</span>
+                              ))}
+                            </div>
+                          ) : null}
 
-                      <footer>
-                        <div className="profile-reaction-stack" aria-hidden="true">
-                          {following.slice(0, 3).map((image) => (
-                            <img key={image} src={image} alt="" />
-                          ))}
-                        </div>
-                        <button
-                          className={likedPosts[post.id] ? "profile-action profile-action--active" : "profile-action"}
-                          type="button"
-                          onClick={() => setLikedPosts((current) => ({ ...current, [post.id]: !current[post.id] }))}
-                        >
-                          <Heart size={19} />
-                          {postStats[post.id].likes}
-                        </button>
-                        <button className="profile-action" type="button">
-                          <MessageCircle size={19} />
-                          {post.comments} Comments
-                        </button>
-                        <button
-                          className={postStats[post.id].shared ? "profile-action profile-action--active" : "profile-action"}
-                          type="button"
-                          onClick={() => setSharedPosts((current) => ({ ...current, [post.id]: !current[post.id] }))}
-                        >
-                          <Share2 size={18} />
-                          {postStats[post.id].shared ? "Shared" : "Share"}
-                        </button>
-                      </footer>
-                    </article>
-                  ))}
+                          {postImage ? (
+                            <figure className="profile-post-image">
+                              <img src={postImage} alt="" />
+                            </figure>
+                          ) : null}
+
+                          <footer>
+                            <div className="profile-reaction-stack" aria-hidden="true">
+                              {following.slice(0, 3).map((image) => (
+                                <img key={image} src={image} alt="" />
+                              ))}
+                            </div>
+                            <button
+                              className={likedPosts[post.id] ? "profile-action profile-action--active" : "profile-action"}
+                              type="button"
+                              onClick={() => setLikedPosts((current) => ({ ...current, [post.id]: !current[post.id] }))}
+                            >
+                              <Heart size={19} />
+                              {postStats[post.id]?.likes ?? post.likes}
+                            </button>
+                            <button className="profile-action" type="button">
+                              <MessageCircle size={19} />
+                              {post.comments} Comments
+                            </button>
+                            <button
+                              className={postStats[post.id]?.shared ? "profile-action profile-action--active" : "profile-action"}
+                              type="button"
+                              onClick={() => setSharedPosts((current) => ({ ...current, [post.id]: !current[post.id] }))}
+                            >
+                              <Share2 size={18} />
+                              {postStats[post.id]?.shared ? "Shared" : "Share"}
+                            </button>
+                          </footer>
+                        </article>
+                      );
+                    })
+                  ) : (
+                    <div className="profile-empty-state">
+                      <strong>Henuz gonderi yok</strong>
+                      <span>Bu alanda /social akisinda bu kullaniciya ait paylasimlar gorunecek.</span>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <ProfileTabPanel activeTab={activeTab} onScroll={handleProfileScroll} />

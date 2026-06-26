@@ -34199,3 +34199,26 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     grid-auto-rows: 210px;
   }
 }
+.profile-empty-state {
+  display: grid;
+  place-items: center;
+  min-height: 260px;
+  padding: 32px;
+  border: 1px dashed rgba(89, 160, 255, 0.24);
+  border-radius: 18px;
+  background: rgba(8, 20, 36, 0.52);
+  color: #92a6bd;
+  text-align: center;
+}
+
+.profile-empty-state strong {
+  color: #f5fbff;
+  font-size: 1rem;
+}
+
+.profile-empty-state span {
+  margin-top: 8px;
+  max-width: 360px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
