@@ -30,6 +30,7 @@ import {
 import { cn } from "../../../lib/utils";
 import { useCurrentUser } from "../../../hooks/use-current-user";
 import AnimatedTabBar from "../../ui/animated-tab-bar";
+import { AvatarProfilePhoto } from "@/components/base/avatar/avatar";
 
 const avatar = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=180&q=80";
 type ProfileFeedPost = {
@@ -377,14 +378,10 @@ export default function UserProfileWorkspace() {
             </div>
             <div className="profile-identity">
               <button type="button" className="profile-avatar-wrap" aria-label="Profil fotografini degistir" onClick={openAvatarEditor}>
-                <img src={avatarSrc} alt={profile.name} />
+                <AvatarProfilePhoto verified size="md" alt={profile.name} src={avatarSrc} />
                 <span className="profile-avatar-edit">
                   <Camera size={15} />
-                  Değiştir
-                </span>
-                <i>
-                  <Check size={14} />
-                </i>
+                  Degistir</span>
               </button>
               <div className="profile-copy">
                 <h1>

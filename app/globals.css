@@ -34222,3 +34222,52 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
   font-size: 0.9rem;
   line-height: 1.5;
 }
+.avatar-profile-photo {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+}
+
+.avatar-profile-photo img {
+  display: block;
+}
+
+.avatar-profile-photo--sm img {
+  width: 48px;
+  height: 48px;
+}
+
+.avatar-profile-photo--md img {
+  width: 90px;
+  height: 90px;
+}
+
+.avatar-profile-photo--lg img {
+  width: 128px;
+  height: 128px;
+}
+
+.avatar-profile-photo__verified {
+  position: absolute;
+  right: 1px;
+  bottom: 7px;
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  border: 3px solid #071427;
+  border-radius: 999px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #17c7ff, #1a74ff);
+  box-shadow: 0 10px 22px rgba(0, 110, 255, 0.32);
+}
+
+.user-profile-content--reference .profile-hero--collapsed .avatar-profile-photo__verified,
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .avatar-profile-photo__verified {
+  right: -2px;
+  bottom: 1px;
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
