@@ -363,7 +363,6 @@ const initialSpeciesCards: FishSpecies[] = [
 ];
 
 const pageSize = 6;
-const galleryPageSize = 8;
 
 export default function SpeciesLibraryWorkspace() {
   const { user } = useCurrentUser();
@@ -390,12 +389,7 @@ export default function SpeciesLibraryWorkspace() {
   const [favorites, setFavorites] = useState(() => new Set(initialSpeciesCards.filter((fish) => fish.favorite).map((fish) => fish.id)));
   const [page, setPage] = useState(1);
   const [galleryFish, setGalleryFish] = useState<FishSpecies | null>(null);
-  const [galleryQuery, setGalleryQuery] = useState("");
-  const [galleryQuality, setGalleryQuality] = useState("all");
-  const [gallerySort, setGallerySort] = useState("newest");
-  const [galleryPage, setGalleryPage] = useState(1);
   const [selectedGalleryPhoto, setSelectedGalleryPhoto] = useState(0);
-  const [galleryFullscreen, setGalleryFullscreen] = useState(false);
 
 
   useEffect(() => {
@@ -414,12 +408,7 @@ export default function SpeciesLibraryWorkspace() {
 
   useEffect(() => {
     if (!galleryFish) return;
-    setGalleryQuery("");
-    setGalleryQuality("all");
-    setGallerySort("newest");
-    setGalleryPage(1);
     setSelectedGalleryPhoto(0);
-    setGalleryFullscreen(false);
   }, [galleryFish]);
 
   const filteredSpecies = useMemo(() => {
@@ -470,24 +459,7 @@ export default function SpeciesLibraryWorkspace() {
   const groupDistribution = useMemo(() => buildGroupDistribution(speciesList), [speciesList]);
   const distributionBackground = useMemo(() => buildDistributionGradient(groupDistribution), [groupDistribution]);
   const galleryPhotos = useMemo(() => (galleryFish ? buildGalleryPhotos(galleryFish) : []), [galleryFish]);
-  const filteredGalleryPhotos = useMemo(() => {
-    const normalizedGalleryQuery = normalize(galleryQuery);
-    const filtered = galleryPhotos.filter((photo) => {
-      const matchesQuery =
-        !normalizedGalleryQuery ||
-        normalize([galleryFish?.name, galleryFish?.latin, photo.label, photo.source].filter(Boolean).join(" ")).includes(normalizedGalleryQuery);
-      const matchesQuality = galleryQuality === "all" || (galleryQuality === "verified" ? photo.quality >= 95 : photo.quality < 95);
-
-      return matchesQuery && matchesQuality;
-    });
-
-    return filtered.sort((a, b) => (gallerySort === "oldest" ? a.index - b.index : b.index - a.index));
-  }, [galleryFish?.latin, galleryFish?.name, galleryPhotos, galleryQuality, galleryQuery, gallerySort]);
-  const galleryPageCount = Math.max(1, Math.ceil(filteredGalleryPhotos.length / galleryPageSize));
-  const currentGalleryPage = Math.min(galleryPage, galleryPageCount);
-  const pagedGalleryPhotos = filteredGalleryPhotos.slice((currentGalleryPage - 1) * galleryPageSize, currentGalleryPage * galleryPageSize);
-  const activeCarouselIndex = Math.max(filteredGalleryPhotos.findIndex((photo) => photo.index === selectedGalleryPhoto), 0);
-  const activeGalleryPhoto = filteredGalleryPhotos[activeCarouselIndex] ?? galleryPhotos[0];
+  const activeCarouselIndex = Math.max(galleryPhotos.findIndex((photo) => photo.index === selectedGalleryPhoto), 0);
 
   function toggleFavorite(id: string) {
     setFavorites((current) => {
@@ -732,7 +704,7 @@ export default function SpeciesLibraryWorkspace() {
       {galleryFish ? createPortal((
         <div className="fish-library-gallery-backdrop" role="presentation" onMouseDown={() => setGalleryFish(null)}>
           <section
-            className={`fish-library-gallery${galleryFullscreen ? " is-fullscreen" : ""}`}
+            className="fish-library-gallery fish-library-gallery--minimal"
             role="dialog"
             aria-modal="true"
             aria-label={`${galleryFish.name} foto galeri`}
@@ -742,106 +714,13 @@ export default function SpeciesLibraryWorkspace() {
               <X size={18} />
             </button>
 
-            <header className="fish-library-gallery-header">
-              <div className="fish-library-gallery-orbit">
-                <img src={activeGalleryPhoto?.src} alt={galleryFish.name} />
-              </div>
-              <div className="fish-library-gallery-title">
-                <span>Tur Galerisi</span>
-                <h2>{galleryFish.name}</h2>
-                <p>{galleryFish.region} <i /> {galleryFish.habitat} <i /> {galleryFish.group}</p>
-                <div className="fish-library-gallery-stats">
-                  <article>
-                    <Fish size={18} />
-                    <small>Toplam Gorsel</small>
-                    <strong>{galleryPhotos.length}</strong>
-                  </article>
-                  <article>
-                    <CalendarDays size={18} />
-                    <small>Analiz Kaydi</small>
-                    <strong>{galleryFish.records.toLocaleString("tr-TR")}</strong>
-                  </article>
-                  <article>
-                    <TrendingUp size={18} />
-                    <small>Dogrulama Orani</small>
-                    <strong>%{galleryFish.score.toFixed(1)}</strong>
-                  </article>
-                </div>
-              </div>
-              <img className="fish-library-gallery-feature" src={activeGalleryPhoto?.src} alt="" aria-hidden="true" />
-            </header>
-
-            <div className="fish-library-gallery-toolbar" aria-label="Galeri filtreleri">
-              <label className="fish-library-gallery-search">
-                <Search size={18} />
-                <input
-                  type="search"
-                  value={galleryQuery}
-                  placeholder="Gorsellerde ara..."
-                  onChange={(event) => {
-                    setGalleryQuery(event.target.value);
-                    setGalleryPage(1);
-                  }}
-                />
-              </label>
-              <label className="fish-library-gallery-control">
-                <CalendarDays size={18} />
-                <select aria-label="Zaman filtresi" defaultValue="all">
-                  <option value="all">Tum Zamanlar</option>
-                  <option value="last30">Son 30 Gun</option>
-                  <option value="last90">Son 90 Gun</option>
-                </select>
-                <ChevronDown size={16} />
-              </label>
-              <label className="fish-library-gallery-control">
-                <Layers size={18} />
-                <select aria-label="Kaynak filtresi" defaultValue="all">
-                  <option value="all">Tum Kaynaklar</option>
-                  <option value="archive">Arsiv</option>
-                  <option value="analysis">Analiz</option>
-                </select>
-                <ChevronDown size={16} />
-              </label>
-              <label className="fish-library-gallery-control">
-                <Star size={18} />
-                <select
-                  aria-label="Kalite filtresi"
-                  value={galleryQuality}
-                  onChange={(event) => {
-                    setGalleryQuality(event.target.value);
-                    setGalleryPage(1);
-                  }}
-                >
-                  <option value="all">Tum Kaliteler</option>
-                  <option value="verified">%95 ve Ustu</option>
-                  <option value="review">Inceleme</option>
-                </select>
-                <ChevronDown size={16} />
-              </label>
-              <label className="fish-library-gallery-control fish-library-gallery-sort">
-                <SlidersHorizontal size={18} />
-                <select
-                  aria-label="Galeri siralama"
-                  value={gallerySort}
-                  onChange={(event) => {
-                    setGallerySort(event.target.value);
-                    setGalleryPage(1);
-                  }}
-                >
-                  <option value="newest">En Yeniler</option>
-                  <option value="oldest">En Eskiler</option>
-                </select>
-                <ChevronDown size={16} />
-              </label>
-            </div>
-
             <div className="fish-library-gallery-carousel" aria-live="polite">
-              {filteredGalleryPhotos.length ? (
+              {galleryPhotos.length ? (
                 <Carousel.Root
                   activeIndex={activeCarouselIndex}
                   className="fish-library-carousel-root"
-                  itemCount={filteredGalleryPhotos.length}
-                  onActiveIndexChange={(index) => setSelectedGalleryPhoto(filteredGalleryPhotos[index]?.index ?? 0)}
+                  itemCount={galleryPhotos.length}
+                  onActiveIndexChange={(index) => setSelectedGalleryPhoto(galleryPhotos[index]?.index ?? 0)}
                 >
                   <Carousel.PrevTrigger className="fish-library-carousel-trigger fish-library-carousel-trigger--prev" aria-label="Onceki gorsel">
                     <ChevronLeft size={22} />
@@ -851,7 +730,7 @@ export default function SpeciesLibraryWorkspace() {
                   </Carousel.NextTrigger>
 
                   <div className="fish-library-carousel-indicator" aria-label="Galeri gostergeci">
-                    {filteredGalleryPhotos.map((photo, index) => (
+                    {galleryPhotos.map((photo, index) => (
                       <button
                         type="button"
                         className={index === activeCarouselIndex ? "is-active" : ""}
@@ -864,10 +743,9 @@ export default function SpeciesLibraryWorkspace() {
                   </div>
 
                   <Carousel.Content className="fish-library-carousel-content">
-                    {filteredGalleryPhotos.map((photo) => (
+                    {galleryPhotos.map((photo) => (
                       <Carousel.Item className="fish-library-carousel-item" key={photo.id}>
                         <img src={photo.src} alt={`${galleryFish.name} arsiv ${photo.index + 1}`} />
-                        <span className="fish-library-carousel-score"><Star size={13} /> %{photo.quality}</span>
                       </Carousel.Item>
                     ))}
                   </Carousel.Content>
@@ -876,19 +754,9 @@ export default function SpeciesLibraryWorkspace() {
                 <div className="fish-library-gallery-empty">
                   <Search size={22} />
                   <strong>Gorsel bulunamadi</strong>
-                  <span>Arama veya kalite filtresini degistirin.</span>
                 </div>
               )}
             </div>
-            <footer className="fish-library-gallery-footer">
-              <strong>{filteredGalleryPhotos.length} gorsel</strong>
-              <div className="fish-library-gallery-position">
-                {filteredGalleryPhotos.length ? `${activeCarouselIndex + 1} / ${filteredGalleryPhotos.length}` : "0 / 0"}
-              </div>              <button type="button" className="fish-library-gallery-fullscreen" onClick={() => setGalleryFullscreen((value) => !value)}>
-                <Maximize2 size={17} />
-                {galleryFullscreen ? "Kucult" : "Tam Ekran"}
-              </button>
-            </footer>
           </section>
         </div>
       ), document.body) : null}

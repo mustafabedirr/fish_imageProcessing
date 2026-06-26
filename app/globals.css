@@ -34458,3 +34458,131 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     overflow: hidden;
   }
 }
+/* Minimal reference gallery modal */
+.fish-library-gallery-backdrop:has(.fish-library-gallery--minimal) {
+  padding: clamp(18px, 4vw, 44px);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+}
+
+.fish-library-gallery--minimal {
+  display: block;
+  width: min(704px, 92vw);
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.fish-library-gallery--minimal::before {
+  display: none;
+}
+
+.fish-library-gallery--minimal .fish-library-gallery-close {
+  right: -14px;
+  top: -14px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(80, 93, 104, 0.16);
+  border-radius: 999px;
+  color: #52616d;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+}
+
+.fish-library-gallery--minimal .fish-library-gallery-carousel {
+  padding: 0;
+}
+
+.fish-library-gallery--minimal .fish-library-carousel-root {
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 1.6;
+  border: 0;
+  border-radius: 12px;
+  background: #d7e5e7;
+  box-shadow: none;
+}
+
+.fish-library-gallery--minimal .fish-library-carousel-item {
+  border-radius: 12px;
+  background: #d7e5e7;
+}
+
+.fish-library-gallery--minimal .fish-library-carousel-item img {
+  filter: none;
+}
+
+.fish-library-gallery--minimal .fish-library-carousel-item::after,
+.fish-library-gallery--minimal .fish-library-carousel-score {
+  display: none;
+}
+
+.fish-library-gallery--minimal .fish-library-carousel-trigger {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  color: #66757f;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: none;
+}
+
+.fish-library-gallery--minimal .fish-library-carousel-trigger:hover:not(:disabled) {
+  background: #ffffff;
+}
+
+.fish-library-gallery--minimal .fish-library-carousel-trigger:disabled {
+  opacity: 0.55;
+}
+
+.fish-library-gallery--minimal .fish-library-carousel-trigger--prev {
+  left: 18px;
+}
+
+.fish-library-gallery--minimal .fish-library-carousel-trigger--next {
+  right: 18px;
+}
+
+.fish-library-gallery--minimal .fish-library-carousel-indicator {
+  bottom: 18px;
+  gap: 9px;
+  padding: 8px 11px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: none;
+}
+
+.fish-library-gallery--minimal .fish-library-carousel-indicator button {
+  width: 8px;
+  height: 8px;
+  background: #d9dde1;
+}
+
+.fish-library-gallery--minimal .fish-library-carousel-indicator button.is-active {
+  width: 8px;
+  background: #7f56d9;
+}
+
+@media (max-width: 560px) {
+  .fish-library-gallery-backdrop:has(.fish-library-gallery--minimal) {
+    padding: 16px;
+  }
+
+  .fish-library-gallery--minimal {
+    width: 100%;
+  }
+
+  .fish-library-gallery--minimal .fish-library-gallery-close {
+    right: 8px;
+    top: 8px;
+    z-index: 6;
+  }
+
+  .fish-library-gallery--minimal .fish-library-carousel-trigger {
+    width: 36px;
+    height: 36px;
+  }
+}
