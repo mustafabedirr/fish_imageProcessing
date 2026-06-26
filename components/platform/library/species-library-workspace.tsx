@@ -710,9 +710,6 @@ export default function SpeciesLibraryWorkspace() {
             aria-label={`${galleryFish.name} foto galeri`}
             onMouseDown={(event) => event.stopPropagation()}
           >
-            <button type="button" className="fish-library-gallery-close" aria-label="Galeriyi kapat" onClick={() => setGalleryFish(null)}>
-              <X size={18} />
-            </button>
 
             <div className="fish-library-gallery-carousel" aria-live="polite">
               {galleryPhotos.length ? (

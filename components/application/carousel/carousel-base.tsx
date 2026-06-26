@@ -82,12 +82,13 @@ function NextTrigger({ className, onClick, ...props }: ButtonHTMLAttributes<HTML
 
 function Content({ className, style, ...props }: HTMLAttributes<HTMLDivElement>) {
   const { activeIndex } = useCarousel();
+  const slideGap = 8;
 
   return (
     <div className="carousel-viewport">
       <div
         className={cn("carousel-content", className)}
-        style={{ ...style, transform: `translate3d(${-activeIndex * 100}%, 0, 0)` }}
+        style={{ ...style, transform: `translate3d(calc(${-activeIndex * 100}% - ${activeIndex * slideGap}px), 0, 0)` }}
         {...props}
       />
     </div>
