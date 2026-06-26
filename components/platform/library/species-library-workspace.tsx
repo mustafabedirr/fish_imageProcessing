@@ -1,6 +1,6 @@
 "use client";
 
-import type { FormEvent, ReactNode } from "react";
+import type { CSSProperties, FormEvent, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -20,6 +20,7 @@ import {
   Waves,
   X,
 } from "lucide-react";
+import { useCurrentUser } from "../../../hooks/use-current-user";
 
 type ArchivedSpeciesItem = {
   id: string;
@@ -359,6 +360,7 @@ const initialSpeciesCards: FishSpecies[] = [
 const pageSize = 6;
 
 export default function SpeciesLibraryWorkspace() {
+  const { user } = useCurrentUser();
   const [speciesList, setSpeciesList] = useState<FishSpecies[]>(initialSpeciesCards);
   const [query, setQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -425,6 +427,25 @@ export default function SpeciesLibraryWorkspace() {
   const pagedSpecies = filteredSpecies.slice((currentPage - 1) * pageSize, currentPage * pageSize);
   const favoriteCount = favorites.size;
   const popularSpecies = [...speciesList].sort((a, b) => b.score - a.score).slice(0, 5);
+  const userLibraryRegion = getLibraryRegionForUser(user?.region);
+  const nearbySpeciesCount = userLibraryRegion ? speciesList.filter((fish) => fish.region === userLibraryRegion).length : 0;
+
+  const summaryItems = useMemo(() => {
+    const totalSpecies = speciesList.length;
+    const seaSpecies = speciesList.filter(isSeaSpecies).length;
+    const freshWaterSpecies = speciesList.filter(isFreshWaterSpecies).length;
+    const protectedSpecies = speciesList.filter(isProtectedSpecies).length;
+
+    return [
+      { label: "Toplam Tur", value: formatCount(totalSpecies), icon: Fish, tone: "cyan" },
+      { label: "Deniz Turu", value: formatCount(seaSpecies), icon: Waves, tone: "blue" },
+      { label: "Tatli Su Turu", value: formatCount(freshWaterSpecies), icon: Waves, tone: "teal" },
+      { label: "Koruma Altında", value: formatCount(protectedSpecies), icon: Shield, tone: "orange" },
+    ];
+  }, [speciesList]);
+
+  const groupDistribution = useMemo(() => buildGroupDistribution(speciesList), [speciesList]);
+  const distributionBackground = useMemo(() => buildDistributionGradient(groupDistribution), [groupDistribution]);
 
   function toggleFavorite(id: string) {
     setFavorites((current) => {
@@ -479,20 +500,6 @@ export default function SpeciesLibraryWorkspace() {
       tags: "Deniz, Etçil",
     });
   }
-
-  const summaryItems = [
-    { label: "Toplam Tür", value: "128", icon: Fish, tone: "cyan" },
-    { label: "Deniz Türü", value: "45", icon: Waves, tone: "blue" },
-    { label: "Tatlı Su Türü", value: "38", icon: Waves, tone: "teal" },
-    { label: "Koruma Altında", value: "45", icon: Shield, tone: "orange" },
-  ];
-  const groupDistribution = [
-    { label: "Balık", value: 96, percent: 72, color: "#168fff" },
-    { label: "Köpek Balığı", value: 8, percent: 6, color: "#7c5cff" },
-    { label: "Vatoz", value: 8, percent: 6, color: "#dc8b8b" },
-    { label: "Diğer", value: 16, percent: 13, color: "#f39c28" },
-  ];
-
   return (
     <section className="fish-library-page">
       <div className="fish-library-shell">
@@ -632,7 +639,7 @@ export default function SpeciesLibraryWorkspace() {
                 <a href="/platform/library" onClick={(event) => event.preventDefault()}>Tümünü Gör <ChevronRight size={14} /></a>
               </div>
               <div className="fish-library-distribution">
-                <div className="fish-library-donut" aria-hidden="true" />
+                <div className="fish-library-donut" aria-hidden="true" style={{ background: distributionBackground }} />
                 <div className="fish-library-distribution-list">
                   {groupDistribution.map((item) => (
                     <div key={item.label}>
@@ -671,9 +678,9 @@ export default function SpeciesLibraryWorkspace() {
                   <Star size={17} />
                   Favori Turlerim ({favoriteCount})
                 </a>
-                <a href="/platform/analyze">
+                <a href="/platform/library" onClick={(event) => { event.preventDefault(); if (userLibraryRegion) { setRegion(userLibraryRegion); setFavoriteOnly(false); setActiveTag(null); setPage(1); } }}>
                   <Search size={17} />
-                  Yakın Bölgemdeki Türler
+                  Yakin Bolgemdeki Turler ({nearbySpeciesCount})
                 </a>
               </div>
             </section>
@@ -895,6 +902,85 @@ function getLibraryOptionMeta(label: string, option: string) {
   return meta[label]?.[option] ?? "Seçimi uygula";
 }
 
+type GroupDistributionItem = {
+  label: string;
+  value: number;
+  percent: number;
+  color: string;
+};
+
+const distributionColors = ["#168fff", "#7c5cff", "#dc8b8b", "#f39c28"];
+
+function buildGroupDistribution(species: FishSpecies[]): GroupDistributionItem[] {
+  const total = species.length;
+  if (!total) {
+    return [{ label: "Veri yok", value: 0, percent: 0, color: distributionColors[0] }];
+  }
+
+  const counts = new Map<string, number>();
+  for (const fish of species) {
+    counts.set(fish.group, (counts.get(fish.group) ?? 0) + 1);
+  }
+
+  const sorted = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
+  const primary = sorted.slice(0, 3);
+  const otherTotal = sorted.slice(3).reduce((sum, [, value]) => sum + value, 0);
+  const rows = otherTotal > 0 ? [...primary, ["Diger", otherTotal] as [string, number]] : primary;
+
+  return rows.map(([label, value], index) => ({
+    label,
+    value,
+    percent: Math.round((value / total) * 100),
+    color: distributionColors[index % distributionColors.length],
+  }));
+}
+
+function buildDistributionGradient(distribution: GroupDistributionItem[]): CSSProperties["background"] {
+  const total = distribution.reduce((sum, item) => sum + item.value, 0);
+  if (!total) return "conic-gradient(#168fff 0deg 360deg)";
+
+  let start = 0;
+  const stops = distribution.map((item) => {
+    const end = start + (item.value / total) * 360;
+    const segment = `${item.color} ${start.toFixed(1)}deg ${end.toFixed(1)}deg`;
+    start = end;
+    return segment;
+  });
+
+  return `conic-gradient(${stops.join(", ")})`;
+}
+
+function isSeaSpecies(fish: FishSpecies) {
+  const value = normalize([fish.habitat, ...fish.tags].join(" "));
+  return value.includes("deniz");
+}
+
+function isFreshWaterSpecies(fish: FishSpecies) {
+  const value = normalize([fish.habitat, ...fish.tags].join(" "));
+  const rawValue = [fish.habitat, ...fish.tags].join(" ").toLocaleLowerCase("tr-TR");
+  return value.includes("tatli") || rawValue.includes("tatlı") || value.includes("fresh");
+}
+
+function isProtectedSpecies(fish: FishSpecies) {
+  const protection = normalize(fish.protection);
+  const rawProtection = fish.protection.toLocaleLowerCase("tr-TR");
+  const safeLabels = ["guvenli", "güvenli", "gÃ¼venli", "gÃœvenli"];
+  return !safeLabels.some((label) => protection.includes(normalize(label)) || rawProtection.includes(label.toLocaleLowerCase("tr-TR")));
+}
+
+function getLibraryRegionForUser(region?: string) {
+  if (!region) return null;
+  const normalizedRegion = normalize(region);
+  if (normalizedRegion.includes("ege") || normalizedRegion.includes("izmir") || normalizedRegion.includes("aydin") || normalizedRegion.includes("mugla")) return "Ege";
+  if (normalizedRegion.includes("akdeniz") || normalizedRegion.includes("antalya") || normalizedRegion.includes("mersin")) return "Akdeniz";
+  if (normalizedRegion.includes("karadeniz") || normalizedRegion.includes("trabzon") || normalizedRegion.includes("samsun")) return "Karadeniz";
+  if (normalizedRegion.includes("anadolu") || normalizedRegion.includes("ankara") || normalizedRegion.includes("konya")) return "İc Anadolu";
+  return null;
+}
+
+function formatCount(value: number) {
+  return new Intl.NumberFormat("tr-TR").format(value);
+}
 function normalize(value: string) {
   return value
     .toLocaleLowerCase("tr-TR")
