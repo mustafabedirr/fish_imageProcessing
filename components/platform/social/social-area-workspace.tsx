@@ -1021,19 +1021,19 @@ export default function SocialAreaWorkspace() {
 
                   <div className="social-composer-tools">
                     <div className="social-composer-actions">
-                      <button type="button" aria-label="Add photo" title="Photo" onClick={() => openModal("media")}>
+                      <button type="button" aria-label="Add photo" title="Photo">
                         <ImageIcon size={17} />
                         <span>Photo</span>
                       </button>
-                      <button type="button" aria-label="Add video" title="Video" onClick={() => openModal("video")}>
+                      <button type="button" aria-label="Add video" title="Video">
                         <Video size={17} />
                         <span>Video</span>
                       </button>
-                      <button type="button" aria-label="Add location" title="Location" onClick={() => openModal("location")}>
+                      <button type="button" aria-label="Add location" title="Location">
                         <MapPin size={17} />
                         <span>Location</span>
                       </button>
-                      <button type="button" aria-label="Add poll" title="Poll" onClick={() => openModal("poll")}>
+                      <button type="button" aria-label="Add poll" title="Poll">
                         <SlidersHorizontal size={17} />
                         <span>Poll</span>
                       </button>
