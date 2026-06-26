@@ -34060,3 +34060,142 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     padding: 14px 16px;
   }
 }
+
+/* Stable gallery modal controls and grid */
+.fish-library-gallery.is-fullscreen {
+  width: min(1520px, 98vw);
+  height: min(980px, 96dvh);
+}
+
+.fish-library-gallery-toolbar {
+  align-items: stretch;
+}
+
+.fish-library-gallery-search,
+.fish-library-gallery-control {
+  position: relative;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.fish-library-gallery-control select {
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  appearance: none;
+  color: #dce9f7;
+  background: transparent;
+  font: inherit;
+  font-weight: 760;
+  cursor: pointer;
+}
+
+.fish-library-gallery-control select option {
+  color: #dce9f7;
+  background: #071629;
+}
+
+.fish-library-gallery-grid {
+  align-content: start;
+  grid-auto-rows: minmax(132px, auto);
+  padding-bottom: 16px;
+}
+
+.fish-library-gallery-grid button {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  isolation: isolate;
+}
+
+.fish-library-gallery-grid button:disabled,
+.fish-library-gallery-footer button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.fish-library-gallery-grid img {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.fish-library-gallery-check,
+.fish-library-gallery-grid em {
+  z-index: 1;
+}
+
+.fish-library-gallery-empty {
+  grid-column: 1 / -1;
+  display: grid;
+  place-items: center;
+  min-height: 260px;
+  padding: 32px;
+  border: 1px dashed rgba(82, 188, 255, 0.22);
+  border-radius: 14px;
+  color: #9fb2c8;
+  background: rgba(8, 22, 40, 0.52);
+  text-align: center;
+}
+
+.fish-library-gallery-empty svg {
+  color: #35ddc9;
+}
+
+.fish-library-gallery-empty strong {
+  margin-top: 8px;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.fish-library-gallery-empty span {
+  font-size: 0.86rem;
+}
+
+@media (max-width: 980px) {
+  .fish-library-gallery.is-fullscreen {
+    width: 98vw;
+    height: 96dvh;
+  }
+
+  .fish-library-gallery-grid {
+    grid-auto-rows: minmax(150px, auto);
+  }
+}
+
+@media (max-width: 560px) {
+  .fish-library-gallery-grid {
+    grid-auto-rows: minmax(190px, auto);
+  }
+
+  .fish-library-gallery-footer > div {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+.fish-library-gallery-grid {
+  grid-auto-rows: auto;
+}
+.fish-library-gallery-grid {
+  grid-auto-rows: clamp(128px, 8.9vw, 170px);
+}
+
+.fish-library-gallery-grid button {
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+@media (max-width: 980px) {
+  .fish-library-gallery-grid {
+    grid-auto-rows: clamp(142px, 22vw, 190px);
+  }
+}
+
+@media (max-width: 560px) {
+  .fish-library-gallery-grid {
+    grid-auto-rows: 210px;
+  }
+}

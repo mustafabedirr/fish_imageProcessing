@@ -3,6 +3,7 @@
 import type { CSSProperties, FormEvent, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { createPortal } from "react-dom";
 import {
   CalendarDays,
   Check,
@@ -361,6 +362,7 @@ const initialSpeciesCards: FishSpecies[] = [
 ];
 
 const pageSize = 6;
+const galleryPageSize = 8;
 
 export default function SpeciesLibraryWorkspace() {
   const { user } = useCurrentUser();
@@ -387,6 +389,12 @@ export default function SpeciesLibraryWorkspace() {
   const [favorites, setFavorites] = useState(() => new Set(initialSpeciesCards.filter((fish) => fish.favorite).map((fish) => fish.id)));
   const [page, setPage] = useState(1);
   const [galleryFish, setGalleryFish] = useState<FishSpecies | null>(null);
+  const [galleryQuery, setGalleryQuery] = useState("");
+  const [galleryQuality, setGalleryQuality] = useState("all");
+  const [gallerySort, setGallerySort] = useState("newest");
+  const [galleryPage, setGalleryPage] = useState(1);
+  const [selectedGalleryPhoto, setSelectedGalleryPhoto] = useState(0);
+  const [galleryFullscreen, setGalleryFullscreen] = useState(false);
 
 
   useEffect(() => {
@@ -402,6 +410,17 @@ export default function SpeciesLibraryWorkspace() {
       alive = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!galleryFish) return;
+    setGalleryQuery("");
+    setGalleryQuality("all");
+    setGallerySort("newest");
+    setGalleryPage(1);
+    setSelectedGalleryPhoto(0);
+    setGalleryFullscreen(false);
+  }, [galleryFish]);
+
   const filteredSpecies = useMemo(() => {
     const normalizedQuery = normalize(query);
     const result = speciesList.filter((fish) => {
@@ -449,7 +468,27 @@ export default function SpeciesLibraryWorkspace() {
 
   const groupDistribution = useMemo(() => buildGroupDistribution(speciesList), [speciesList]);
   const distributionBackground = useMemo(() => buildDistributionGradient(groupDistribution), [groupDistribution]);
-  const galleryPhotos = galleryFish ? buildGalleryPhotos(galleryFish) : [];
+  const galleryPhotos = useMemo(() => (galleryFish ? buildGalleryPhotos(galleryFish) : []), [galleryFish]);
+  const filteredGalleryPhotos = useMemo(() => {
+    const normalizedGalleryQuery = normalize(galleryQuery);
+    const filtered = galleryPhotos.filter((photo) => {
+      const matchesQuery =
+        !normalizedGalleryQuery ||
+        normalize([galleryFish?.name, galleryFish?.latin, photo.label, photo.source].filter(Boolean).join(" ")).includes(normalizedGalleryQuery);
+      const matchesQuality = galleryQuality === "all" || (galleryQuality === "verified" ? photo.quality >= 95 : photo.quality < 95);
+
+      return matchesQuery && matchesQuality;
+    });
+
+    return filtered.sort((a, b) => (gallerySort === "oldest" ? a.index - b.index : b.index - a.index));
+  }, [galleryFish?.latin, galleryFish?.name, galleryPhotos, galleryQuality, galleryQuery, gallerySort]);
+  const galleryPageCount = Math.max(1, Math.ceil(filteredGalleryPhotos.length / galleryPageSize));
+  const currentGalleryPage = Math.min(galleryPage, galleryPageCount);
+  const pagedGalleryPhotos = filteredGalleryPhotos.slice((currentGalleryPage - 1) * galleryPageSize, currentGalleryPage * galleryPageSize);
+  const visibleSelectedGalleryPhoto = pagedGalleryPhotos.some((photo) => photo.index === selectedGalleryPhoto)
+    ? selectedGalleryPhoto
+    : pagedGalleryPhotos[0]?.index ?? selectedGalleryPhoto;
+  const activeGalleryPhoto = galleryPhotos[visibleSelectedGalleryPhoto] ?? galleryPhotos[0];
 
   function toggleFavorite(id: string) {
     setFavorites((current) => {
@@ -691,16 +730,22 @@ export default function SpeciesLibraryWorkspace() {
           </aside>
         </div>
       </div>
-      {galleryFish ? (
+      {galleryFish ? createPortal((
         <div className="fish-library-gallery-backdrop" role="presentation" onMouseDown={() => setGalleryFish(null)}>
-          <section className="fish-library-gallery" role="dialog" aria-modal="true" aria-label={`${galleryFish.name} foto galeri`} onMouseDown={(event) => event.stopPropagation()}>
+          <section
+            className={`fish-library-gallery${galleryFullscreen ? " is-fullscreen" : ""}`}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${galleryFish.name} foto galeri`}
+            onMouseDown={(event) => event.stopPropagation()}
+          >
             <button type="button" className="fish-library-gallery-close" aria-label="Galeriyi kapat" onClick={() => setGalleryFish(null)}>
               <X size={18} />
             </button>
 
             <header className="fish-library-gallery-header">
               <div className="fish-library-gallery-orbit">
-                <img src={galleryPhotos[0]} alt={galleryFish.name} />
+                <img src={activeGalleryPhoto?.src} alt={galleryFish.name} />
               </div>
               <div className="fish-library-gallery-title">
                 <span>Tur Galerisi</span>
@@ -724,44 +769,141 @@ export default function SpeciesLibraryWorkspace() {
                   </article>
                 </div>
               </div>
-              <img className="fish-library-gallery-feature" src={galleryPhotos[0]} alt="" aria-hidden="true" />
+              <img className="fish-library-gallery-feature" src={activeGalleryPhoto?.src} alt="" aria-hidden="true" />
             </header>
 
             <div className="fish-library-gallery-toolbar" aria-label="Galeri filtreleri">
-              <label>
+              <label className="fish-library-gallery-search">
                 <Search size={18} />
-                <input type="search" placeholder="Gorsellerde ara..." />
+                <input
+                  type="search"
+                  value={galleryQuery}
+                  placeholder="Gorsellerde ara..."
+                  onChange={(event) => {
+                    setGalleryQuery(event.target.value);
+                    setGalleryPage(1);
+                  }}
+                />
               </label>
-              <button type="button"><CalendarDays size={18} />Tum Zamanlar<ChevronDown size={16} /></button>
-              <button type="button"><Layers size={18} />Tum Kaynaklar<ChevronDown size={16} /></button>
-              <button type="button"><Star size={18} />Tum Kaliteler<ChevronDown size={16} /></button>
-              <button type="button" className="fish-library-gallery-sort"><SlidersHorizontal size={18} />En Yeniler<ChevronDown size={16} /></button>
+              <label className="fish-library-gallery-control">
+                <CalendarDays size={18} />
+                <select aria-label="Zaman filtresi" defaultValue="all">
+                  <option value="all">Tum Zamanlar</option>
+                  <option value="last30">Son 30 Gun</option>
+                  <option value="last90">Son 90 Gun</option>
+                </select>
+                <ChevronDown size={16} />
+              </label>
+              <label className="fish-library-gallery-control">
+                <Layers size={18} />
+                <select aria-label="Kaynak filtresi" defaultValue="all">
+                  <option value="all">Tum Kaynaklar</option>
+                  <option value="archive">Arsiv</option>
+                  <option value="analysis">Analiz</option>
+                </select>
+                <ChevronDown size={16} />
+              </label>
+              <label className="fish-library-gallery-control">
+                <Star size={18} />
+                <select
+                  aria-label="Kalite filtresi"
+                  value={galleryQuality}
+                  onChange={(event) => {
+                    setGalleryQuality(event.target.value);
+                    setGalleryPage(1);
+                  }}
+                >
+                  <option value="all">Tum Kaliteler</option>
+                  <option value="verified">%95 ve Ustu</option>
+                  <option value="review">Inceleme</option>
+                </select>
+                <ChevronDown size={16} />
+              </label>
+              <label className="fish-library-gallery-control fish-library-gallery-sort">
+                <SlidersHorizontal size={18} />
+                <select
+                  aria-label="Galeri siralama"
+                  value={gallerySort}
+                  onChange={(event) => {
+                    setGallerySort(event.target.value);
+                    setGalleryPage(1);
+                  }}
+                >
+                  <option value="newest">En Yeniler</option>
+                  <option value="oldest">En Eskiler</option>
+                </select>
+                <ChevronDown size={16} />
+              </label>
             </div>
 
-            <div className="fish-library-gallery-grid">
-              {galleryPhotos.map((photo, index) => (
-                <button type="button" className={index === 0 ? "is-selected" : ""} key={`${photo}-${index}`} aria-label={`${galleryFish.name} arsiv ${index + 1}`}>
-                  <img src={photo} alt="" />
-                  {index === 0 ? <span className="fish-library-gallery-check"><Check size={18} /></span> : null}
-                  <em><Star size={12} /> %{galleryFish.score.toFixed(0)}</em>
-                </button>
-              ))}
+            <div className="fish-library-gallery-grid" aria-live="polite">
+              {pagedGalleryPhotos.length ? (
+                pagedGalleryPhotos.map((photo) => {
+                  const selected = photo.index === visibleSelectedGalleryPhoto;
+
+                  return (
+                    <button
+                      type="button"
+                      className={selected ? "is-selected" : ""}
+                      key={photo.id}
+                      aria-label={`${galleryFish.name} arsiv ${photo.index + 1}`}
+                      aria-pressed={selected}
+                      onClick={() => setSelectedGalleryPhoto(photo.index)}
+                    >
+                      <img src={photo.src} alt="" />
+                      {selected ? <span className="fish-library-gallery-check"><Check size={18} /></span> : null}
+                      <em><Star size={12} /> %{photo.quality}</em>
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="fish-library-gallery-empty">
+                  <Search size={22} />
+                  <strong>Gorsel bulunamadi</strong>
+                  <span>Arama veya kalite filtresini degistirin.</span>
+                </div>
+              )}
             </div>
 
             <footer className="fish-library-gallery-footer">
-              <strong>{galleryPhotos.length} gorsel</strong>
+              <strong>{filteredGalleryPhotos.length} gorsel</strong>
               <div>
-                <button type="button" aria-label="Onceki sayfa"><ChevronLeft size={17} /></button>
-                {[1, 2, 3, 4, 5].map((pageNumber) => (
-                  <button type="button" className={pageNumber === 1 ? "is-active" : ""} key={pageNumber}>{pageNumber}</button>
+                <button
+                  type="button"
+                  aria-label="Onceki sayfa"
+                  disabled={currentGalleryPage === 1}
+                  onClick={() => setGalleryPage((value) => Math.max(1, value - 1))}
+                >
+                  <ChevronLeft size={17} />
+                </button>
+                {Array.from({ length: galleryPageCount }, (_, index) => index + 1).map((pageNumber) => (
+                  <button
+                    type="button"
+                    className={pageNumber === currentGalleryPage ? "is-active" : ""}
+                    key={pageNumber}
+                    aria-current={pageNumber === currentGalleryPage ? "page" : undefined}
+                    onClick={() => setGalleryPage(pageNumber)}
+                  >
+                    {pageNumber}
+                  </button>
                 ))}
-                <button type="button" aria-label="Sonraki sayfa"><ChevronRight size={17} /></button>
+                <button
+                  type="button"
+                  aria-label="Sonraki sayfa"
+                  disabled={currentGalleryPage === galleryPageCount}
+                  onClick={() => setGalleryPage((value) => Math.min(galleryPageCount, value + 1))}
+                >
+                  <ChevronRight size={17} />
+                </button>
               </div>
-              <button type="button" className="fish-library-gallery-fullscreen"><Maximize2 size={17} />Tam Ekran</button>
+              <button type="button" className="fish-library-gallery-fullscreen" onClick={() => setGalleryFullscreen((value) => !value)}>
+                <Maximize2 size={17} />
+                {galleryFullscreen ? "Kucult" : "Tam Ekran"}
+              </button>
             </footer>
           </section>
         </div>
-      ) : null}
+      ), document.body) : null}
       {addModalOpen ? (
         <div className="fish-library-modal-backdrop" role="presentation" onMouseDown={() => setAddModalOpen(false)}>
           <section className="fish-library-modal" role="dialog" aria-modal="true" aria-labelledby="new-species-title" onMouseDown={(event) => event.stopPropagation()}>
@@ -957,12 +1099,28 @@ type GroupDistributionItem = {
 
 const distributionColors = ["#168fff", "#7c5cff", "#dc8b8b", "#f39c28"];
 
-function buildGalleryPhotos(fish: FishSpecies) {
+type GalleryPhoto = {
+  id: string;
+  src: string;
+  index: number;
+  label: string;
+  source: string;
+  quality: number;
+};
+
+function buildGalleryPhotos(fish: FishSpecies): GalleryPhoto[] {
   const source = [...(fish.photos ?? []), fish.image].filter(Boolean);
   const photos = source.length ? source : [fish.image];
   const targetLength = Math.max(12, photos.length);
 
-  return Array.from({ length: targetLength }, (_, index) => photos[index % photos.length]);
+  return Array.from({ length: targetLength }, (_, index) => ({
+    id: `${fish.id}-gallery-${index}`,
+    src: photos[index % photos.length],
+    index,
+    label: `${fish.name} ${fish.latin} gorsel ${index + 1}`,
+    source: index % 3 === 0 ? "Analiz" : "Arsiv",
+    quality: Math.max(82, Math.round(fish.score - (index % 4) * 2)),
+  }));
 }
 function buildGroupDistribution(species: FishSpecies[]): GroupDistributionItem[] {
   const total = species.length;
