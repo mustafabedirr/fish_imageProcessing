@@ -547,7 +547,7 @@ export default function SpeciesLibraryWorkspace() {
               <LibrarySelect label="Sırala" value={sortBy} options={["Popülerlik", "Uygunluk", "Kayit Sayısı", "Ada Göre"]} onChange={(value) => updateFilter(setSortBy, value)} icon={<SlidersHorizontal size={16} />} />
             </section>
 
-            <section className={viewMode === "grid" ? "fish-library-grid" : "fish-library-grid fish-library-grid--list"} aria-label="Balik turleri">
+            <section key={`${viewMode}-${currentPage}-${filteredSpecies.length}`} className={viewMode === "grid" ? "fish-library-grid fish-library-grid--page-transition" : "fish-library-grid fish-library-grid--list fish-library-grid--page-transition"} aria-label="Balik turleri">
               {pagedSpecies.length ? (
                 pagedSpecies.map((fish) => (
                   <article className="fish-library-card" key={fish.id} role="button" tabIndex={0} onClick={() => setGalleryFish(fish)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setGalleryFish(fish); }}>
