@@ -25,6 +25,7 @@ import {
   X,
 } from "lucide-react";
 import { useCurrentUser } from "../../../hooks/use-current-user";
+import { Carousel } from "@/components/application/carousel/carousel-base";
 
 type ArchivedSpeciesItem = {
   id: string;
@@ -485,10 +486,8 @@ export default function SpeciesLibraryWorkspace() {
   const galleryPageCount = Math.max(1, Math.ceil(filteredGalleryPhotos.length / galleryPageSize));
   const currentGalleryPage = Math.min(galleryPage, galleryPageCount);
   const pagedGalleryPhotos = filteredGalleryPhotos.slice((currentGalleryPage - 1) * galleryPageSize, currentGalleryPage * galleryPageSize);
-  const visibleSelectedGalleryPhoto = pagedGalleryPhotos.some((photo) => photo.index === selectedGalleryPhoto)
-    ? selectedGalleryPhoto
-    : pagedGalleryPhotos[0]?.index ?? selectedGalleryPhoto;
-  const activeGalleryPhoto = galleryPhotos[visibleSelectedGalleryPhoto] ?? galleryPhotos[0];
+  const activeCarouselIndex = Math.max(filteredGalleryPhotos.findIndex((photo) => photo.index === selectedGalleryPhoto), 0);
+  const activeGalleryPhoto = filteredGalleryPhotos[activeCarouselIndex] ?? galleryPhotos[0];
 
   function toggleFavorite(id: string) {
     setFavorites((current) => {
@@ -836,26 +835,43 @@ export default function SpeciesLibraryWorkspace() {
               </label>
             </div>
 
-            <div className="fish-library-gallery-grid" aria-live="polite">
-              {pagedGalleryPhotos.length ? (
-                pagedGalleryPhotos.map((photo) => {
-                  const selected = photo.index === visibleSelectedGalleryPhoto;
+            <div className="fish-library-gallery-carousel" aria-live="polite">
+              {filteredGalleryPhotos.length ? (
+                <Carousel.Root
+                  activeIndex={activeCarouselIndex}
+                  className="fish-library-carousel-root"
+                  itemCount={filteredGalleryPhotos.length}
+                  onActiveIndexChange={(index) => setSelectedGalleryPhoto(filteredGalleryPhotos[index]?.index ?? 0)}
+                >
+                  <Carousel.PrevTrigger className="fish-library-carousel-trigger fish-library-carousel-trigger--prev" aria-label="Onceki gorsel">
+                    <ChevronLeft size={22} />
+                  </Carousel.PrevTrigger>
+                  <Carousel.NextTrigger className="fish-library-carousel-trigger fish-library-carousel-trigger--next" aria-label="Sonraki gorsel">
+                    <ChevronRight size={22} />
+                  </Carousel.NextTrigger>
 
-                  return (
-                    <button
-                      type="button"
-                      className={selected ? "is-selected" : ""}
-                      key={photo.id}
-                      aria-label={`${galleryFish.name} arsiv ${photo.index + 1}`}
-                      aria-pressed={selected}
-                      onClick={() => setSelectedGalleryPhoto(photo.index)}
-                    >
-                      <img src={photo.src} alt="" />
-                      {selected ? <span className="fish-library-gallery-check"><Check size={18} /></span> : null}
-                      <em><Star size={12} /> %{photo.quality}</em>
-                    </button>
-                  );
-                })
+                  <div className="fish-library-carousel-indicator" aria-label="Galeri gostergeci">
+                    {filteredGalleryPhotos.map((photo, index) => (
+                      <button
+                        type="button"
+                        className={index === activeCarouselIndex ? "is-active" : ""}
+                        key={photo.id}
+                        aria-label={`${galleryFish.name} gorsel ${index + 1}`}
+                        aria-current={index === activeCarouselIndex ? "true" : undefined}
+                        onClick={() => setSelectedGalleryPhoto(photo.index)}
+                      />
+                    ))}
+                  </div>
+
+                  <Carousel.Content className="fish-library-carousel-content">
+                    {filteredGalleryPhotos.map((photo) => (
+                      <Carousel.Item className="fish-library-carousel-item" key={photo.id}>
+                        <img src={photo.src} alt={`${galleryFish.name} arsiv ${photo.index + 1}`} />
+                        <span className="fish-library-carousel-score"><Star size={13} /> %{photo.quality}</span>
+                      </Carousel.Item>
+                    ))}
+                  </Carousel.Content>
+                </Carousel.Root>
               ) : (
                 <div className="fish-library-gallery-empty">
                   <Search size={22} />
@@ -864,39 +880,11 @@ export default function SpeciesLibraryWorkspace() {
                 </div>
               )}
             </div>
-
             <footer className="fish-library-gallery-footer">
               <strong>{filteredGalleryPhotos.length} gorsel</strong>
-              <div>
-                <button
-                  type="button"
-                  aria-label="Onceki sayfa"
-                  disabled={currentGalleryPage === 1}
-                  onClick={() => setGalleryPage((value) => Math.max(1, value - 1))}
-                >
-                  <ChevronLeft size={17} />
-                </button>
-                {Array.from({ length: galleryPageCount }, (_, index) => index + 1).map((pageNumber) => (
-                  <button
-                    type="button"
-                    className={pageNumber === currentGalleryPage ? "is-active" : ""}
-                    key={pageNumber}
-                    aria-current={pageNumber === currentGalleryPage ? "page" : undefined}
-                    onClick={() => setGalleryPage(pageNumber)}
-                  >
-                    {pageNumber}
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  aria-label="Sonraki sayfa"
-                  disabled={currentGalleryPage === galleryPageCount}
-                  onClick={() => setGalleryPage((value) => Math.min(galleryPageCount, value + 1))}
-                >
-                  <ChevronRight size={17} />
-                </button>
-              </div>
-              <button type="button" className="fish-library-gallery-fullscreen" onClick={() => setGalleryFullscreen((value) => !value)}>
+              <div className="fish-library-gallery-position">
+                {filteredGalleryPhotos.length ? `${activeCarouselIndex + 1} / ${filteredGalleryPhotos.length}` : "0 / 0"}
+              </div>              <button type="button" className="fish-library-gallery-fullscreen" onClick={() => setGalleryFullscreen((value) => !value)}>
                 <Maximize2 size={17} />
                 {galleryFullscreen ? "Kucult" : "Tam Ekran"}
               </button>
