@@ -34286,7 +34286,7 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
   display: flex;
   width: 100%;
   height: 100%;
-  transition: transform 260ms ease;
+  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
 
@@ -34461,8 +34461,11 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 /* Minimal reference gallery modal */
 .fish-library-gallery-backdrop:has(.fish-library-gallery--minimal) {
   padding: clamp(18px, 4vw, 44px);
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(8px);
+  background:
+    radial-gradient(circle at 16% 64%, rgba(35, 223, 199, 0.12), transparent 32%),
+    radial-gradient(circle at 84% 18%, rgba(84, 190, 255, 0.14), transparent 34%),
+    rgba(1, 8, 18, 0.46);
+  backdrop-filter: blur(18px) saturate(1.08);
 }
 
 .fish-library-gallery--minimal {
@@ -34474,7 +34477,7 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
   border: 0;
   border-radius: 12px;
   background: transparent;
-  box-shadow: none;
+  box-shadow: 0 34px 96px rgba(0, 0, 0, 0.38);
 }
 
 .fish-library-gallery--minimal::before {
@@ -34488,9 +34491,10 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
   height: 34px;
   border: 1px solid rgba(80, 93, 104, 0.16);
   border-radius: 999px;
-  color: #52616d;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+  color: #eaf7ff;
+  background: rgba(7, 18, 32, 0.64);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(10px);
 }
 
 .fish-library-gallery--minimal .fish-library-gallery-carousel {
