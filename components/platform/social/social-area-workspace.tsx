@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import type { ChangeEvent, CSSProperties, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Award,
@@ -119,6 +119,32 @@ type ApiPostComment = {
   avatar?: string | null;
   comments?: number;
 };
+
+type ComposerPhoto = {
+  id: string;
+  name: string;
+  size: number;
+  url: string;
+  caption: string;
+};
+
+const MAX_COMPOSER_PHOTOS = 6;
+const MAX_COMPOSER_PHOTO_SIZE = 5 * 1024 * 1024;
+
+function readImageAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error ?? new Error("Image could not be read."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function formatUploadSize(bytes: number) {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 function formatFeedTime(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
@@ -699,6 +725,8 @@ export default function SocialAreaWorkspace() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchUsers, setSearchUsers] = useState<SocialSearchUser[]>([]);
   const [composerText, setComposerText] = useState("");
+  const [composerPhotos, setComposerPhotos] = useState<ComposerPhoto[]>([]);
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
   const [audience, setAudience] = useState("Everyone");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
@@ -880,30 +908,82 @@ export default function SocialAreaWorkspace() {
       setNotice("Takip islemi tamamlanamadi. Oturumunuzu kontrol edin.");
     });
   };
-  const createPost = async () => {
-    const text = composerText.trim();
-    if (!text) {
-      setNotice("Paylasim yapmak icin once bir metin girin.");
+  const openPhotoPicker = () => {
+    photoInputRef.current?.click();
+  };
+
+  const handleComposerPhotoChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(event.target.files ?? []);
+    event.target.value = "";
+    if (!selectedFiles.length) return;
+
+    const availableSlots = MAX_COMPOSER_PHOTOS - composerPhotos.length;
+    if (availableSlots <= 0) {
+      setNotice(`En fazla ${MAX_COMPOSER_PHOTOS} fotograf ekleyebilirsiniz.`);
       return;
     }
 
-    const tags = Array.from(new Set(text.match(/#[\w-]+/g) ?? ["#AquaScope"]));
+    const imageFiles = selectedFiles
+      .filter((file) => file.type.startsWith("image/"))
+      .filter((file) => file.size <= MAX_COMPOSER_PHOTO_SIZE)
+      .slice(0, availableSlots);
+
+    if (!imageFiles.length) {
+      setNotice("Lutfen 5 MB altinda bir gorsel dosyasi secin.");
+      return;
+    }
+
+    const photos = await Promise.all(
+      imageFiles.map(async (file, index) => ({
+        id: `${file.name}-${file.lastModified}-${Date.now()}-${index}`,
+        name: file.name,
+        size: file.size,
+        url: await readImageAsDataUrl(file),
+        caption: "",
+      }))
+    );
+
+    setComposerPhotos((current) => [...current, ...photos]);
+    setNotice(`${photos.length} fotograf paylasima eklendi.`);
+  };
+
+  const updateComposerPhotoCaption = (photoId: string, caption: string) => {
+    setComposerPhotos((current) => current.map((photo) => (photo.id === photoId ? { ...photo, caption } : photo)));
+  };
+
+  const removeComposerPhoto = (photoId: string) => {
+    setComposerPhotos((current) => current.filter((photo) => photo.id !== photoId));
+  };
+  const createPost = async () => {
+    const text = composerText.trim();
+    const photoCaptions = composerPhotos.map((photo) => photo.caption.trim()).filter(Boolean);
+    const body = [text, ...photoCaptions].filter(Boolean).join("\n\n");
+
+    if (!body && composerPhotos.length === 0) {
+      setNotice("Paylasim yapmak icin once bir metin girin veya fotograf ekleyin.");
+      return;
+    }
+
+    const tags = Array.from(new Set(body.match(/#[\w-]+/g) ?? [composerPhotos.length ? "#Photo" : "#AquaScope"]));
+    const mediaUrls = composerPhotos.map((photo) => photo.url);
+    const postKind: SocialPostKind = mediaUrls.length ? "photo" : "text";
     const optimisticPost: SocialPost = {
       id: `local-${Date.now()}`,
       author: currentUserName,
       handle: currentUserHandle,
       time: "Just now",
       avatar: currentUserAvatar,
-      kind: "text",
-      text,
+      kind: postKind,
+      text: body || "Yeni bir fotograf paylasti.",
       tags,
       likes: 0,
       comments: 0,
-      photos: ["https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=85"],
+      photos: mediaUrls.length ? mediaUrls : ["https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=85"],
     };
 
     setPosts((current) => [optimisticPost, ...current]);
     setComposerText("");
+    setComposerPhotos([]);
     setActiveTab("For You");
     setNotice(`${audience} icin yeni paylasim yayinlandi.`);
 
@@ -911,7 +991,7 @@ export default function SocialAreaWorkspace() {
       fetch("/api/posts", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ body: text, kind: "text", tags }),
+        body: JSON.stringify({ body: optimisticPost.text, kind: postKind, tags, mediaUrls }),
       })
         .then(async (response) => {
           const data = await response.json().catch(() => null);
@@ -924,7 +1004,6 @@ export default function SocialAreaWorkspace() {
         .catch(() => setNotice("Paylasim yerel olarak eklendi, backend kaydi daha sonra tekrar denenebilir."));
     }
   };
-
   const toggleAudience = () => {
     setAudience((current) => (current === "Everyone" ? "Followers" : "Everyone"));
   };
@@ -1008,6 +1087,15 @@ export default function SocialAreaWorkspace() {
               <div className="social-composer-row">
                 <img src={currentUserAvatar} alt={currentUserName} />
                 <div className="social-composer-body">
+                  <input
+                    ref={photoInputRef}
+                    type="file"
+                    accept="image/svg+xml,image/png,image/jpeg,image/jpg,image/gif,image/webp"
+                    multiple
+                    className="social-composer-file-input"
+                    aria-label="Upload image files"
+                    onChange={handleComposerPhotoChange}
+                  />
                   <textarea
                     placeholder={`What's happening, ${currentUserName.split(" ")[0] ?? "there"}?`}
                     aria-label="Share a post"
@@ -1019,9 +1107,41 @@ export default function SocialAreaWorkspace() {
                     rows={2}
                   />
 
+                  {composerPhotos.length ? (
+                    <div className="social-composer-photo-list" aria-label="Selected photos">
+                      {composerPhotos.map((photo) => (
+                        <article className="social-composer-photo-card" key={photo.id}>
+                          <div className="social-composer-photo-preview">
+                            <img src={photo.url} alt={photo.name} />
+                            <button
+                              type="button"
+                              className="social-composer-photo-remove"
+                              aria-label={`${photo.name} gorselini kaldir`}
+                              onClick={() => removeComposerPhoto(photo.id)}
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                          <label className="social-composer-photo-note">
+                            <span>
+                              <ImageIcon size={15} />
+                              <strong>{photo.name}</strong>
+                              <small>{formatUploadSize(photo.size)}</small>
+                            </span>
+                            <textarea
+                              value={photo.caption}
+                              onChange={(event) => updateComposerPhotoCaption(photo.id, event.target.value)}
+                              placeholder="Bu fotograf icin aciklama ekle..."
+                              rows={3}
+                            />
+                          </label>
+                        </article>
+                      ))}
+                    </div>
+                  ) : null}
                   <div className="social-composer-tools">
                     <div className="social-composer-actions">
-                      <button type="button" aria-label="Add photo" title="Photo">
+                      <button type="button" aria-label="Add photo" title="Photo" onClick={openPhotoPicker}>
                         <ImageIcon size={17} />
                         <span>Photo</span>
                       </button>

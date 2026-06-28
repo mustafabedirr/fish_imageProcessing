@@ -68,7 +68,8 @@ export async function GET(request: NextRequest) {
     const marineUrl = new URL("https://marine-api.open-meteo.com/v1/marine");
     marineUrl.searchParams.set("latitude", String(latitude));
     marineUrl.searchParams.set("longitude", String(longitude));
-    marineUrl.searchParams.set("current", "wave_height,wave_direction,wave_period");
+    marineUrl.searchParams.set("current", "wave_height,wave_direction,wave_period,sea_surface_temperature,ocean_current_velocity,ocean_current_direction");
+    marineUrl.searchParams.set("velocity_unit", "kn");
     marineUrl.searchParams.set("timezone", "auto");
 
     const forecastUrl = new URL("https://api.open-meteo.com/v1/forecast");
@@ -92,6 +93,7 @@ export async function GET(request: NextRequest) {
     const waveHeight = formatNumber(marine?.current?.wave_height);
     const waveDirection = formatNumber(marine?.current?.wave_direction, 0);
     const wavePeriod = formatNumber(marine?.current?.wave_period);
+    const seaSurfaceTemperature = formatNumber(marine?.current?.sea_surface_temperature);
     const windSpeed = formatNumber(forecast?.current?.wind_speed_10m);
     const windDirection = formatNumber(forecast?.current?.wind_direction_10m, 0);
     const airTemperature = formatNumber(forecast?.current?.temperature_2m);
@@ -105,7 +107,7 @@ export async function GET(request: NextRequest) {
       windSpeed: windSpeed ? `${windSpeed} kn` : fallback.windSpeed,
       windDirection: windDirection ? `${windDirection} deg` : fallback.windDirection,
       airTemperature: airTemperature ? `${airTemperature} C` : fallback.airTemperature,
-      waterTemperature: fallback.waterTemperature,
+      waterTemperature: seaSurfaceTemperature ? `${seaSurfaceTemperature} C` : fallback.waterTemperature,
     } satisfies MarineConditions);
   } catch {
     return NextResponse.json(getFallback(region));

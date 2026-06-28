@@ -34602,3 +34602,113 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     height: 36px;
   }
 }
+.social-area-page .social-composer-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.social-area-page .social-composer-photo-list {
+  display: grid;
+  gap: 12px;
+  margin: 10px 0 12px;
+}
+
+.social-area-page .social-composer-photo-card {
+  display: grid;
+  grid-template-columns: minmax(120px, 168px) minmax(0, 1fr);
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid rgba(91, 149, 207, 0.2);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(0, 212, 255, 0.08), transparent 42%),
+    rgba(3, 15, 29, 0.58);
+}
+
+.social-area-page .social-composer-photo-preview {
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 1.28;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(1, 9, 18, 0.7);
+}
+
+.social-area-page .social-composer-photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.social-area-page .social-composer-photo-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgba(212, 233, 255, 0.2);
+  border-radius: 999px;
+  color: #e8f8ff;
+  background: rgba(2, 11, 21, 0.78);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+}
+
+.social-area-page .social-composer-photo-note {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.social-area-page .social-composer-photo-note span {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  color: #9fb7ce;
+  font-size: 12px;
+}
+
+.social-area-page .social-composer-photo-note strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #dbe7f4;
+  font-size: 12px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.social-area-page .social-composer-photo-note small {
+  color: #6f8aa6;
+  font-size: 11px;
+}
+
+.social-area-page .social-composer-photo-note textarea {
+  min-height: 86px;
+  padding: 11px 12px;
+  border: 1px solid rgba(91, 149, 207, 0.18);
+  border-radius: 12px;
+  background: rgba(2, 12, 24, 0.68);
+  color: #e5f0fb;
+  resize: vertical;
+}
+
+.social-area-page .social-composer-photo-note textarea:focus {
+  border-color: rgba(0, 212, 255, 0.48);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.12);
+}
+
+@media (max-width: 720px) {
+  .social-area-page .social-composer-photo-card {
+    grid-template-columns: 1fr;
+  }
+}

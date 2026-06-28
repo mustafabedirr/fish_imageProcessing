@@ -5,7 +5,11 @@ type MarinePoint = {
   weight: number;
   temperature: number;
   waveHeight: number;
+  waveDirection: number;
+  wavePeriod: number;
   windSpeed: number;
+  currentVelocity: number;
+  currentDirection: number;
 };
 
 type MarineRegion = {
@@ -28,190 +32,55 @@ type MarineRegion = {
   };
 };
 
-const globalPorts = [
-  { name: "Izmir", coordinates: [27.14, 38.42] },
-  { name: "Kusadasi", coordinates: [27.26, 37.86] },
-  { name: "Bodrum", coordinates: [27.43, 37.03] },
-  { name: "Rhodes", coordinates: [28.22, 36.43] },
-  { name: "Tokyo Bay", coordinates: [139.78, 35.55] },
-  { name: "Yokohama", coordinates: [139.64, 35.45] },
-  { name: "Osaka Bay", coordinates: [135.18, 34.45] },
-  { name: "Busan", coordinates: [129.07, 35.1] },
-  { name: "Singapore Strait", coordinates: [103.85, 1.25] },
-  { name: "San Francisco Bay", coordinates: [-122.42, 37.78] },
-  { name: "Sydney Harbour", coordinates: [151.22, -33.85] },
-  { name: "Cape Town", coordinates: [18.42, -33.92] },
+type OverpassElement = {
+  id: number;
+  type: "node" | "way" | "relation";
+  lat?: number;
+  lon?: number;
+  tags?: Record<string, string>;
+  geometry?: Array<{ lat: number; lon: number }>;
+};
+
+const TURKEY_MARINE_BOUNDS = {
+  west: 23.1,
+  south: 34.0,
+  east: 45.2,
+  north: 43.8,
+};
+
+const TURKEY_SEA_BOXES = [
+  [23.1, 34.0, 30.2, 41.4],
+  [29.0, 35.0, 36.5, 37.2],
+  [26.0, 40.0, 30.4, 41.4],
+  [28.0, 40.8, 42.4, 43.8],
+  [35.2, 35.1, 36.8, 36.8],
 ] as const;
+
+const emptyFeatureCollection = { type: "FeatureCollection", features: [] };
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 const formatCoordinates = ([longitude, latitude]: [number, number]) =>
   `${Math.abs(latitude).toFixed(4)} ${latitude >= 0 ? "N" : "S"}, ${Math.abs(longitude).toFixed(4)} ${longitude >= 0 ? "E" : "W"}`;
 
-const seededValue = (longitude: number, latitude: number, salt: number) => {
-  const seed = Math.sin(longitude * 12.9898 + latitude * 78.233 + salt * 37.719) * 43758.5453;
-  return seed - Math.floor(seed);
-};
-
 const isInBox = (longitude: number, latitude: number, west: number, south: number, east: number, north: number) =>
   longitude >= west && longitude <= east && latitude >= south && latitude <= north;
 
-const pointInPolygon = ([longitude, latitude]: [number, number], polygon: Array<[number, number]>) => {
-  let inside = false;
+const intersectsTurkeyMarineBounds = (bounds: NonNullable<ReturnType<typeof parseBounds>>) =>
+  bounds.maxLon >= TURKEY_MARINE_BOUNDS.west &&
+  bounds.minLon <= TURKEY_MARINE_BOUNDS.east &&
+  bounds.maxLat >= TURKEY_MARINE_BOUNDS.south &&
+  bounds.minLat <= TURKEY_MARINE_BOUNDS.north;
 
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i, i += 1) {
-    const [xi, yi] = polygon[i];
-    const [xj, yj] = polygon[j];
-    const intersects = yi > latitude !== yj > latitude && longitude < ((xj - xi) * (latitude - yi)) / (yj - yi) + xi;
-
-    if (intersects) inside = !inside;
-  }
-
-  return inside;
-};
-
-const landPolygons: Array<Array<[number, number]>> = [
-  // North America
-  [
-    [-168, 14],
-    [-153, 58],
-    [-126, 72],
-    [-62, 58],
-    [-52, 8],
-    [-82, 7],
-    [-98, 15],
-    [-125, 25],
-    [-168, 14],
-  ],
-  // South America
-  [
-    [-82, 12],
-    [-52, 10],
-    [-35, -8],
-    [-50, -56],
-    [-72, -54],
-    [-82, -18],
-    [-82, 12],
-  ],
-  // Europe mainland
-  [
-    [-11, 35],
-    [5, 58],
-    [31, 72],
-    [48, 58],
-    [42, 40],
-    [28, 36],
-    [14, 38],
-    [-11, 35],
-  ],
-  // Africa
-  [
-    [-18, 37],
-    [34, 34],
-    [52, 10],
-    [43, -34],
-    [18, -35],
-    [-15, -20],
-    [-18, 37],
-  ],
-  // Asia mainland, shaped to avoid covering Japan seas.
-  [
-    [25, 5],
-    [95, 5],
-    [112, 18],
-    [124, 32],
-    [132, 43],
-    [168, 62],
-    [170, 72],
-    [25, 72],
-    [25, 5],
-  ],
-  // Australia
-  [
-    [112, -11],
-    [154, -10],
-    [155, -39],
-    [114, -44],
-    [112, -11],
-  ],
-  // Greenland
-  [
-    [-74, 59],
-    [-12, 60],
-    [-18, 84],
-    [-60, 84],
-    [-74, 59],
-  ],
-  // Japan main islands
-  [
-    [130.2, 31.4],
-    [135.4, 33.0],
-    [141.8, 39.0],
-    [141.0, 41.6],
-    [135.8, 37.4],
-    [130.2, 31.4],
-  ],
-  [
-    [141.0, 41.2],
-    [145.8, 42.2],
-    [145.5, 45.8],
-    [140.8, 45.4],
-    [141.0, 41.2],
-  ],
-  [
-    [129.6, 31.0],
-    [131.4, 31.4],
-    [131.1, 33.6],
-    [129.4, 33.2],
-    [129.6, 31.0],
-  ],
-  // Korean peninsula
-  [
-    [125.0, 34.0],
-    [129.8, 34.4],
-    [130.2, 42.4],
-    [126.0, 43.0],
-    [125.0, 34.0],
-  ],
-  // UK and Ireland
-  [
-    [-10.8, 49.8],
-    [2.2, 50.0],
-    [1.0, 59.2],
-    [-9.6, 58.8],
-    [-10.8, 49.8],
-  ],
-];
-
-const isLikelyMarinePoint = (longitude: number, latitude: number) => {
-  if (latitude > 78 || latitude < -70) return false;
-
-  const trustedSeaBoxes = [
-    [20, 34, 31, 42], // Aegean
-    [139.45, 35.1, 140.25, 35.85], // Tokyo Bay
-    [134.7, 33.9, 135.65, 34.85], // Osaka Bay
-    [128.2, 33.2, 130.1, 35.6], // Korea Strait
-    [100, -2, 112, 8], // Singapore / Malacca
-    [-123.2, 37.1, -121.6, 38.4], // San Francisco Bay
-    [150.8, -34.4, 151.6, -33.3], // Sydney coast
-    [17, -36, 21, -32], // Cape Town coast
-  ] as const;
-
-  if (trustedSeaBoxes.some(([west, south, east, north]) => isInBox(longitude, latitude, west, south, east, north))) {
-    return true;
-  }
-
-  return !landPolygons.some((polygon) => pointInPolygon([longitude, latitude], polygon));
-};
+const isTurkeyMarinePoint = (longitude: number, latitude: number) =>
+  TURKEY_SEA_BOXES.some(([west, south, east, north]) => isInBox(longitude, latitude, west, south, east, north));
 
 const getViewportName = ([longitude, latitude]: [number, number]) => {
-  if (longitude > 126 && longitude < 147 && latitude > 28 && latitude < 46) return "Japonya Deniz Alani";
-  if (longitude > 120 && longitude < 132 && latitude > 30 && latitude < 42) return "Kore Bogazi";
-  if (longitude > 100 && longitude < 112 && latitude > -2 && latitude < 8) return "Singapur Deniz Koridoru";
-  if (longitude > -126 && longitude < -116 && latitude > 32 && latitude < 42) return "Kaliforniya Kiyi Alani";
-  if (longitude > 145 && longitude < 156 && latitude > -38 && latitude < -28) return "Dogu Avustralya Kiyi Alani";
-  if (longitude > 20 && longitude < 31 && latitude > 34 && latitude < 42) return "Ege Denizi";
-  return "Acik Deniz Alani";
+  if (longitude >= 28 && longitude <= 42.4 && latitude >= 40.8) return "Karadeniz Kiyilari";
+  if (longitude >= 26 && longitude <= 30.4 && latitude >= 40) return "Marmara Denizi";
+  if (longitude >= 29 && longitude <= 36.8 && latitude <= 37.4) return "Akdeniz Kiyilari";
+  if (longitude >= 23.1 && longitude <= 30.2) return "Ege Denizi";
+  return "Turkiye Deniz Alani";
 };
 
 const toPointCollection = (items: MarinePoint[], property: "weight" | "temperature") => ({
@@ -225,47 +94,35 @@ const toPointCollection = (items: MarinePoint[], property: "weight" | "temperatu
 
 const toLineCollection = (items: MarinePoint[]) => ({
   type: "FeatureCollection",
-  features: items.slice(0, 4).map((item, index) => {
+  features: items.slice(0, 8).map((item) => {
     const [longitude, latitude] = item.position;
-    const offset = 0.18 + index * 0.04;
+    const radians = ((item.currentDirection || 0) * Math.PI) / 180;
+    const distance = 0.22;
+    const dx = Math.sin(radians) * distance;
+    const dy = Math.cos(radians) * distance * 0.62;
+
     return {
       type: "Feature",
-      properties: { speed: Number((0.3 + item.windSpeed / 28).toFixed(2)) },
+      properties: { speed: Number(Math.max(0.2, item.currentVelocity).toFixed(2)) },
       geometry: {
         type: "LineString",
         coordinates: [
-          [Number((longitude - offset).toFixed(4)), Number((latitude - offset * 0.25).toFixed(4))],
-          [Number(longitude.toFixed(4)), Number((latitude + offset * 0.28).toFixed(4))],
-          [Number((longitude + offset).toFixed(4)), Number((latitude + offset * 0.08).toFixed(4))],
+          [Number((longitude - dx).toFixed(4)), Number((latitude - dy).toFixed(4))],
+          [Number(longitude.toFixed(4)), Number(latitude.toFixed(4))],
+          [Number((longitude + dx).toFixed(4)), Number((latitude + dy).toFixed(4))],
         ],
       },
     };
   }),
 });
 
-const toPolygonCollection = (items: MarinePoint[]) => ({
+const toPolygonCollection = (items: Array<{ name: string; polygon: Array<[number, number]> }>) => ({
   type: "FeatureCollection",
-  features: items.slice(0, 2).map((item, index) => {
-    const [longitude, latitude] = item.position;
-    const width = 0.18 + index * 0.08;
-    const height = 0.12 + index * 0.05;
-    return {
-      type: "Feature",
-      properties: { name: `${getViewportName(item.position)} Koruma ${index + 1}` },
-      geometry: {
-        type: "Polygon",
-        coordinates: [
-          [
-            [Number((longitude - width).toFixed(4)), Number((latitude - height).toFixed(4))],
-            [Number((longitude + width).toFixed(4)), Number((latitude - height * 0.8).toFixed(4))],
-            [Number((longitude + width * 0.86).toFixed(4)), Number((latitude + height).toFixed(4))],
-            [Number((longitude - width * 0.72).toFixed(4)), Number((latitude + height * 0.9).toFixed(4))],
-            [Number((longitude - width).toFixed(4)), Number((latitude - height).toFixed(4))],
-          ],
-        ],
-      },
-    };
-  }),
+  features: items.map((item) => ({
+    type: "Feature",
+    properties: { name: item.name },
+    geometry: { type: "Polygon", coordinates: [item.polygon] },
+  })),
 });
 
 const buildRegions = (items: MarinePoint[]): MarineRegion[] =>
@@ -273,7 +130,7 @@ const buildRegions = (items: MarinePoint[]): MarineRegion[] =>
     .sort((a, b) => b.weight - a.weight)
     .slice(0, 4)
     .map((item, index) => {
-      const density = item.weight > 74 ? "Yuksek" : item.weight > 55 ? "Orta" : "Dusuk";
+      const condition = item.weight > 74 ? "Uygun" : item.weight > 55 ? "Orta" : "Dusuk";
       const name = `${getViewportName(item.position)} ${index + 1}`;
 
       return {
@@ -286,70 +143,74 @@ const buildRegions = (items: MarinePoint[]): MarineRegion[] =>
           name,
           coordinatesText: formatCoordinates(item.position),
           center: item.position,
-          density,
+          density: condition,
           densityScore: `%${item.weight}`,
           temperature: `${item.temperature.toFixed(1)} C`,
-          chlorophyll: item.weight > 72 ? "Orta" : "Dusuk",
-          current: `${(0.25 + item.windSpeed / 35).toFixed(1)} m/s`,
+          chlorophyll: "Gercek veri yok",
+          current: `${item.currentVelocity.toFixed(1)} kn / ${item.currentDirection.toFixed(0)} deg`,
           wave: `${item.waveHeight.toFixed(1)} m`,
           wind: `${item.windSpeed.toFixed(0)} kn`,
         },
       };
     });
 
-const buildFallbackPoint = (longitude: number, latitude: number): MarinePoint => {
-  const temperature = 8 + (1 - Math.abs(latitude) / 90) * 18 + seededValue(longitude, latitude, 22) * 3;
-  const waveHeight = 0.2 + seededValue(longitude, latitude, 44) * 1.8;
-  const windSpeed = 5 + seededValue(longitude, latitude, 33) * 22;
-  const weight = Math.round(clamp(38 + seededValue(longitude, latitude, 11) * 48 + (1 - Math.abs(latitude) / 92) * 12, 28, 96));
-
-  return {
-    position: [Number(longitude.toFixed(4)), Number(latitude.toFixed(4))],
-    weight,
-    temperature,
-    waveHeight,
-    windSpeed,
-  };
-};
-
 const sampleOpenMeteoPoint = async (longitude: number, latitude: number): Promise<MarinePoint | null> => {
   const marineUrl = new URL("https://marine-api.open-meteo.com/v1/marine");
   marineUrl.searchParams.set("latitude", String(latitude));
   marineUrl.searchParams.set("longitude", String(longitude));
-  marineUrl.searchParams.set("current", "wave_height,wave_period");
+  marineUrl.searchParams.set("current", "wave_height,wave_direction,wave_period,sea_surface_temperature,ocean_current_velocity,ocean_current_direction");
+  marineUrl.searchParams.set("velocity_unit", "kn");
   marineUrl.searchParams.set("timezone", "auto");
 
   const forecastUrl = new URL("https://api.open-meteo.com/v1/forecast");
   forecastUrl.searchParams.set("latitude", String(latitude));
   forecastUrl.searchParams.set("longitude", String(longitude));
-  forecastUrl.searchParams.set("current", "temperature_2m,wind_speed_10m");
+  forecastUrl.searchParams.set("current", "wind_speed_10m");
   forecastUrl.searchParams.set("wind_speed_unit", "kn");
   forecastUrl.searchParams.set("timezone", "auto");
 
   const [marineResponse, forecastResponse] = await Promise.all([
-    fetch(marineUrl, { cache: "no-store", signal: AbortSignal.timeout(2600) }),
-    fetch(forecastUrl, { cache: "no-store", signal: AbortSignal.timeout(2600) }),
+    fetch(marineUrl, { cache: "no-store", signal: AbortSignal.timeout(3200) }),
+    fetch(forecastUrl, { cache: "no-store", signal: AbortSignal.timeout(3200) }),
   ]);
 
   if (!marineResponse.ok || !forecastResponse.ok) return null;
 
   const [marine, forecast] = await Promise.all([marineResponse.json(), forecastResponse.json()]);
   const waveHeight = Number(marine?.current?.wave_height);
-  const temperature = Number(forecast?.current?.temperature_2m);
+  const waveDirection = Number(marine?.current?.wave_direction);
+  const wavePeriod = Number(marine?.current?.wave_period);
+  const seaSurfaceTemperature = Number(marine?.current?.sea_surface_temperature);
   const windSpeed = Number(forecast?.current?.wind_speed_10m);
+  const currentVelocity = Number(marine?.current?.ocean_current_velocity);
+  const currentDirection = Number(marine?.current?.ocean_current_direction);
 
-  if (!Number.isFinite(waveHeight) || !Number.isFinite(temperature) || !Number.isFinite(windSpeed)) return null;
+  if (
+    !Number.isFinite(waveHeight) ||
+    !Number.isFinite(waveDirection) ||
+    !Number.isFinite(wavePeriod) ||
+    !Number.isFinite(seaSurfaceTemperature) ||
+    !Number.isFinite(windSpeed) ||
+    !Number.isFinite(currentVelocity) ||
+    !Number.isFinite(currentDirection)
+  ) {
+    return null;
+  }
 
-  const waveScore = clamp(waveHeight * 18, 0, 36);
-  const windScore = clamp(windSpeed * 1.4, 0, 34);
-  const temperatureScore = clamp((temperature - 6) * 1.1, 0, 28);
+  const waveScore = clamp(40 - waveHeight * 12, 0, 40);
+  const windScore = clamp(32 - windSpeed * 1.2, 0, 32);
+  const temperatureScore = clamp((seaSurfaceTemperature - 10) * 1.8, 0, 28);
 
   return {
     position: [Number(longitude.toFixed(4)), Number(latitude.toFixed(4))],
-    weight: Math.round(clamp(24 + waveScore + windScore + temperatureScore, 18, 96)),
-    temperature,
+    weight: Math.round(clamp(waveScore + windScore + temperatureScore, 8, 96)),
+    temperature: seaSurfaceTemperature,
     waveHeight,
+    waveDirection,
+    wavePeriod,
     windSpeed,
+    currentVelocity,
+    currentDirection,
   };
 };
 
@@ -372,16 +233,22 @@ const parseBounds = (bbox: string | null) => {
 };
 
 const buildCandidateGrid = (bounds: NonNullable<ReturnType<typeof parseBounds>>, zoom: number) => {
-  const lonSpan = Math.max(bounds.maxLon - bounds.minLon, 0.3);
-  const latSpan = Math.max(bounds.maxLat - bounds.minLat, 0.3);
+  const clippedBounds = {
+    minLon: Math.max(bounds.minLon, TURKEY_MARINE_BOUNDS.west),
+    maxLon: Math.min(bounds.maxLon, TURKEY_MARINE_BOUNDS.east),
+    minLat: Math.max(bounds.minLat, TURKEY_MARINE_BOUNDS.south),
+    maxLat: Math.min(bounds.maxLat, TURKEY_MARINE_BOUNDS.north),
+  };
+  const lonSpan = Math.max(clippedBounds.maxLon - clippedBounds.minLon, 0.3);
+  const latSpan = Math.max(clippedBounds.maxLat - clippedBounds.minLat, 0.3);
   const columns = zoom > 7 ? 4 : 3;
   const rows = zoom > 7 ? 3 : 2;
   const points: Array<[number, number]> = [];
 
   for (let row = 1; row <= rows; row += 1) {
     for (let column = 1; column <= columns; column += 1) {
-      const longitude = bounds.minLon + (lonSpan * column) / (columns + 1);
-      const latitude = bounds.minLat + (latSpan * row) / (rows + 1);
+      const longitude = clippedBounds.minLon + (lonSpan * column) / (columns + 1);
+      const latitude = clippedBounds.minLat + (latSpan * row) / (rows + 1);
       points.push([longitude, latitude]);
     }
   }
@@ -389,21 +256,94 @@ const buildCandidateGrid = (bounds: NonNullable<ReturnType<typeof parseBounds>>,
   return points.slice(0, 12);
 };
 
-const buildResponse = (points: MarinePoint[], bounds: NonNullable<ReturnType<typeof parseBounds>>, source: "open-meteo" | "fallback") => {
-  const ports = globalPorts
-    .filter((port) => {
-      const [longitude, latitude] = port.coordinates;
-      return longitude >= bounds.minLon && longitude <= bounds.maxLon && latitude >= bounds.minLat && latitude <= bounds.maxLat;
-    })
-    .map((port) => ({ name: port.name, coordinates: port.coordinates }));
+const emptyResponse = (source: "out-of-region" | "unavailable") => ({
+  source,
+  isDynamic: true,
+  densityPoints: emptyFeatureCollection,
+  temperaturePoints: emptyFeatureCollection,
+  currents: emptyFeatureCollection,
+  protectedPolygons: emptyFeatureCollection,
+  ports: [],
+  regions: [],
+});
+
+const fetchOverpassElements = async (query: string): Promise<OverpassElement[]> => {
+  const response = await fetch("https://overpass-api.de/api/interpreter", {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded;charset=UTF-8" },
+    body: new URLSearchParams({ data: query }),
+    cache: "no-store",
+    signal: AbortSignal.timeout(4200),
+  });
+
+  if (!response.ok) return [];
+  const data = await response.json();
+  return Array.isArray(data?.elements) ? data.elements : [];
+};
+
+const fetchRealPorts = async (bounds: NonNullable<ReturnType<typeof parseBounds>>) => {
+  const bbox = `${bounds.minLat},${bounds.minLon},${bounds.maxLat},${bounds.maxLon}`;
+  const query = `[out:json][timeout:4];(node["seamark:type"="harbour"](${bbox});node["harbour"](${bbox});node["leisure"="marina"](${bbox});node["amenity"="ferry_terminal"](${bbox}););out center 24;`;
+
+  try {
+    const elements = await fetchOverpassElements(query);
+    return elements
+      .map((element) => {
+        const longitude = element.lon;
+        const latitude = element.lat;
+        if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return null;
+        if (!isTurkeyMarinePoint(Number(longitude), Number(latitude))) return null;
+        return {
+          name: element.tags?.name ?? element.tags?.["name:tr"] ?? "Liman",
+          coordinates: [Number(longitude), Number(latitude)] as [number, number],
+        };
+      })
+      .filter((port): port is { name: string; coordinates: [number, number] } => Boolean(port))
+      .slice(0, 24);
+  } catch {
+    return [];
+  }
+};
+
+const fetchRealProtectedPolygons = async (bounds: NonNullable<ReturnType<typeof parseBounds>>) => {
+  const bbox = `${bounds.minLat},${bounds.minLon},${bounds.maxLat},${bounds.maxLon}`;
+  const query = `[out:json][timeout:4];(way["boundary"="protected_area"](${bbox});way["protect_class"](${bbox});way["leisure"="nature_reserve"](${bbox}););out geom 12;`;
+
+  try {
+    const elements = await fetchOverpassElements(query);
+    return elements
+      .map((element) => {
+        const geometry = element.geometry ?? [];
+        const polygon = geometry
+          .map((point) => [Number(point.lon), Number(point.lat)] as [number, number])
+          .filter(([longitude, latitude]) => Number.isFinite(longitude) && Number.isFinite(latitude) && isTurkeyMarinePoint(longitude, latitude));
+
+        if (polygon.length < 4) return null;
+        const first = polygon[0];
+        const last = polygon[polygon.length - 1];
+        const closedPolygon = first[0] === last[0] && first[1] === last[1] ? polygon : [...polygon, first];
+        return {
+          name: element.tags?.name ?? element.tags?.["name:tr"] ?? "Koruma Alani",
+          polygon: closedPolygon,
+        };
+      })
+      .filter((polygon): polygon is { name: string; polygon: Array<[number, number]> } => Boolean(polygon))
+      .slice(0, 12);
+  } catch {
+    return [];
+  }
+};
+
+const buildResponse = async (points: MarinePoint[], bounds: NonNullable<ReturnType<typeof parseBounds>>) => {
+  const [ports, protectedAreas] = await Promise.all([fetchRealPorts(bounds), fetchRealProtectedPolygons(bounds)]);
 
   return {
-    source,
+    source: "open-meteo",
     isDynamic: true,
     densityPoints: toPointCollection(points, "weight"),
     temperaturePoints: toPointCollection(points, "temperature"),
     currents: toLineCollection(points),
-    protectedPolygons: toPolygonCollection(points),
+    protectedPolygons: toPolygonCollection(protectedAreas),
     ports,
     regions: buildRegions(points),
   };
@@ -417,20 +357,27 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Invalid bbox" }, { status: 400 });
   }
 
+  if (!intersectsTurkeyMarineBounds(bounds)) {
+    return NextResponse.json(emptyResponse("out-of-region"));
+  }
+
   const candidatePoints = buildCandidateGrid(bounds, Number.isFinite(zoom) ? zoom : 5);
-  const marineCandidatePoints = candidatePoints.filter(([longitude, latitude]) => isLikelyMarinePoint(longitude, latitude));
-  const fallbackPoints = marineCandidatePoints.map(([longitude, latitude]) => buildFallbackPoint(longitude, latitude));
+  const marineCandidatePoints = candidatePoints.filter(([longitude, latitude]) => isTurkeyMarinePoint(longitude, latitude));
 
   if (marineCandidatePoints.length === 0) {
-    return NextResponse.json(buildResponse([], bounds, "fallback"));
+    return NextResponse.json(emptyResponse("out-of-region"));
   }
 
   try {
     const sampled = await Promise.all(marineCandidatePoints.map(([longitude, latitude]) => sampleOpenMeteoPoint(longitude, latitude)));
     const realPoints = sampled.filter((point): point is MarinePoint => Boolean(point));
 
-    return NextResponse.json(buildResponse(realPoints.length ? realPoints : fallbackPoints, bounds, realPoints.length ? "open-meteo" : "fallback"));
+    if (!realPoints.length) {
+      return NextResponse.json(emptyResponse("unavailable"));
+    }
+
+    return NextResponse.json(await buildResponse(realPoints, bounds));
   } catch {
-    return NextResponse.json(buildResponse(fallbackPoints, bounds, "fallback"));
+    return NextResponse.json(emptyResponse("unavailable"));
   }
 }

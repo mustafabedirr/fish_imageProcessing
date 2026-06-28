@@ -36,10 +36,10 @@ import {
 import NotificationPopover from "../shell/notification-popover";
 
 const layerItems = [
-  { id: "fish-density", icon: Fish, title: "Balik Yogunlugu", low: "Dusuk", high: "Yuksek", active: true, tone: "blue" },
+  { id: "fish-density", icon: Fish, title: "Deniz Kosul Skoru", low: "Dusuk", high: "Uygun", active: true, tone: "blue" },
   { id: "water-temperature", icon: Thermometer, title: "Su Sicakligi", low: "Soguk", high: "Sicak", active: true, tone: "heat" },
   { id: "chlorophyll", icon: Leaf, title: "Klorofil Seviyesi", low: "Dusuk", high: "Yuksek", active: false, tone: "green" },
-  { id: "current-direction", icon: Waves, title: "Akinti Yonu", low: "Yon & Hiz", high: "", active: true, tone: "blue" },
+  { id: "current-direction", icon: Waves, title: "Dalga Yonu", low: "Yon & Periyot", high: "", active: true, tone: "blue" },
   { id: "protected-areas", icon: Shield, title: "Koruma Alanlari", low: "Resmi Bolgeler", high: "", active: true, tone: "green" },
   { id: "ports", icon: Anchor, title: "Limanlar", low: "Liman & Iskele", high: "", active: true, tone: "blue" },
   { id: "weather", icon: CloudRain, title: "Hava Durumu", low: "Ruzgar & Yagis", high: "", active: false, tone: "muted" },
@@ -215,7 +215,7 @@ type MarineMapMarker = {
 };
 
 type MarineMapData = {
-  source?: "open-meteo" | "fallback" | "static";
+  source?: "open-meteo" | "fallback" | "static" | "out-of-region" | "unavailable";
   densityPoints: unknown;
   temperaturePoints: unknown;
   currents: unknown;
@@ -254,17 +254,12 @@ const toPolygonCollection = (items: ReadonlyArray<{ name: string; polygon: reado
 
 const staticMarineMapData: MarineMapData = {
   source: "static",
-  densityPoints: toPointCollection(fishDensityData),
-  temperaturePoints: toPointCollection(fishDensityData),
-  currents: toLineCollection(currentPaths),
-  protectedPolygons: toPolygonCollection(protectedAreas),
-  ports: [...portMarkers] as Array<{ name: string; coordinates: [number, number] }>,
-  regions: regionMarkers.map((marker) => ({
-    name: marker.name,
-    label: marker.label,
-    coordinates: marker.coordinates as [number, number],
-    region: mapRegions[marker.regionIndex] as MarineMapRegion,
-  })),
+  densityPoints: { type: "FeatureCollection", features: [] },
+  temperaturePoints: { type: "FeatureCollection", features: [] },
+  currents: { type: "FeatureCollection", features: [] },
+  protectedPolygons: { type: "FeatureCollection", features: [] },
+  ports: [],
+  regions: [],
   isDynamic: false,
 };
 
@@ -318,17 +313,21 @@ export default function WorldMapWorkspace() {
       ? "Veri aliniyor"
       : marineConditions?.source === "open-meteo"
       ? "Open-Meteo Marine"
+      : marineMapData.source === "out-of-region"
+      ? "Turkiye disi veri kapali"
+      : marineMapData.source === "unavailable"
+      ? "Gercek veri alinamadi"
       : marineMapData.source === "fallback"
-      ? "Deniz maskeli fallback"
+      ? "Fallback veri"
       : marineMapData.isDynamic
-      ? "Viewport marine verisi"
-      : "Demo fallback";
+      ? "Open-Meteo + OSM"
+      : "Veri bekleniyor";
   const floatingMetrics = [
     { icon: Thermometer, label: "Su Sicakligi", value: marineConditions?.waterTemperature ?? selectedRegion.temperature },
     { icon: Wind, label: "Ruzgar", value: marineConditions?.windSpeed ?? selectedRegion.wind },
     { icon: Waves, label: "Dalga", value: marineConditions?.waveHeight ?? selectedRegion.wave },
-    { icon: Waves, label: "Akinti", value: selectedRegion.current },
-    { icon: Layers, label: "Tuzluluk", value: "36.1 PSU" },
+    { icon: Waves, label: "Dalga Yonu", value: selectedRegion.current },
+    { icon: Layers, label: "Klorofil", value: selectedRegion.chlorophyll },
   ];
 
   const activeMapStyle = useMemo(() => {
@@ -457,24 +456,7 @@ export default function WorldMapWorkspace() {
     if (query.includes("izmir")) focusRegion(1);
     if (query.includes("bodrum")) focusRegion(2);
     if (query.includes("ege")) focusRegion(0);
-    if (query.includes("japon") || query.includes("japan") || query.includes("tokyo")) {
-      const region: MarineMapRegion = {
-        id: "search-japan",
-        name: "Japonya Deniz Alani",
-        coordinatesText: "35.5500 N, 139.7800 E",
-        center: [139.78, 35.55],
-        density: "Orta",
-        densityScore: "%68",
-        temperature: "20.4 C",
-        chlorophyll: "Orta",
-        current: "0.8 m/s",
-        wave: "0.9 m",
-        wind: "13 kn",
-      };
-      setViewportRegion(region);
-      setIsRegionPanelOpen(true);
-      mapRef.current?.flyTo({ center: region.center, zoom: 6.7, duration: 950 });
-    }
+    if (query.includes("karadeniz")) mapRef.current?.flyTo({ center: [34.8, 42.0], zoom: 6.25, duration: 950 });
   };
 
   const applyFilterPreset = (preset: "density" | "environment" | "navigation") => {
