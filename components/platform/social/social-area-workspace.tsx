@@ -463,6 +463,8 @@ const suggestedFriends = [
   ["Qarack Babarma", "@obama21", "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=96&q=80"],
 ];
 
+const storyActionDefaults = { likes: 142, comments: 24, shares: 12, liked: false, shared: false, saved: false };
+
 const storyItems = [
   {
     name: "Your Story",
@@ -1639,6 +1641,10 @@ function StoryViewer({
   const activeUserStoryPosition = Math.max(activeUserStories.findIndex(({ index }) => index === activeIndex), 0);
   const [progress, setProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [storyOptionsOpen, setStoryOptionsOpen] = useState(false);
+  const [storyReply, setStoryReply] = useState("");
+  const [storyActions, setStoryActions] = useState<Record<string, typeof storyActionDefaults>>({});
+  const replyInputRef = useRef<HTMLInputElement>(null);
   const progressRef = useRef(0);
   const storyDurationMs = 5200;
 
@@ -1665,6 +1671,7 @@ function StoryViewer({
   useEffect(() => {
     progressRef.current = 0;
     setProgress(0);
+    setStoryOptionsOpen(false);
   }, [activeIndex]);
   useEffect(() => {
     if (isPaused) return;
@@ -1698,6 +1705,34 @@ function StoryViewer({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeIndex, activeUserStoryPosition, activeUserStories, onClose, onNext, onPrevious, onSelect]);
+
+  const activeStoryKey = `${activeStory.handle}-${activeStory.time}-${activeStory.image}`;
+  const activeStoryActions = storyActions[activeStoryKey] ?? storyActionDefaults;
+  const updateStoryActions = (updater: (current: typeof storyActionDefaults) => typeof storyActionDefaults) => {
+    setStoryActions((current) => ({
+      ...current,
+      [activeStoryKey]: updater(current[activeStoryKey] ?? storyActionDefaults),
+    }));
+  };
+  const toggleStoryLike = () => {
+    updateStoryActions((current) => {
+      const liked = !current.liked;
+      return { ...current, liked, likes: Math.max(0, current.likes + (liked ? 1 : -1)) };
+    });
+  };
+  const focusStoryReply = () => replyInputRef.current?.focus();
+  const toggleStoryShare = () => {
+    updateStoryActions((current) => ({ ...current, shared: !current.shared, shares: current.shared ? Math.max(0, current.shares - 1) : current.shares + 1 }));
+  };
+  const toggleStorySave = () => updateStoryActions((current) => ({ ...current, saved: !current.saved }));
+  const submitStoryReply = () => {
+    if (!storyReply.trim()) {
+      focusStoryReply();
+      return;
+    }
+    updateStoryActions((current) => ({ ...current, comments: current.comments + 1 }));
+    setStoryReply("");
+  };
 
   const progressStyle = { "--story-progress": `${progress}%` } as CSSProperties;
   const pauseStory = () => setIsPaused(true);
@@ -1739,16 +1774,23 @@ function StoryViewer({
             ))}
           </div>
 
-          <header>
-            <img src={activeStory.avatar} alt={activeStory.name} />
-            <div>
-              <strong>{activeStory.name}</strong>
-              <span>{activeStory.time}</span>
-            </div>
-            <button type="button" aria-label="Story options">
-              <MoreVertical size={19} />
+          <div className="social-story-more">
+            <button
+              type="button"
+              aria-label="Story options"
+              aria-expanded={storyOptionsOpen}
+              onClick={() => setStoryOptionsOpen((open) => !open)}
+            >
+              <MoreVertical size={21} />
             </button>
-          </header>
+            {storyOptionsOpen ? (
+              <div className="social-story-more-menu" role="menu">
+                <button type="button" role="menuitem" onClick={() => setStoryOptionsOpen(false)}>Story details</button>
+                <button type="button" role="menuitem" onClick={() => setStoryOptionsOpen(false)}>Share</button>
+                <button type="button" role="menuitem" onClick={() => setStoryOptionsOpen(false)}>Report</button>
+              </div>
+            ) : null}
+          </div>
 
           <figure className={isPaused ? "social-story-media is-paused" : "social-story-media"} key={`${activeStory.name}-${activeStory.image}`}>
             <img src={activeStory.image} alt={`${activeStory.name} story`} />
@@ -1778,8 +1820,8 @@ function StoryViewer({
           </div>
 
           <label className="social-story-reply" onPointerDown={(event) => event.stopPropagation()}>
-            <input type="text" placeholder="Reply..." />
-            <button type="button" aria-label="Send reply">
+            <input ref={replyInputRef} type="text" placeholder="Reply..." value={storyReply} onChange={(event) => setStoryReply(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") submitStoryReply(); }} />
+            <button type="button" aria-label="Send reply" onClick={submitStoryReply}>
               <Send size={20} />
             </button>
           </label>
@@ -1789,10 +1831,10 @@ function StoryViewer({
           <button type="button" className="social-story-close" aria-label="Close story viewer" onClick={onClose}>
             <X size={25} />
           </button>
-          <button type="button" aria-label="Like story"><Heart size={24} /><span>142</span></button>
-          <button type="button" aria-label="Comment story"><MessageCircle size={24} /><span>24</span></button>
-          <button type="button" aria-label="Share story"><Send size={23} /><span>12</span></button>
-          <button type="button" aria-label="Save story"><Bookmark size={23} /></button>
+          <button type="button" className={activeStoryActions.liked ? "is-active" : ""} aria-label="Like story" aria-pressed={activeStoryActions.liked} onClick={toggleStoryLike}><Heart size={24} /><span>{activeStoryActions.likes}</span></button>
+          <button type="button" aria-label="Comment story" onClick={focusStoryReply}><MessageCircle size={24} /><span>{activeStoryActions.comments}</span></button>
+          <button type="button" className={activeStoryActions.shared ? "is-active" : ""} aria-label="Share story" aria-pressed={activeStoryActions.shared} onClick={toggleStoryShare}><Send size={23} /><span>{activeStoryActions.shares}</span></button>
+          <button type="button" className={activeStoryActions.saved ? "is-active" : ""} aria-label="Save story" aria-pressed={activeStoryActions.saved} onClick={toggleStorySave}><Bookmark size={23} /><span>{activeStoryActions.saved ? "Saved" : "Save"}</span></button>
         </aside>
       </section>
     </div>

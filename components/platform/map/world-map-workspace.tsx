@@ -36,7 +36,7 @@ import {
 import NotificationPopover from "../shell/notification-popover";
 
 const layerItems = [
-  { id: "fish-density", icon: Fish, title: "Deniz Kosul Skoru", low: "Dusuk", high: "Uygun", active: true, tone: "blue" },
+  { id: "fish-density", icon: Fish, title: "Gozlem / Habitat Skoru", low: "Az", high: "Yogun", active: true, tone: "blue" },
   { id: "water-temperature", icon: Thermometer, title: "Su Sicakligi", low: "Soguk", high: "Sicak", active: true, tone: "heat" },
   { id: "chlorophyll", icon: Leaf, title: "Klorofil Seviyesi", low: "Dusuk", high: "Yuksek", active: false, tone: "green" },
   { id: "current-direction", icon: Waves, title: "Dalga Yonu", low: "Yon & Periyot", high: "", active: true, tone: "blue" },
@@ -263,7 +263,20 @@ const staticMarineMapData: MarineMapData = {
   isDynamic: false,
 };
 
-const MIN_DYNAMIC_MAP_ZOOM = 5.15;
+const MIN_DYNAMIC_MAP_ZOOM = 0;
+const TURKEY_PREMIUM_VIEW_BOUNDS = {
+  west: 23.1,
+  south: 34.0,
+  east: 45.2,
+  north: 43.8,
+};
+
+type PremiumClearArea = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
 
 const formatMapCoordinates = ([longitude, latitude]: [number, number]) =>
   `${Math.abs(latitude).toFixed(4)} ${latitude >= 0 ? "N" : "S"}, ${Math.abs(longitude).toFixed(4)} ${longitude >= 0 ? "E" : "W"}`;
@@ -304,8 +317,10 @@ export default function WorldMapWorkspace() {
   const [marineMapData, setMarineMapData] = useState<MarineMapData>(staticMarineMapData);
   const [viewportRegion, setViewportRegion] = useState<MarineMapRegion | null>(null);
   const [viewportZoom, setViewportZoom] = useState(6.15);
+  const [premiumClearArea, setPremiumClearArea] = useState<PremiumClearArea | null>(null);
 
   const selectedRegion = viewportRegion ?? (mapRegions[activeRegionIndex] as MarineMapRegion);
+  const isPremiumRegion = marineMapData.source === "out-of-region";
   const selectedObservation = observations[selectedObservationIndex];
   const selectedDayIndex = Math.max(days.indexOf(selectedDay), 0);
   const liveSourceLabel =
@@ -320,7 +335,7 @@ export default function WorldMapWorkspace() {
       : marineMapData.source === "fallback"
       ? "Fallback veri"
       : marineMapData.isDynamic
-      ? "Open-Meteo + OSM"
+      ? "Open-Meteo + NOAA + OBIS/GBIF"
       : "Veri bekleniyor";
   const floatingMetrics = [
     { icon: Thermometer, label: "Su Sicakligi", value: marineConditions?.waterTemperature ?? selectedRegion.temperature },
@@ -368,12 +383,37 @@ export default function WorldMapWorkspace() {
     mapRef.current?.flyTo({ center: region.center, zoom: Math.max(viewportZoom, 6.2), duration: 750 });
   };
 
+  const updatePremiumClearArea = () => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    const mapInstance = map.getMap();
+    const canvas = mapInstance.getCanvas();
+    const northWest = mapInstance.project([TURKEY_PREMIUM_VIEW_BOUNDS.west, TURKEY_PREMIUM_VIEW_BOUNDS.north]);
+    const southEast = mapInstance.project([TURKEY_PREMIUM_VIEW_BOUNDS.east, TURKEY_PREMIUM_VIEW_BOUNDS.south]);
+    const rawLeft = Math.min(northWest.x, southEast.x);
+    const rawRight = Math.max(northWest.x, southEast.x);
+    const rawTop = Math.min(northWest.y, southEast.y);
+    const rawBottom = Math.max(northWest.y, southEast.y);
+    const left = Math.max(0, rawLeft);
+    const top = Math.max(0, rawTop);
+    const right = Math.min(canvas.clientWidth, rawRight);
+    const bottom = Math.min(canvas.clientHeight, rawBottom);
+
+    if (right <= 0 || bottom <= 0 || left >= canvas.clientWidth || top >= canvas.clientHeight || right <= left || bottom <= top) {
+      setPremiumClearArea(null);
+      return;
+    }
+
+    setPremiumClearArea({ left, top, width: right - left, height: bottom - top });
+  };
   const refreshViewportMarineData = () => {
     const map = mapRef.current;
     if (!map) return;
 
     const mapInstance = map.getMap();
     const zoom = mapInstance.getZoom();
+    updatePremiumClearArea();
     setViewportZoom(zoom);
     mapDataControllerRef.current?.abort();
 
@@ -671,7 +711,7 @@ export default function WorldMapWorkspace() {
                 ) : null}
               </div>
 
-              <div className="aqua-map-canvas-v2" aria-label="Ege Denizi veri haritasi">
+              <div className={isPremiumRegion ? "aqua-map-canvas-v2 is-premium-locked" : "aqua-map-canvas-v2"} aria-label="Ege Denizi veri haritasi">
                 <Map
                   ref={mapRef}
                   initialViewState={{ longitude: 26.35, latitude: 38.1, zoom: 6.15, pitch: 12 }}
@@ -796,6 +836,29 @@ export default function WorldMapWorkspace() {
                 </Map>
 
                 <div className="aqua-map-data-overlay" aria-hidden />
+                {isPremiumRegion ? (
+                  <div className="aqua-map-premium-mask" aria-hidden>
+                    {premiumClearArea ? (
+                      <>
+                        <span className="aqua-map-premium-blur-segment" style={{ left: 0, top: 0, right: 0, height: premiumClearArea.top }} />
+                        <span className="aqua-map-premium-blur-segment" style={{ left: 0, top: premiumClearArea.top + premiumClearArea.height, right: 0, bottom: 0 }} />
+                        <span className="aqua-map-premium-blur-segment" style={{ left: 0, top: premiumClearArea.top, width: premiumClearArea.left, height: premiumClearArea.height }} />
+                        <span className="aqua-map-premium-blur-segment" style={{ left: premiumClearArea.left + premiumClearArea.width, top: premiumClearArea.top, right: 0, height: premiumClearArea.height }} />
+                      </>
+                    ) : (
+                      <span className="aqua-map-premium-blur-segment" style={{ inset: 0 }} />
+                    )}
+                  </div>
+                ) : null}
+                {isPremiumRegion ? (
+                  <div className="aqua-map-premium-overlay" role="status" aria-live="polite">
+                    <div>
+                      <Shield size={22} />
+                      <strong>Premium harita alani</strong>
+                      <span>Gercek zamanli veri katmanlari su anda Turkiye ve cevresi icin acik. Diger bolgeler premium uyelik ile kullanilabilir.</span>
+                    </div>
+                  </div>
+                ) : null}
               </div>
 
               <div className="aqua-map-layer-dock aqua-glass-panel">

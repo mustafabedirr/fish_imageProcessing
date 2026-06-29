@@ -10,6 +10,7 @@ type MarinePoint = {
   windSpeed: number;
   currentVelocity: number;
   currentDirection: number;
+  chlorophyllMgM3?: number | null;
 };
 
 type MarineRegion = {
@@ -32,6 +33,15 @@ type MarineRegion = {
   };
 };
 
+
+type SpeciesObservation = {
+  id: string;
+  source: "OBIS" | "GBIF";
+  scientificName: string;
+  commonName?: string;
+  eventDate?: string;
+  coordinates: [number, number];
+};
 type OverpassElement = {
   id: number;
   type: "node" | "way" | "relation";
@@ -57,6 +67,7 @@ const TURKEY_SEA_BOXES = [
 ] as const;
 
 const emptyFeatureCollection = { type: "FeatureCollection", features: [] };
+const NOAA_CHLOROPHYLL_DATASET_ID = "noaacwNPPN20S3ASCIDINEOF2kmDaily";
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
@@ -87,7 +98,7 @@ const toPointCollection = (items: MarinePoint[], property: "weight" | "temperatu
   type: "FeatureCollection",
   features: items.map((item) => ({
     type: "Feature",
-    properties: { weight: property === "temperature" ? item.temperature : item.weight },
+    properties: { weight: property === "temperature" ? item.temperature : item.weight, chlorophyll: item.chlorophyllMgM3 ?? null },
     geometry: { type: "Point", coordinates: item.position },
   })),
 });
@@ -125,34 +136,67 @@ const toPolygonCollection = (items: Array<{ name: string; polygon: Array<[number
   })),
 });
 
-const buildRegions = (items: MarinePoint[]): MarineRegion[] =>
-  [...items]
-    .sort((a, b) => b.weight - a.weight)
-    .slice(0, 4)
-    .map((item, index) => {
-      const condition = item.weight > 74 ? "Uygun" : item.weight > 55 ? "Orta" : "Dusuk";
-      const name = `${getViewportName(item.position)} ${index + 1}`;
+const buildRegions = (items: MarinePoint[], observations: SpeciesObservation[] = []): MarineRegion[] =>
+  (observations.length
+    ? observations.slice(0, 8).map((observation, index) => {
+        const nearestPoint = items.reduce<MarinePoint | null>((nearest, item) => {
+          if (!nearest) return item;
+          const [obsLon, obsLat] = observation.coordinates;
+          const [itemLon, itemLat] = item.position;
+          const [nearLon, nearLat] = nearest.position;
+          const itemDistance = Math.abs(obsLon - itemLon) + Math.abs(obsLat - itemLat);
+          const nearestDistance = Math.abs(obsLon - nearLon) + Math.abs(obsLat - nearLat);
+          return itemDistance < nearestDistance ? item : nearest;
+        }, null);
+        const score = nearestPoint?.weight ?? 0;
 
-      return {
-        id: `${item.position[0]}-${item.position[1]}`,
-        name,
-        label: `%${item.weight}`,
-        coordinates: item.position,
-        region: {
-          id: `marine-${index}-${item.position[0]}-${item.position[1]}`,
-          name,
-          coordinatesText: formatCoordinates(item.position),
-          center: item.position,
-          density: condition,
-          densityScore: `%${item.weight}`,
-          temperature: `${item.temperature.toFixed(1)} C`,
-          chlorophyll: "Gercek veri yok",
-          current: `${item.currentVelocity.toFixed(1)} kn / ${item.currentDirection.toFixed(0)} deg`,
-          wave: `${item.waveHeight.toFixed(1)} m`,
-          wind: `${item.windSpeed.toFixed(0)} kn`,
-        },
-      };
-    });
+        return {
+          id: observation.id,
+          name: observation.commonName ?? observation.scientificName,
+          label: observation.source,
+          coordinates: observation.coordinates,
+          region: {
+            id: `observation-${observation.id}`,
+            name: observation.commonName ?? observation.scientificName,
+            coordinatesText: formatCoordinates(observation.coordinates),
+            center: observation.coordinates,
+            density: "Gercek gozlem",
+            densityScore: observation.source,
+            temperature: nearestPoint ? `${nearestPoint.temperature.toFixed(1)} C` : "-",
+            chlorophyll: nearestPoint?.chlorophyllMgM3 != null ? `${nearestPoint.chlorophyllMgM3.toFixed(2)} mg/m3` : "Gercek veri yok",
+            current: nearestPoint ? `${nearestPoint.currentVelocity.toFixed(1)} kn / ${nearestPoint.currentDirection.toFixed(0)} deg` : "-",
+            wave: nearestPoint ? `${nearestPoint.waveHeight.toFixed(1)} m` : "-",
+            wind: nearestPoint ? `${nearestPoint.windSpeed.toFixed(0)} kn` : "-",
+          },
+        };
+      })
+    : [...items]
+        .sort((a, b) => b.weight - a.weight)
+        .slice(0, 4)
+        .map((item, index) => {
+          const condition = item.weight > 74 ? "Uygun" : item.weight > 55 ? "Orta" : "Dusuk";
+          const name = `${getViewportName(item.position)} ${index + 1}`;
+
+          return {
+            id: `${item.position[0]}-${item.position[1]}`,
+            name,
+            label: `%${item.weight}`,
+            coordinates: item.position,
+            region: {
+              id: `marine-${index}-${item.position[0]}-${item.position[1]}`,
+              name,
+              coordinatesText: formatCoordinates(item.position),
+              center: item.position,
+              density: condition,
+              densityScore: `%${item.weight}`,
+              temperature: `${item.temperature.toFixed(1)} C`,
+              chlorophyll: item.chlorophyllMgM3 != null ? `${item.chlorophyllMgM3.toFixed(2)} mg/m3` : "Gercek veri yok",
+              current: `${item.currentVelocity.toFixed(1)} kn / ${item.currentDirection.toFixed(0)} deg`,
+              wave: `${item.waveHeight.toFixed(1)} m`,
+              wind: `${item.windSpeed.toFixed(0)} kn`,
+            },
+          };
+        }));
 
 const sampleOpenMeteoPoint = async (longitude: number, latitude: number): Promise<MarinePoint | null> => {
   const marineUrl = new URL("https://marine-api.open-meteo.com/v1/marine");
@@ -334,18 +378,146 @@ const fetchRealProtectedPolygons = async (bounds: NonNullable<ReturnType<typeof 
   }
 };
 
+const sampleNoaaChlorophyll = async (longitude: number, latitude: number): Promise<number | null> => {
+  const url = new URL(`https://coastwatch.pfeg.noaa.gov/erddap/griddap/${NOAA_CHLOROPHYLL_DATASET_ID}.json`);
+  url.search = `?chlor_a[(last)][(0)][(${latitude.toFixed(4)})][(${longitude.toFixed(4)})]`;
+
+  try {
+    const response = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(4500) });
+    if (!response.ok) return null;
+    const data = await response.json();
+    const value = Number(data?.table?.rows?.[0]?.[4]);
+    return Number.isFinite(value) ? value : null;
+  } catch {
+    return null;
+  }
+};
+
+const enrichWithChlorophyll = async (points: MarinePoint[]) => {
+  const sampled = await Promise.all(
+    points.map(async (point) => ({
+      ...point,
+      chlorophyllMgM3: await sampleNoaaChlorophyll(point.position[0], point.position[1]),
+    }))
+  );
+
+  return sampled;
+};
+
+const toObservationPointCollection = (observations: SpeciesObservation[]) => ({
+  type: "FeatureCollection",
+  features: observations.map((observation) => ({
+    type: "Feature",
+    properties: { weight: observation.source === "OBIS" ? 92 : 84, source: observation.source, name: observation.scientificName },
+    geometry: { type: "Point", coordinates: observation.coordinates },
+  })),
+});
+
+const boundsToWktPolygon = (bounds: NonNullable<ReturnType<typeof parseBounds>>) =>
+  `POLYGON((${bounds.minLon} ${bounds.minLat},${bounds.maxLon} ${bounds.minLat},${bounds.maxLon} ${bounds.maxLat},${bounds.minLon} ${bounds.maxLat},${bounds.minLon} ${bounds.minLat}))`;
+
+const isLikelyFishObservation = (item: Record<string, unknown>) => {
+  const className = String(item.class ?? item.className ?? "").toLocaleLowerCase("tr-TR");
+  const orderName = String(item.order ?? "").toLocaleLowerCase("tr-TR");
+  return ["actinopter", "chondrich", "elasmobranch", "squal", "perciform", "clupeiform", "gobiiform"].some((token) => className.includes(token) || orderName.includes(token));
+};
+
+const fetchObisObservations = async (bounds: NonNullable<ReturnType<typeof parseBounds>>): Promise<SpeciesObservation[]> => {
+  const url = new URL("https://api.obis.org/v3/occurrence");
+  url.searchParams.set("geometry", boundsToWktPolygon(bounds));
+  url.searchParams.set("size", "80");
+
+  try {
+    const response = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(5200) });
+    if (!response.ok) return [];
+    const data = await response.json();
+    const results = Array.isArray(data?.results) ? data.results : [];
+
+    return results
+      .filter((item: Record<string, unknown>) => isLikelyFishObservation(item))
+      .map((item: Record<string, unknown>) => {
+        const longitude = Number(item.decimalLongitude);
+        const latitude = Number(item.decimalLatitude);
+        if (!Number.isFinite(longitude) || !Number.isFinite(latitude) || !isTurkeyMarinePoint(longitude, latitude)) return null;
+        const scientificName = String(item.scientificName ?? item.species ?? "Deniz turu gozlemi");
+        return {
+          id: `obis-${String(item.occurrenceID ?? `${longitude}-${latitude}-${scientificName}`)}`,
+          source: "OBIS" as const,
+          scientificName,
+          eventDate: item.eventDate ? String(item.eventDate) : undefined,
+          coordinates: [Number(longitude.toFixed(4)), Number(latitude.toFixed(4))] as [number, number],
+        };
+      })
+      .filter((item): item is SpeciesObservation => Boolean(item))
+      .slice(0, 12);
+  } catch {
+    return [];
+  }
+};
+
+const fetchGbifObservations = async (bounds: NonNullable<ReturnType<typeof parseBounds>>): Promise<SpeciesObservation[]> => {
+  const url = new URL("https://api.gbif.org/v1/occurrence/search");
+  url.searchParams.set("geometry", boundsToWktPolygon(bounds));
+  url.searchParams.set("hasCoordinate", "true");
+  url.searchParams.set("classKey", "204");
+  url.searchParams.set("limit", "40");
+
+  try {
+    const response = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(5200) });
+    if (!response.ok) return [];
+    const data = await response.json();
+    const results = Array.isArray(data?.results) ? data.results : [];
+
+    return results
+      .map((item: Record<string, unknown>) => {
+        const longitude = Number(item.decimalLongitude);
+        const latitude = Number(item.decimalLatitude);
+        if (!Number.isFinite(longitude) || !Number.isFinite(latitude) || !isTurkeyMarinePoint(longitude, latitude)) return null;
+        const scientificName = String(item.scientificName ?? item.species ?? "Balik gozlemi");
+        return {
+          id: `gbif-${String(item.key ?? `${longitude}-${latitude}-${scientificName}`)}`,
+          source: "GBIF" as const,
+          scientificName,
+          commonName: item.vernacularName ? String(item.vernacularName) : undefined,
+          eventDate: item.eventDate ? String(item.eventDate) : undefined,
+          coordinates: [Number(longitude.toFixed(4)), Number(latitude.toFixed(4))] as [number, number],
+        };
+      })
+      .filter((item): item is SpeciesObservation => Boolean(item))
+      .slice(0, 12);
+  } catch {
+    return [];
+  }
+};
+
+const uniqueObservations = (observations: SpeciesObservation[]) => {
+  const seen = new Set<string>();
+  return observations.filter((observation) => {
+    const key = `${observation.scientificName}-${observation.coordinates[0]}-${observation.coordinates[1]}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
 const buildResponse = async (points: MarinePoint[], bounds: NonNullable<ReturnType<typeof parseBounds>>) => {
-  const [ports, protectedAreas] = await Promise.all([fetchRealPorts(bounds), fetchRealProtectedPolygons(bounds)]);
+  const [enrichedPoints, ports, protectedAreas, obisObservations, gbifObservations] = await Promise.all([
+    enrichWithChlorophyll(points),
+    fetchRealPorts(bounds),
+    fetchRealProtectedPolygons(bounds),
+    fetchObisObservations(bounds),
+    fetchGbifObservations(bounds),
+  ]);
+  const observations = uniqueObservations([...obisObservations, ...gbifObservations]);
 
   return {
     source: "open-meteo",
     isDynamic: true,
-    densityPoints: toPointCollection(points, "weight"),
-    temperaturePoints: toPointCollection(points, "temperature"),
-    currents: toLineCollection(points),
+    densityPoints: observations.length ? toObservationPointCollection(observations) : toPointCollection(enrichedPoints, "weight"),
+    temperaturePoints: toPointCollection(enrichedPoints, "temperature"),
+    currents: toLineCollection(enrichedPoints),
     protectedPolygons: toPolygonCollection(protectedAreas),
     ports,
-    regions: buildRegions(points),
+    regions: buildRegions(enrichedPoints, observations),
   };
 };
 
