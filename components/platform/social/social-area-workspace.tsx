@@ -752,6 +752,8 @@ export default function SocialAreaWorkspace() {
   const [addedFriends, setAddedFriends] = useState<Record<string, boolean>>({});
   const [followedUsers, setFollowedUsers] = useState<Record<string, boolean>>({});
   const [hiddenFriends, setHiddenFriends] = useState<Record<string, boolean>>({});
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement | null>(null);
   const [joinedEvent, setJoinedEvent] = useState(false);
   const [notice, setNotice] = useState("Topluluk akışınız hazır.");
   const [activeModal, setActiveModal] = useState<SocialModal>(null);
@@ -762,7 +764,17 @@ export default function SocialAreaWorkspace() {
   );
   const storyRailRef = useRef<HTMLElement | null>(null);
   const storyInputRef = useRef<HTMLInputElement | null>(null);
+  useEffect(() => {
+    if (!profileMenuOpen) return undefined;
 
+    const handlePointerDown = (event: PointerEvent) => {
+      if (profileMenuRef.current?.contains(event.target as Node)) return;
+      setProfileMenuOpen(false);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [profileMenuOpen]);
 
   useEffect(() => {
     fetch("/api/users")
@@ -1426,24 +1438,68 @@ export default function SocialAreaWorkspace() {
                 onToggleAdd={(name) => setAddedFriends((current) => ({ ...current, [name]: !current[name] }))}
                 onHide={(name) => setHiddenFriends((current) => ({ ...current, [name]: true }))}
               />
-              <button type="button" className="social-profile-chip" aria-label="Open profile menu">
-                <img src={currentUserAvatar} alt={currentUserName} />
-                <span />
-                <ChevronDown size={13} />
-              </button>
+              <div className="social-profile-menu-wrap" ref={profileMenuRef}>
+                <button
+                  type="button"
+                  className={profileMenuOpen ? "social-profile-chip is-open" : "social-profile-chip"}
+                  aria-label="Open profile menu"
+                  aria-expanded={profileMenuOpen}
+                  onClick={() => setProfileMenuOpen((open) => !open)}
+                >
+                  <img src={currentUserAvatar} alt={currentUserName} />
+                  <span />
+                  <ChevronDown size={13} />
+                </button>
+                {profileMenuOpen ? (
+                  <div className="social-profile-menu" role="menu">
+                    <a href="/platform/profile" role="menuitem" onClick={() => setProfileMenuOpen(false)}>
+                      <img src={currentUserAvatar} alt="" />
+                      <span><strong>{currentUserName}</strong><small>{currentUserHandle}</small></span>
+                    </a>
+                    <button type="button" role="menuitem" onClick={() => { setProfileMenuOpen(false); openModal("create"); }}>
+                      <Plus size={15} /> Yeni paylasim
+                    </button>
+                    <button type="button" role="menuitem" onClick={() => { setProfileMenuOpen(false); setActiveTab("Following"); setNotice("Takip ettiginiz kullanicilarin akisi acildi."); }}>
+                      <Users size={15} /> Takip akisi
+                    </button>
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
 
           <SocialPanel title="Friend Suggestions" action="See All" onAction={() => openModal("friends")}>
             <div className="social-suggestion-list">
               {suggestedFriends.map(([name, handle, image]) => (
-                <article key={name}>
+                <article
+                  key={name}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => openModal("friends")}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      openModal("friends");
+                    }
+                  }}
+                >
                   <img src={image} alt={name} />
                   <div>
                     <strong>{name}</strong>
                     <span>{handle}</span>
                   </div>
-                  <button type="button" aria-label={`Add ${name}`} onClick={() => setAddedFriends((current) => ({ ...current, [name]: !current[name] }))}>
+                  <button
+                    type="button"
+                    className={addedFriends[name] ? "is-active" : ""}
+                    aria-label={addedFriends[name] ? `Remove ${name}` : `Add ${name}`}
+                    aria-pressed={Boolean(addedFriends[name])}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      const nextActive = !addedFriends[name];
+                      setAddedFriends((current) => ({ ...current, [name]: nextActive }));
+                      setNotice(`${name} ${nextActive ? "arkadas listesine eklendi" : "onerilerden cikarildi"}.`);
+                    }}
+                  >
                     <Plus size={16} />
                   </button>
                 </article>
@@ -1452,7 +1508,18 @@ export default function SocialAreaWorkspace() {
           </SocialPanel>
 
           <SocialPanel title="Profile Activity" action="" onAction={() => openModal("members")}>
-            <div className="social-profile-activity-card">
+            <div
+              className="social-profile-activity-card"
+              role="button"
+              tabIndex={0}
+              onClick={() => openModal("members")}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  openModal("members");
+                }
+              }}
+            >
               <div className="social-profile-activity-avatars">
                 {members.slice(0, 5).map(([name, , image]) => (
                   <img key={name} src={image} alt={name} />
@@ -1466,7 +1533,18 @@ export default function SocialAreaWorkspace() {
           </SocialPanel>
 
           <SocialPanel title="Upcoming Events" action="See All" onAction={() => openModal("events")}>
-            <div className="social-event-card">
+            <div
+              className="social-event-card"
+              role="button"
+              tabIndex={0}
+              onClick={() => openModal("events")}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  openModal("events");
+                }
+              }}
+            >
               <time>
                 <span>MAY</span>
                 25
@@ -1476,8 +1554,8 @@ export default function SocialAreaWorkspace() {
                 <span>May 25, 2024 - 09:00 AM</span>
                 <small>Lake Washington</small>
               </div>
-              <button type="button" aria-label="Previous event"><ChevronLeft size={16} /></button>
-              <button type="button" className={joinedEvent ? "is-joined" : ""} onClick={() => setJoinedEvent((joined) => !joined)} aria-label="Join event">
+              <button type="button" aria-label="Previous event" onClick={(event) => { event.stopPropagation(); setNotice("Onceki etkinlik icin etkinlik listesi acildi."); openModal("events"); }}><ChevronLeft size={16} /></button>
+              <button type="button" className={joinedEvent ? "is-joined" : ""} onClick={(event) => { event.stopPropagation(); const nextJoined = !joinedEvent; setJoinedEvent(nextJoined); setNotice(nextJoined ? "Etkinlige katilim kaydedildi." : "Etkinlik katilimi kaldirildi."); }} aria-label="Join event">
                 {joinedEvent ? "Joined" : <ChevronRight size={16} />}
               </button>
             </div>

@@ -34897,3 +34897,114 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
   backdrop-filter: blur(22px) saturate(1.08) !important;
   -webkit-backdrop-filter: blur(22px) saturate(1.08) !important;
 }
+
+/* Social right panel interactive controls */
+.social-area-page .social-profile-menu-wrap {
+  position: relative;
+  display: inline-flex;
+  isolation: isolate;
+}
+
+.social-area-page .social-profile-chip.is-open,
+.social-area-page .social-profile-chip:hover {
+  background: rgba(23, 78, 132, 0.32);
+  color: #ffffff;
+}
+
+.social-area-page .social-profile-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 420;
+  display: grid;
+  gap: 6px;
+  width: min(238px, calc(100vw - 32px));
+  padding: 10px;
+  border: 1px solid rgba(76, 156, 235, 0.3);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 82% 0%, rgba(0, 212, 255, 0.16), transparent 34%),
+    linear-gradient(180deg, rgba(7, 28, 54, 0.98), rgba(3, 13, 26, 0.99));
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.social-area-page .social-profile-menu a,
+.social-area-page .social-profile-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  color: #dcecff;
+  background: transparent;
+  font: inherit;
+  font-size: 0.8rem;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.social-area-page .social-profile-menu a:hover,
+.social-area-page .social-profile-menu button:hover,
+.social-area-page .social-profile-menu a:focus-visible,
+.social-area-page .social-profile-menu button:focus-visible {
+  outline: 0;
+  background: rgba(42, 132, 220, 0.2);
+}
+
+.social-area-page .social-profile-menu a img {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.social-area-page .social-profile-menu a span {
+  display: grid;
+  min-width: 0;
+}
+
+.social-area-page .social-profile-menu a strong,
+.social-area-page .social-profile-menu a small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.social-area-page .social-profile-menu a strong {
+  color: #ffffff;
+  font-size: 0.82rem;
+}
+
+.social-area-page .social-profile-menu a small {
+  color: #8fa7c2;
+  font-size: 0.72rem;
+}
+
+.social-area-page .social-suggestion-list article,
+.social-area-page .social-profile-activity-card,
+.social-area-page .social-event-card {
+  cursor: pointer;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease, background 180ms ease;
+}
+
+.social-area-page .social-suggestion-list article:hover,
+.social-area-page .social-suggestion-list article:focus-visible,
+.social-area-page .social-profile-activity-card:hover,
+.social-area-page .social-profile-activity-card:focus-visible,
+.social-area-page .social-event-card:hover,
+.social-area-page .social-event-card:focus-visible {
+  outline: 0;
+  transform: translateY(-1px);
+  background-color: rgba(28, 100, 170, 0.16);
+  box-shadow: 0 18px 42px rgba(0, 96, 190, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.social-area-page .social-suggestion-list button.is-active {
+  border-color: rgba(45, 212, 191, 0.58);
+  color: #061421;
+  background: #2dd4bf;
+}
