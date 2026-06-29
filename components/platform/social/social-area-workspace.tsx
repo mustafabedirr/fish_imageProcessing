@@ -465,7 +465,18 @@ const suggestedFriends = [
 
 const storyActionDefaults = { likes: 142, comments: 24, shares: 12, liked: false, shared: false, saved: false };
 
-const storyItems = [
+type StoryItem = {
+  name: string;
+  handle: string;
+  time: string;
+  avatar: string;
+  ownStory: boolean;
+  image: string;
+  caption: string;
+  location: string;
+};
+
+const initialStoryItems: StoryItem[] = [
   {
     name: "Your Story",
     handle: "Add to story",
@@ -576,7 +587,7 @@ const storyItems = [
     caption: "Visibility was perfect near the wall.",
     location: "North Aegean",
   },
-] as const;
+];
 
 const featuredDemoPostIds = new Set([
   "flow-text-james",
@@ -745,7 +756,11 @@ export default function SocialAreaWorkspace() {
   const [activeModal, setActiveModal] = useState<SocialModal>(null);
   const [activeFlowPostId, setActiveFlowPostId] = useState<string | null>(null);
   const [activeStoryIndex, setActiveStoryIndex] = useState<number | null>(null);
+  const [storyItems, setStoryItems] = useState<StoryItem[]>(() =>
+    initialStoryItems.map((story, index) => (index === 0 ? { ...story, avatar: currentUserAvatar } : story))
+  );
   const storyRailRef = useRef<HTMLElement | null>(null);
+  const storyInputRef = useRef<HTMLInputElement | null>(null);
 
 
   useEffect(() => {
@@ -915,6 +930,42 @@ export default function SocialAreaWorkspace() {
     photoInputRef.current?.click();
   };
 
+  const openStoryComposer = () => {
+    storyInputRef.current?.click();
+  };
+
+  const handleStoryFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    if (!file.type.startsWith("image/") || file.size > MAX_COMPOSER_PHOTO_SIZE) {
+      setNotice("Story icin 5 MB altinda bir gorsel dosyasi secin.");
+      return;
+    }
+
+    const imageUrl = await readImageAsDataUrl(file);
+    const nextStory: StoryItem = {
+      name: "Your Story",
+      handle: "Your story",
+      time: "Just now",
+      avatar: currentUserAvatar,
+      ownStory: true,
+      image: imageUrl,
+      caption: composerText.trim() || "Yeni bir story paylasti.",
+      location: "AquaScope",
+    };
+
+    setStoryItems((current) => {
+      const ownIndex = current.findIndex((story) => story.ownStory);
+      if (ownIndex < 0) return [nextStory, ...current];
+      const next = [...current];
+      next[ownIndex] = nextStory;
+      return next;
+    });
+    setActiveStoryIndex(0);
+    setNotice("Story paylasildi.");
+  };
   const handleComposerPhotoChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(event.target.files ?? []);
     event.target.value = "";
@@ -1044,11 +1095,31 @@ export default function SocialAreaWorkspace() {
       <div className="social-area-content social-area-content--mockup">
         <main className="social-feed-panel">
           <section className="social-story-rail" aria-label="Stories" ref={storyRailRef}>
+            <input ref={storyInputRef} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={handleStoryFileChange} />
             {storyItems.map((story, index) => (
               <button type="button" key={`${story.name}-${story.avatar}`} className={story.ownStory ? "social-story-item is-own" : "social-story-item"} onClick={() => setActiveStoryIndex(index)}>
                 <span>
                   <img src={story.avatar} alt={story.name} />
-                  {story.ownStory ? <b><Plus size={12} /></b> : null}
+                  {story.ownStory ? (
+                    <b
+                      role="button"
+                      tabIndex={0}
+                      aria-label="Add to story"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        openStoryComposer();
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          openStoryComposer();
+                        }
+                      }}
+                    >
+                      <Plus size={12} />
+                    </b>
+                  ) : null}
                 </span>
                 <small>{story.name}</small>
               </button>
@@ -1623,7 +1694,7 @@ function StoryViewer({
   onSelect,
 }: {
   activeIndex: number;
-  stories: typeof storyItems;
+  stories: StoryItem[];
   onClose: () => void;
   onNext: () => void;
   onPrevious: () => void;
@@ -1748,7 +1819,7 @@ function StoryViewer({
               <button type="button" key={`${story.name}-${story.time}`} className={index === activeIndex ? "is-active" : ""} onClick={() => onSelect(index)}>
                 <span>
                   <img src={story.avatar} alt={story.name} />
-                  {story.ownStory ? <b><Plus size={12} /></b> : null}
+                  {story.ownStory ? (<b><Plus size={12} /></b>) : null}
                 </span>
                 <div>
                   <strong>{story.ownStory ? "Your Story" : story.name}</strong>
