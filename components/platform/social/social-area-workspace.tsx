@@ -1628,10 +1628,40 @@ function StoryViewer({
   onSelect: (index: number) => void;
 }) {
   const activeStory = stories[activeIndex];
+  const activeStoryOwnerKey = activeStory.ownStory ? "__own_story__" : activeStory.handle;
+  const activeUserStories = useMemo(
+    () =>
+      stories
+        .map((story, index) => ({ story, index }))
+        .filter(({ story }) => (story.ownStory ? "__own_story__" : story.handle) === activeStoryOwnerKey),
+    [activeStoryOwnerKey, stories]
+  );
+  const activeUserStoryPosition = Math.max(activeUserStories.findIndex(({ index }) => index === activeIndex), 0);
   const [progress, setProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const progressRef = useRef(0);
   const storyDurationMs = 5200;
+
+  const goToNextUserStory = () => {
+    const nextStory = activeUserStories[activeUserStoryPosition + 1];
+    if (nextStory) {
+      onSelect(nextStory.index);
+      return;
+    }
+
+    onNext();
+  };
+
+  const goToPreviousUserStory = () => {
+    const previousStory = activeUserStories[activeUserStoryPosition - 1];
+    if (previousStory) {
+      onSelect(previousStory.index);
+      return;
+    }
+
+    onPrevious();
+  };
+
   useEffect(() => {
     progressRef.current = 0;
     setProgress(0);
@@ -1647,7 +1677,7 @@ function StoryViewer({
       setProgress(nextProgress);
 
       if (nextProgress >= 100) {
-        onNext();
+        goToNextUserStory();
         return;
       }
 
@@ -1656,17 +1686,18 @@ function StoryViewer({
 
     animationFrame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(animationFrame);
-  }, [activeIndex, isPaused, onNext]);
+  }, [activeIndex, activeUserStoryPosition, activeUserStories, isPaused, onNext, onSelect]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "ArrowRight") onNext();
-      if (event.key === "ArrowLeft") onPrevious();
+      if (event.key === "ArrowRight") goToNextUserStory();
+      if (event.key === "ArrowLeft") goToPreviousUserStory();
       if (event.key === "Escape") onClose();
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose, onNext, onPrevious]);
+  }, [activeIndex, activeUserStoryPosition, activeUserStories, onClose, onNext, onPrevious, onSelect]);
 
   const progressStyle = { "--story-progress": `${progress}%` } as CSSProperties;
   const pauseStory = () => setIsPaused(true);
@@ -1697,10 +1728,10 @@ function StoryViewer({
 
         <main className="social-story-stage">
           <div className="social-story-progress" aria-hidden>
-            {stories.map((story, index) => (
+            {activeUserStories.map(({ story, index }, timelineIndex) => (
               <span
-                key={`${story.name}-progress`}
-                className={index < activeIndex ? "is-filled" : index === activeIndex ? "is-active" : ""}
+                key={`${story.handle}-${story.time}-${timelineIndex}-progress`}
+                className={timelineIndex < activeUserStoryPosition ? "is-filled" : index === activeIndex ? "is-active" : ""}
                 style={index === activeIndex ? progressStyle : undefined}
               >
                 <i />
@@ -1730,14 +1761,14 @@ function StoryViewer({
             onPointerCancel={resumeStory}
             onPointerLeave={resumeStory}
           >
-            <button type="button" aria-label="Previous story content" onClick={onPrevious} />
-            <button type="button" aria-label="Next story content" onClick={onNext} />
+            <button type="button" aria-label="Previous story content" onClick={goToPreviousUserStory} />
+            <button type="button" aria-label="Next story content" onClick={goToNextUserStory} />
           </div>
 
-          <button type="button" className="social-story-nav social-story-nav--previous" aria-label="Previous story" onClick={onPrevious}>
+          <button type="button" className="social-story-nav social-story-nav--previous" aria-label="Previous story" onClick={goToPreviousUserStory}>
             <ChevronLeft size={23} />
           </button>
-          <button type="button" className="social-story-nav social-story-nav--next" aria-label="Next story" onClick={onNext}>
+          <button type="button" className="social-story-nav social-story-nav--next" aria-label="Next story" onClick={goToNextUserStory}>
             <ChevronRight size={23} />
           </button>
 
