@@ -35140,3 +35140,16 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     transform: translateY(0);
   }
 }
+
+/* Social saved post active state */
+.social-area-page .social-bookmark.is-active {
+  color: #1581FB !important;
+  background: rgba(21, 129, 251, 0.16) !important;
+  border-color: rgba(21, 129, 251, 0.42) !important;
+}
+
+.social-area-page .social-bookmark.is-active svg {
+  color: #1581FB;
+  fill: rgba(21, 129, 251, 0.24);
+  stroke: #1581FB;
+}
