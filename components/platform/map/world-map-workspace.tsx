@@ -20,6 +20,7 @@ import {
   Plus,
   Search,
   Shield,
+  ShipWheel,
   Star,
   Thermometer,
   Waves,
@@ -36,39 +37,14 @@ import {
 import NotificationPopover from "../shell/notification-popover";
 
 const layerItems = [
-  { id: "fish-density", icon: Fish, title: "Gozlem / Habitat Skoru", low: "Az", high: "Yogun", active: true, tone: "blue" },
+  { id: "fish-density", icon: Fish, title: "Gozlem Kayitlari", low: "Yok", high: "Kayit", active: true, tone: "blue" },
   { id: "water-temperature", icon: Thermometer, title: "Su Sicakligi", low: "Soguk", high: "Sicak", active: true, tone: "heat" },
   { id: "chlorophyll", icon: Leaf, title: "Klorofil Seviyesi", low: "Dusuk", high: "Yuksek", active: false, tone: "green" },
-  { id: "current-direction", icon: Waves, title: "Dalga Yonu", low: "Yon & Periyot", high: "", active: true, tone: "blue" },
   { id: "protected-areas", icon: Shield, title: "Koruma Alanlari", low: "Resmi Bolgeler", high: "", active: true, tone: "green" },
-  { id: "ports", icon: Anchor, title: "Limanlar", low: "Liman & Iskele", high: "", active: true, tone: "blue" },
-  { id: "weather", icon: CloudRain, title: "Hava Durumu", low: "Ruzgar & Yagis", high: "", active: false, tone: "muted" },
+  { id: "ports", icon: Anchor, title: "Limanlar", low: "Ticari Liman", high: "", active: true, tone: "blue" },
+  { id: "marinas", icon: ShipWheel, title: "Marinalar", low: "Yat Limani", high: "", active: true, tone: "green" },
+  { id: "weather", icon: CloudRain, title: "Hava Durumu", low: "Ruzgar & Yagis", high: "Anlik", active: true, tone: "muted" },
 ];
-
-const observations = [
-  {
-    name: "Levrek",
-    latin: "Dicentrarchus labrax",
-    time: "Bugun 14:32",
-    score: "%95.4",
-    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=180&q=80",
-  },
-  {
-    name: "Cipura",
-    latin: "Sparus aurata",
-    time: "Bugun 10:15",
-    score: "%92.1",
-    image: "https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=180&q=80",
-  },
-  {
-    name: "Palamut",
-    latin: "Sarda sarda",
-    time: "Dun 18:45",
-    score: "%91.3",
-    image: "https://images.unsplash.com/photo-1534043464124-3be32fe000c9?auto=format&fit=crop&w=180&q=80",
-  },
-];
-
 const mapStyle = {
   version: 8,
   sources: {
@@ -99,99 +75,25 @@ const mapStyle = {
     },
   ],
 };
-
-const fishDensityData = [
-  { position: [26.4142, 39.2326], weight: 78 },
-  { position: [27.1428, 38.4237], weight: 62 },
-  { position: [25.8947, 37.9838], weight: 58 },
-  { position: [26.72, 38.18], weight: 73 },
-  { position: [25.42, 38.62], weight: 66 },
-  { position: [27.55, 36.91], weight: 74 },
-  { position: [24.92, 37.55], weight: 54 },
-  { position: [26.02, 40.02], weight: 88 },
-] as const;
-
-const currentPaths = [
-  { path: [[24.2, 38.9], [24.9, 39.1], [25.7, 39.08], [26.25, 39.28]], speed: 0.8 },
-  { path: [[25.1, 37.85], [25.9, 38.0], [26.8, 37.82], [27.44, 38.12]], speed: 0.7 },
-  { path: [[24.7, 36.72], [25.6, 37.05], [26.58, 37.0], [27.6, 37.28]], speed: 0.9 },
-  { path: [[23.9, 37.32], [24.65, 37.58], [25.3, 37.52], [26.05, 37.76]], speed: 0.6 },
-] as const;
-
-const protectedAreas = [
-  {
-    name: "Kuzey Ege Koruma Alani",
-    polygon: [[25.86, 39.12], [26.62, 39.04], [26.72, 39.42], [26.12, 39.62], [25.86, 39.12]],
-  },
-  {
-    name: "Bodrum Resif Bolgesi",
-    polygon: [[27.18, 37.1], [27.82, 37.0], [27.74, 37.42], [27.24, 37.5], [27.18, 37.1]],
-  },
-  {
-    name: "Kiklad Gecis Alani",
-    polygon: [[24.2, 37.0], [24.82, 36.86], [25.02, 37.22], [24.36, 37.44], [24.2, 37.0]],
-  },
-] as const;
-
-const portMarkers = [
-  { name: "Izmir", coordinates: [27.14, 38.42] },
-  { name: "Kusadasi", coordinates: [27.26, 37.86] },
-  { name: "Bodrum", coordinates: [27.43, 37.03] },
-  { name: "Rhodes", coordinates: [28.22, 36.43] },
-] as const;
-
-const regionMarkers = [
-  { name: "Kuzey Ege", label: "%78", regionIndex: 0, coordinates: [26.4412, 39.2326] },
-  { name: "Izmir Korfezi", label: "%62", regionIndex: 1, coordinates: [27.1428, 38.4237] },
-  { name: "Bodrum Resifi", label: "%74", regionIndex: 2, coordinates: [27.4305, 37.0344] },
-  { name: "Kiklad Gecisi", label: "%58", regionIndex: 0, coordinates: [25.25, 37.35] },
-] as const;
-
 const days = ["12 May", "13 May", "14 May", "15 May", "16 May", "17 May", "18 May"];
 
 const regionTabs = ["Ozet", "Canli Veriler", "Analiz", "Notlar"] as const;
 
-const mapRegions = [
-  {
-    id: "north",
-    name: "Kuzey Ege Bolgesi",
-    coordinatesText: "39.2326 N, 26.4412 E",
-    center: [26.4412, 39.2326],
-    density: "Yuksek",
-    densityScore: "%78",
-    temperature: "18.6 C",
-    chlorophyll: "Orta",
-    current: "0.8 m/s",
-    wave: "0.3 m",
-    wind: "12 kn",
-  },
-  {
-    id: "izmir",
-    name: "Izmir Korfezi",
-    coordinatesText: "38.4237 N, 27.1428 E",
-    center: [27.1428, 38.4237],
-    density: "Orta",
-    densityScore: "%62",
-    temperature: "19.1 C",
-    chlorophyll: "Orta",
-    current: "0.6 m/s",
-    wave: "0.2 m",
-    wind: "9 kn",
-  },
-  {
-    id: "bodrum",
-    name: "Bodrum Resif Bolgesi",
-    coordinatesText: "37.0344 N, 27.4305 E",
-    center: [27.4305, 37.0344],
-    density: "Yuksek",
-    densityScore: "%74",
-    temperature: "20.2 C",
-    chlorophyll: "Dusuk",
-    current: "0.7 m/s",
-    wave: "0.4 m",
-    wind: "14 kn",
-  },
-] as const;
+const emptyMapRegion: MarineMapRegion = {
+  id: "live-map",
+  name: "Turkiye Deniz Alani",
+  coordinatesText: "Gercek veri secilmedi",
+  center: [29.0, 39.0],
+  density: "Gercek gozlem yok",
+  densityScore: "-",
+  temperature: "Gercek veri yok",
+  chlorophyll: "Gercek veri yok",
+  current: "Gercek veri yok",
+  wave: "Gercek veri yok",
+  wind: "Gercek veri yok",
+};
+
+const mapRegions = [emptyMapRegion] as const;
 
 type MarineMapRegion = {
   id: string;
@@ -208,61 +110,53 @@ type MarineMapRegion = {
 };
 
 type MarineMapMarker = {
+  id: string;
   name: string;
   label: string;
   coordinates: [number, number];
   region: MarineMapRegion;
 };
 
+type MarineMapPort = { name: string; locode?: string; coordinates: [number, number] };
+
+type MarineMapMarina = {
+  name: string;
+  city?: string;
+  coordinates: [number, number];
+  capacity?: string;
+  maxDepth?: string;
+  maxLength?: string;
+  opened?: string;
+};
+
+type SelectedMapFacility =
+  | ({ kind: "port" } & MarineMapPort)
+  | ({ kind: "marina" } & MarineMapMarina);
+
 type MarineMapData = {
-  source?: "open-meteo" | "fallback" | "static" | "out-of-region" | "unavailable";
+  source?: "open-meteo" | "static" | "out-of-region" | "unavailable";
   densityPoints: unknown;
   temperaturePoints: unknown;
+  weatherPoints: unknown;
   currents: unknown;
   protectedPolygons: unknown;
-  ports: Array<{ name: string; coordinates: [number, number] }>;
+  ports: MarineMapPort[];
+  marinas: MarineMapMarina[];
   regions: MarineMapMarker[];
   isDynamic: boolean;
 };
-
-const toPointCollection = (items: ReadonlyArray<{ position: readonly [number, number] | readonly number[]; weight: number }>) => ({
-  type: "FeatureCollection",
-  features: items.map((item) => ({
-    type: "Feature",
-    properties: { weight: item.weight },
-    geometry: { type: "Point", coordinates: item.position },
-  })),
-});
-
-const toLineCollection = (items: ReadonlyArray<{ path: readonly (readonly number[])[]; speed: number }>) => ({
-  type: "FeatureCollection",
-  features: items.map((item) => ({
-    type: "Feature",
-    properties: { speed: item.speed },
-    geometry: { type: "LineString", coordinates: item.path },
-  })),
-});
-
-const toPolygonCollection = (items: ReadonlyArray<{ name: string; polygon: readonly (readonly number[])[] }>) => ({
-  type: "FeatureCollection",
-  features: items.map((item) => ({
-    type: "Feature",
-    properties: { name: item.name },
-    geometry: { type: "Polygon", coordinates: [item.polygon] },
-  })),
-});
-
 const staticMarineMapData: MarineMapData = {
   source: "static",
   densityPoints: { type: "FeatureCollection", features: [] },
   temperaturePoints: { type: "FeatureCollection", features: [] },
+  weatherPoints: { type: "FeatureCollection", features: [] },
   currents: { type: "FeatureCollection", features: [] },
   protectedPolygons: { type: "FeatureCollection", features: [] },
   ports: [],
+  marinas: [],
   regions: [],
   isDynamic: false,
 };
-
 const MIN_DYNAMIC_MAP_ZOOM = 0;
 const TURKEY_PREMIUM_VIEW_BOUNDS = {
   west: 23.1,
@@ -282,7 +176,7 @@ const formatMapCoordinates = ([longitude, latitude]: [number, number]) =>
   `${Math.abs(latitude).toFixed(4)} ${latitude >= 0 ? "N" : "S"}, ${Math.abs(longitude).toFixed(4)} ${longitude >= 0 ? "E" : "W"}`;
 
 type MarineConditions = {
-  source: "open-meteo" | "fallback";
+  source: "open-meteo" | "unavailable";
   updatedAt: string;
   waveHeight: string;
   waveDirection: string;
@@ -311,17 +205,18 @@ export default function WorldMapWorkspace() {
   const [activeRegionIndex, setActiveRegionIndex] = useState(0);
   const [activeRegionTab, setActiveRegionTab] = useState<(typeof regionTabs)[number]>("Ozet");
   const [favoriteRegion, setFavoriteRegion] = useState(false);
-  const [selectedObservationIndex, setSelectedObservationIndex] = useState(0);
   const [marineConditions, setMarineConditions] = useState<MarineConditions | null>(null);
-  const [marineStatus, setMarineStatus] = useState<"loading" | "ready" | "fallback">("loading");
+  const [marineStatus, setMarineStatus] = useState<"loading" | "ready" | "unavailable">("loading");
   const [marineMapData, setMarineMapData] = useState<MarineMapData>(staticMarineMapData);
   const [viewportRegion, setViewportRegion] = useState<MarineMapRegion | null>(null);
+  const [selectedFacility, setSelectedFacility] = useState<SelectedMapFacility | null>(null);
   const [viewportZoom, setViewportZoom] = useState(6.15);
   const [premiumClearArea, setPremiumClearArea] = useState<PremiumClearArea | null>(null);
 
   const selectedRegion = viewportRegion ?? (mapRegions[activeRegionIndex] as MarineMapRegion);
+  const selectedPanelCoordinates = selectedFacility?.coordinates ?? selectedRegion.center;
+  const selectedPanelCoordinatesText = formatMapCoordinates(selectedPanelCoordinates);
   const isPremiumRegion = marineMapData.source === "out-of-region";
-  const selectedObservation = observations[selectedObservationIndex];
   const selectedDayIndex = Math.max(days.indexOf(selectedDay), 0);
   const liveSourceLabel =
     marineStatus === "loading"
@@ -330,18 +225,16 @@ export default function WorldMapWorkspace() {
       ? "Open-Meteo Marine"
       : marineMapData.source === "out-of-region"
       ? "Turkiye disi veri kapali"
-      : marineMapData.source === "unavailable"
+      : marineMapData.source === "unavailable" || marineStatus === "unavailable"
       ? "Gercek veri alinamadi"
-      : marineMapData.source === "fallback"
-      ? "Fallback veri"
       : marineMapData.isDynamic
       ? "Open-Meteo + NOAA + OBIS/GBIF"
       : "Veri bekleniyor";
   const floatingMetrics = [
-    { icon: Thermometer, label: "Su Sicakligi", value: marineConditions?.waterTemperature ?? selectedRegion.temperature },
-    { icon: Wind, label: "Ruzgar", value: marineConditions?.windSpeed ?? selectedRegion.wind },
-    { icon: Waves, label: "Dalga", value: marineConditions?.waveHeight ?? selectedRegion.wave },
-    { icon: Waves, label: "Dalga Yonu", value: selectedRegion.current },
+    { icon: Thermometer, label: "Su Sicakligi", value: marineConditions?.waterTemperature ?? "Gercek veri yok" },
+    { icon: CloudRain, label: "Hava", value: marineConditions?.airTemperature ?? "Gercek veri yok" },
+    { icon: Wind, label: "Ruzgar", value: marineConditions?.windSpeed ?? "Gercek veri yok" },
+    { icon: Waves, label: "Dalga", value: marineConditions?.waveHeight ?? "Gercek veri yok" },
     { icon: Layers, label: "Klorofil", value: selectedRegion.chlorophyll },
   ];
 
@@ -373,14 +266,23 @@ export default function WorldMapWorkspace() {
     const region = mapRegions[index] as MarineMapRegion;
     setActiveRegionIndex(index);
     setViewportRegion(null);
+    setSelectedFacility(null);
     setIsRegionPanelOpen(true);
     mapRef.current?.flyTo({ center: region.center as [number, number], zoom: 7.25, duration: 850 });
   };
 
   const focusMarineRegion = (region: MarineMapRegion) => {
     setViewportRegion(region);
+    setSelectedFacility(null);
     setIsRegionPanelOpen(true);
     mapRef.current?.flyTo({ center: region.center, zoom: Math.max(viewportZoom, 6.2), duration: 750 });
+  };
+
+  const focusMapFacility = (facility: SelectedMapFacility) => {
+    setSelectedFacility(facility);
+    setIsRegionPanelOpen(true);
+    setActiveRegionTab("Ozet");
+    mapRef.current?.flyTo({ center: facility.coordinates, zoom: Math.max(viewportZoom, 8.2), duration: 650 });
   };
 
   const updatePremiumClearArea = () => {
@@ -454,13 +356,13 @@ export default function WorldMapWorkspace() {
               name: "Deniz verisi bulunamadi",
               coordinatesText: formatMapCoordinates(center),
               center,
-              density: "Yok",
-              densityScore: "%0",
-              temperature: "-",
-              chlorophyll: "-",
-              current: "-",
-              wave: "-",
-              wind: "-",
+              density: "Gercek gozlem yok",
+              densityScore: "-",
+              temperature: "Gercek veri yok",
+              chlorophyll: "Gercek veri yok",
+              current: "Gercek veri yok",
+              wave: "Gercek veri yok",
+              wind: "Gercek veri yok",
             };
           }
 
@@ -493,9 +395,7 @@ export default function WorldMapWorkspace() {
       return;
     }
 
-    if (query.includes("izmir")) focusRegion(1);
-    if (query.includes("bodrum")) focusRegion(2);
-    if (query.includes("ege")) focusRegion(0);
+    if (query.includes("turkiye") || query.includes("ege") || query.includes("akdeniz")) focusRegion(0);
     if (query.includes("karadeniz")) mapRef.current?.flyTo({ center: [34.8, 42.0], zoom: 6.25, duration: 950 });
   };
 
@@ -505,9 +405,9 @@ export default function WorldMapWorkspace() {
       "fish-density": preset !== "navigation",
       "water-temperature": preset !== "navigation",
       chlorophyll: preset === "environment",
-      "current-direction": preset !== "density",
       "protected-areas": preset !== "density",
       ports: preset === "navigation",
+      marinas: preset === "navigation",
       weather: preset === "environment",
     }));
     setFiltersOpen(false);
@@ -542,12 +442,12 @@ export default function WorldMapWorkspace() {
       .then((response) => response.json())
       .then((data: MarineConditions) => {
         setMarineConditions(data);
-        setMarineStatus(data.source === "open-meteo" ? "ready" : "fallback");
+        setMarineStatus(data.source === "open-meteo" ? "ready" : "unavailable");
       })
       .catch((error) => {
         if (error instanceof DOMException && error.name === "AbortError") return;
         setMarineConditions(null);
-        setMarineStatus("fallback");
+        setMarineStatus("unavailable");
       });
 
     return () => controller.abort();
@@ -586,7 +486,7 @@ export default function WorldMapWorkspace() {
             </button>
             {filtersOpen ? (
               <div className="aqua-map-filter-menu">
-                <button type="button" onClick={() => applyFilterPreset("density")}>Yogunluk odagi</button>
+                <button type="button" onClick={() => applyFilterPreset("density")}>Gozlem odagi</button>
                 <button type="button" onClick={() => applyFilterPreset("environment")}>Cevre verileri</button>
                 <button type="button" onClick={() => applyFilterPreset("navigation")}>Navigasyon</button>
               </div>
@@ -733,7 +633,7 @@ export default function WorldMapWorkspace() {
                           "circle-color": [
                             "interpolate",
                             ["linear"],
-                            ["get", "weight"],
+                            ["get", "value"],
                             52,
                             "rgba(34,211,238,0.22)",
                             72,
@@ -748,13 +648,40 @@ export default function WorldMapWorkspace() {
                     </Source>
                   ) : null}
 
+
+                  {activeLayers.weather ? (
+                    <Source id="aqua-weather-points" type="geojson" data={marineMapData.weatherPoints as any}>
+                      <Layer
+                        id="aqua-weather-temperature-circles"
+                        type="circle"
+                        paint={{
+                          "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 12, 8, 34],
+                          "circle-color": [
+                            "interpolate",
+                            ["linear"],
+                            ["get", "temperature"],
+                            5,
+                            "rgba(56,189,248,0.16)",
+                            18,
+                            "rgba(34,211,238,0.22)",
+                            28,
+                            "rgba(255,161,62,0.32)",
+                            36,
+                            "rgba(255,72,60,0.42)",
+                          ],
+                          "circle-opacity": 0.62,
+                          "circle-blur": 0.64,
+                        }}
+                      />
+                    </Source>
+                  ) : null}
                   {activeLayers["fish-density"] ? (
                     <Source id="aqua-fish-density" type="geojson" data={marineMapData.densityPoints as any}>
                       <Layer
                         id="aqua-fish-density-heat"
                         type="heatmap"
                         paint={{
-                          "heatmap-weight": ["interpolate", ["linear"], ["get", "weight"], 0, 0, 100, 1],
+                          "heatmap-weight": 1,
                           "heatmap-intensity": ["interpolate", ["linear"], ["zoom"], 4, 1.1, 8, 1.75],
                           "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 4, 28, 8, 62],
                           "heatmap-opacity": 0.72,
@@ -778,23 +705,6 @@ export default function WorldMapWorkspace() {
                     </Source>
                   ) : null}
 
-                  {activeLayers["current-direction"] ? (
-                    <Source id="aqua-current-paths" type="geojson" data={marineMapData.currents as any}>
-                      <Layer
-                        id="aqua-current-path-line"
-                        type="line"
-                        layout={{ "line-cap": "round", "line-join": "round" }}
-                        paint={{
-                          "line-color": "#22d3ee",
-                          "line-width": ["interpolate", ["linear"], ["get", "speed"], 0.5, 1.4, 1, 2.4],
-                          "line-opacity": 0.66,
-                          "line-blur": 0.15,
-                          "line-dasharray": [2.5, 2],
-                        }}
-                      />
-                    </Source>
-                  ) : null}
-
                   {activeLayers["protected-areas"] ? (
                     <Source id="aqua-protected-areas" type="geojson" data={marineMapData.protectedPolygons as any}>
                       <Layer
@@ -810,14 +720,60 @@ export default function WorldMapWorkspace() {
                     </Source>
                   ) : null}
 
+
+                  {activeLayers.weather
+                    ? ((marineMapData.weatherPoints as any)?.features ?? []).map((feature: any, index: number) => {
+                        const [longitude, latitude] = feature.geometry?.coordinates ?? [];
+                        const properties = feature.properties ?? {};
+                        if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return null;
+
+                        const weatherTitle = [
+                          `Hava: ${Number(properties.temperature).toFixed(1)} C`,
+                          `Ruzgar: ${Number(properties.windSpeed).toFixed(0)} kn`,
+                          `Nem: %${Number(properties.humidity).toFixed(0)}`,
+                          `Yagis: ${Number(properties.precipitation).toFixed(1)} mm`,
+                          properties.isDay === 1 ? "Gunduz" : "Gece",
+                        ].join(" | ");
+
+                        return (
+                          <Marker longitude={longitude} latitude={latitude} anchor="center" key={`weather-${longitude}-${latitude}-${index}`}>
+                            <span className="aqua-map-weather-marker" title={weatherTitle}>
+                              <CloudRain size={13} />
+                            </span>
+                          </Marker>
+                        );
+                      })
+                    : null}
                   {activeLayers.ports
                     ? marineMapData.ports.map((port) => (
-                        <Marker longitude={port.coordinates[0]} latitude={port.coordinates[1]} anchor="center" key={port.name}>
-                          <span className="aqua-map-port-marker" title={port.name}>
+                        <Marker longitude={port.coordinates[0]} latitude={port.coordinates[1]} anchor="center" key={`${port.name}-${port.coordinates[0]}-${port.coordinates[1]}`}>
+                          <button type="button" className="aqua-map-port-marker" title={port.locode ? `${port.name} (${port.locode})` : port.name} onClick={() => focusMapFacility({ ...port, kind: "port" })}>
                             <Anchor size={13} />
-                          </span>
+                          </button>
                         </Marker>
                       ))
+                    : null}
+
+                  {activeLayers.marinas
+                    ? marineMapData.marinas.map((marina) => {
+                        const marinaTitle = [
+                          marina.name,
+                          marina.city,
+                          marina.capacity ? `Kapasite: ${marina.capacity}` : undefined,
+                          marina.maxDepth ? `Derinlik: ${marina.maxDepth}` : undefined,
+                          marina.maxLength ? `Uzunluk: ${marina.maxLength}` : undefined,
+                        ]
+                          .filter(Boolean)
+                          .join(" | ");
+
+                        return (
+                          <Marker longitude={marina.coordinates[0]} latitude={marina.coordinates[1]} anchor="center" key={`${marina.name}-${marina.coordinates[0]}-${marina.coordinates[1]}`}>
+                            <button type="button" className="aqua-map-marina-marker" title={marinaTitle} onClick={() => focusMapFacility({ ...marina, kind: "marina" })}>
+                              <ShipWheel size={14} />
+                            </button>
+                          </Marker>
+                        );
+                      })
                     : null}
 
                   {marineMapData.regions.map((marker) => (
@@ -885,8 +841,8 @@ export default function WorldMapWorkspace() {
               </div>
 
               <div className="aqua-map-context-label">
-                <strong>{selectedRegion.name}</strong>
-                <span>{selectedRegion.coordinatesText}</span>
+                <strong>{selectedFacility?.name ?? selectedRegion.name}</strong>
+                <span>{selectedFacility ? selectedPanelCoordinatesText : selectedRegion.coordinatesText}</span>
                 <small>{liveSourceLabel}</small>
               </div>
 
@@ -966,7 +922,7 @@ export default function WorldMapWorkspace() {
           <aside className={isRegionPanelOpen ? "aqua-region-panel aqua-glass-panel is-open" : "aqua-region-panel aqua-glass-panel"} aria-hidden={!isRegionPanelOpen}>
             <section className="aqua-region-card">
               <div className="aqua-region-title">
-                <span>Secili Bolge</span>
+                <span>{selectedFacility ? (selectedFacility.kind === "port" ? "Secili Liman" : "Secili Marina") : "Secili Bolge"}</span>
                 <div className="aqua-region-title-actions">
                   <button
                     type="button"
@@ -981,8 +937,8 @@ export default function WorldMapWorkspace() {
                   </button>
                 </div>
               </div>
-              <h2>{selectedRegion.name}</h2>
-              <p>{selectedRegion.coordinatesText}</p>
+              <h2>{selectedFacility?.name ?? selectedRegion.name}</h2>
+              <p>{selectedFacility ? selectedPanelCoordinatesText : selectedRegion.coordinatesText}</p>
               <div className="aqua-region-preview">
                 <span />
               </div>
@@ -995,46 +951,87 @@ export default function WorldMapWorkspace() {
                 ))}
               </nav>
 
-              <div className="aqua-region-metrics">
-                <article>
-                  <span>Balik Yogunlugu</span>
-                  <strong>{selectedRegion.density}</strong>
-                  <small>{selectedRegion.densityScore}</small>
-                </article>
-                <article>
-                  <span>Su Sicakligi</span>
-                  <strong>{marineConditions?.waterTemperature ?? selectedRegion.temperature}</strong>
-                </article>
-                <article>
-                  <span>Klorofil Seviyesi</span>
-                  <strong>{selectedRegion.chlorophyll}</strong>
-                  <small>3.2 mg/m3</small>
-                </article>
-                <article>
-                  <span>Akinti Hizi</span>
-                  <strong>{selectedRegion.current}</strong>
-                </article>
-                <article>
-                  <span>Dalga Yuksekligi</span>
-                  <strong>{marineConditions?.waveHeight ?? selectedRegion.wave}</strong>
-                </article>
-                <article>
-                  <span>Ruzgar Hizi</span>
-                  <strong>{marineConditions?.windSpeed ?? selectedRegion.wind}</strong>
-                </article>
-              </div>
-              <div className="aqua-region-tab-detail">
-                <strong>{activeRegionTab}</strong>
-                <span>
-                  {activeRegionTab === "Ozet"
-                    ? `${selectedRegion.name} icin ${selectedDay} verileri ${liveSourceLabel} kaynagi ile izleniyor.`
-                    : activeRegionTab === "Canli Veriler"
-                    ? `Dalga ${marineConditions?.waveHeight ?? selectedRegion.wave}, yon ${marineConditions?.waveDirection ?? "-"}, periyot ${marineConditions?.wavePeriod ?? "-"}, ruzgar ${marineConditions?.windSpeed ?? selectedRegion.wind}.`
-                    : activeRegionTab === "Analiz"
-                    ? `${selectedRegion.density} balik yogunlugu ve ${selectedRegion.chlorophyll.toLocaleLowerCase("tr-TR")} klorofil seviyesi raporlandi.`
-                    : "Bu bolge icin saha notu eklenmedi."}
-                </span>
-              </div>
+              {selectedFacility ? (
+                <>
+                  <div className="aqua-region-metrics">
+                    <article>
+                      <span>Tur</span>
+                      <strong>{selectedFacility.kind === "port" ? "Liman" : "Marina"}</strong>
+                      {selectedFacility.kind === "port" && selectedFacility.locode ? <small>{selectedFacility.locode}</small> : null}
+                    </article>
+                    <article>
+                      <span>Koordinat</span>
+                      <strong>{selectedPanelCoordinatesText}</strong>
+                    </article>
+                    <article>
+                      <span>Sehir</span>
+                      <strong>{selectedFacility.kind === "marina" ? selectedFacility.city ?? "-" : "-"}</strong>
+                    </article>
+                    <article>
+                      <span>Kapasite</span>
+                      <strong>{selectedFacility.kind === "marina" ? selectedFacility.capacity ?? "-" : "-"}</strong>
+                    </article>
+                    <article>
+                      <span>Maks. Derinlik</span>
+                      <strong>{selectedFacility.kind === "marina" ? selectedFacility.maxDepth ?? "-" : "-"}</strong>
+                    </article>
+                    <article>
+                      <span>Maks. Uzunluk</span>
+                      <strong>{selectedFacility.kind === "marina" ? selectedFacility.maxLength ?? "-" : "-"}</strong>
+                    </article>
+                  </div>
+                  <div className="aqua-region-tab-detail">
+                    <strong>{selectedFacility.kind === "port" ? "Liman Bilgisi" : "Marina Bilgisi"}</strong>
+                    <span>
+                      {selectedFacility.kind === "port"
+                        ? `${selectedFacility.name}${selectedFacility.locode ? ` (${selectedFacility.locode})` : ""} harita uzerinde secildi.`
+                        : `${selectedFacility.name}${selectedFacility.city ? `, ${selectedFacility.city}` : ""}${selectedFacility.opened ? `, acilis ${selectedFacility.opened}` : ""}.`}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="aqua-region-metrics">
+                    <article>
+                      <span>Gozlem Durumu</span>
+                      <strong>{selectedRegion.density}</strong>
+                      <small>{selectedRegion.densityScore}</small>
+                    </article>
+                    <article>
+                      <span>Su Sicakligi</span>
+                      <strong>{marineConditions?.waterTemperature ?? "Gercek veri yok"}</strong>
+                    </article>
+                    <article>
+                      <span>Klorofil Seviyesi</span>
+                      <strong>{selectedRegion.chlorophyll}</strong>
+                    </article>
+                    <article>
+                      <span>Akinti Hizi</span>
+                      <strong>{selectedRegion.current}</strong>
+                    </article>
+                    <article>
+                      <span>Dalga Yuksekligi</span>
+                      <strong>{marineConditions?.waveHeight ?? "Gercek veri yok"}</strong>
+                    </article>
+                    <article>
+                      <span>Ruzgar Hizi</span>
+                      <strong>{marineConditions?.windSpeed ?? "Gercek veri yok"}</strong>
+                    </article>
+                  </div>
+                  <div className="aqua-region-tab-detail">
+                    <strong>{activeRegionTab}</strong>
+                    <span>
+                      {activeRegionTab === "Ozet"
+                        ? `${selectedRegion.name} icin ${selectedDay} verileri ${liveSourceLabel} kaynagi ile izleniyor.`
+                        : activeRegionTab === "Canli Veriler"
+                        ? `Dalga ${marineConditions?.waveHeight ?? "Gercek veri yok"}, yon ${marineConditions?.waveDirection ?? "Gercek veri yok"}, periyot ${marineConditions?.wavePeriod ?? "Gercek veri yok"}, ruzgar ${marineConditions?.windSpeed ?? "Gercek veri yok"}.`
+                        : activeRegionTab === "Analiz"
+                        ? `${selectedRegion.density} durumu ve ${selectedRegion.chlorophyll.toLocaleLowerCase("tr-TR")} klorofil seviyesi raporlandi.`
+                        : "Bu bolge icin saha notu eklenmedi."}
+                    </span>
+                  </div>
+                </>
+              )}
             </section>
 
             <section className="aqua-observation-card">
@@ -1043,30 +1040,32 @@ export default function WorldMapWorkspace() {
                 <a href="/platform/analyze">Tumunu Gor</a>
               </div>
               <div className="aqua-observation-list">
-                {observations.map((item, index) => (
-                  <article
-                    className={index === selectedObservationIndex ? "is-selected" : ""}
-                    key={item.name}
-                    onClick={() => {
-                      setSelectedObservationIndex(index);
-                      focusRegion(index % mapRegions.length);
-                    }}
-                  >
-                    <img src={item.image} alt="" />
+                {marineMapData.regions.length ? (
+                  marineMapData.regions.map((item) => (
+                    <article key={item.id} onClick={() => focusMarineRegion(item.region)}>
+                      <div>
+                        <strong>{item.name}</strong>
+                        <span>{item.region.coordinatesText}</span>
+                        <small>{item.label}</small>
+                      </div>
+                      <b>{item.label}</b>
+                      <ChevronRight size={18} />
+                    </article>
+                  ))
+                ) : (
+                  <article className="is-empty">
                     <div>
-                      <strong>{item.name}</strong>
-                      <span>{item.latin}</span>
-                      <small>{item.time}</small>
+                      <strong>Gercek gozlem yok</strong>
+                      <span>OBIS/GBIF kaydi bulunamadi.</span>
+                      <small>Sadece gercek kaynaklar gosterilir.</small>
                     </div>
-                    <b>{item.score}</b>
-                    <ChevronRight size={18} />
                   </article>
-                ))}
+                )}
               </div>
               <div className="aqua-selected-observation">
                 <span>Secili gozlem</span>
-                <strong>{selectedObservation.name}</strong>
-                <small>{selectedObservation.score} guven skoru ile {selectedObservation.time.toLocaleLowerCase("tr-TR")} kaydedildi.</small>
+                <strong>{marineMapData.regions[0]?.name ?? "Gercek gozlem yok"}</strong>
+                <small>{marineMapData.regions[0]?.label ?? "OBIS/GBIF kaydi bekleniyor."}</small>
               </div>
               <a className="aqua-map-analysis-link" href="/platform/analyze">
                 Detayli Analize Git

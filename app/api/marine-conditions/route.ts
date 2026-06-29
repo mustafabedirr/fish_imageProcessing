@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 type MarineConditions = {
-  source: "open-meteo" | "fallback";
+  source: "open-meteo" | "unavailable";
   updatedAt: string;
   waveHeight: string;
   waveDirection: string;
@@ -12,56 +12,31 @@ type MarineConditions = {
   waterTemperature: string;
 };
 
-const fallbackByRegion: Record<string, Omit<MarineConditions, "source" | "updatedAt">> = {
-  north: {
-    waveHeight: "0.3 m",
-    waveDirection: "236 deg",
-    wavePeriod: "4.8 s",
-    windSpeed: "12 kn",
-    windDirection: "318 deg",
-    airTemperature: "21.4 C",
-    waterTemperature: "18.6 C",
-  },
-  izmir: {
-    waveHeight: "0.2 m",
-    waveDirection: "248 deg",
-    wavePeriod: "4.2 s",
-    windSpeed: "9 kn",
-    windDirection: "305 deg",
-    airTemperature: "22.1 C",
-    waterTemperature: "19.1 C",
-  },
-  bodrum: {
-    waveHeight: "0.4 m",
-    waveDirection: "221 deg",
-    wavePeriod: "5.4 s",
-    windSpeed: "14 kn",
-    windDirection: "292 deg",
-    airTemperature: "24.0 C",
-    waterTemperature: "20.2 C",
-  },
-};
-
 const formatNumber = (value: unknown, digits = 1) => {
   const numeric = Number(value);
   if (!Number.isFinite(numeric)) return null;
   return numeric.toFixed(digits);
 };
 
-const getFallback = (region: string): MarineConditions => ({
-  source: "fallback",
+const unavailableConditions = (): MarineConditions => ({
+  source: "unavailable",
   updatedAt: new Date().toISOString(),
-  ...(fallbackByRegion[region] ?? fallbackByRegion.north),
+  waveHeight: "Gercek veri yok",
+  waveDirection: "Gercek veri yok",
+  wavePeriod: "Gercek veri yok",
+  windSpeed: "Gercek veri yok",
+  windDirection: "Gercek veri yok",
+  airTemperature: "Gercek veri yok",
+  waterTemperature: "Gercek veri yok",
 });
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const latitude = Number(searchParams.get("lat"));
   const longitude = Number(searchParams.get("lon"));
-  const region = searchParams.get("region") ?? "north";
 
   if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-    return NextResponse.json(getFallback(region));
+    return NextResponse.json(unavailableConditions());
   }
 
   try {
@@ -85,11 +60,10 @@ export async function GET(request: NextRequest) {
     ]);
 
     if (!marineResponse.ok || !forecastResponse.ok) {
-      return NextResponse.json(getFallback(region));
+      return NextResponse.json(unavailableConditions());
     }
 
     const [marine, forecast] = await Promise.all([marineResponse.json(), forecastResponse.json()]);
-    const fallback = getFallback(region);
     const waveHeight = formatNumber(marine?.current?.wave_height);
     const waveDirection = formatNumber(marine?.current?.wave_direction, 0);
     const wavePeriod = formatNumber(marine?.current?.wave_period);
@@ -101,15 +75,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       source: "open-meteo",
       updatedAt: String(marine?.current?.time ?? forecast?.current?.time ?? new Date().toISOString()),
-      waveHeight: waveHeight ? `${waveHeight} m` : fallback.waveHeight,
-      waveDirection: waveDirection ? `${waveDirection} deg` : fallback.waveDirection,
-      wavePeriod: wavePeriod ? `${wavePeriod} s` : fallback.wavePeriod,
-      windSpeed: windSpeed ? `${windSpeed} kn` : fallback.windSpeed,
-      windDirection: windDirection ? `${windDirection} deg` : fallback.windDirection,
-      airTemperature: airTemperature ? `${airTemperature} C` : fallback.airTemperature,
-      waterTemperature: seaSurfaceTemperature ? `${seaSurfaceTemperature} C` : fallback.waterTemperature,
+      waveHeight: waveHeight ? `${waveHeight} m` : "Gercek veri yok",
+      waveDirection: waveDirection ? `${waveDirection} deg` : "Gercek veri yok",
+      wavePeriod: wavePeriod ? `${wavePeriod} s` : "Gercek veri yok",
+      windSpeed: windSpeed ? `${windSpeed} kn` : "Gercek veri yok",
+      windDirection: windDirection ? `${windDirection} deg` : "Gercek veri yok",
+      airTemperature: airTemperature ? `${airTemperature} C` : "Gercek veri yok",
+      waterTemperature: seaSurfaceTemperature ? `${seaSurfaceTemperature} C` : "Gercek veri yok",
     } satisfies MarineConditions);
   } catch {
-    return NextResponse.json(getFallback(region));
+    return NextResponse.json(unavailableConditions());
   }
 }
