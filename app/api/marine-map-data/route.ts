@@ -420,10 +420,10 @@ const buildCandidateGrid = (bounds: NonNullable<ReturnType<typeof parseBounds>>,
     }
   }
 
-  return points.slice(0, 12);
+  return points.slice(0, 6);
 };
 
-const emptyResponse = (source: "out-of-region" | "unavailable") => ({
+const emptyResponse = (source: "unavailable") => ({
   source,
   isDynamic: true,
   densityPoints: emptyFeatureCollection,
@@ -688,14 +688,21 @@ const uniqueObservations = (observations: SpeciesObservation[]) => {
     return true;
   });
 };
-const buildResponse = async (points: MarinePoint[], bounds: NonNullable<ReturnType<typeof parseBounds>>) => {
+const buildResponse = async (points: MarinePoint[], bounds: NonNullable<ReturnType<typeof parseBounds>>, layers: Set<string>) => {
+  const wantsChlorophyll = layers.has("chlorophyll");
+  const wantsObservations = layers.has("fish-density");
+  const wantsProtectedAreas = layers.has("protected-areas");
+  const wantsPorts = layers.has("ports");
+  const wantsMarinas = layers.has("marinas");
+  const wantsWeather = layers.has("weather");
+
   const [enrichedPoints, ports, marinas, protectedAreas, obisObservations, gbifObservations] = await Promise.all([
-    enrichWithChlorophyll(points),
-    fetchRealPorts(bounds),
-    Promise.resolve(getTurkeyMarinasInBounds(bounds)),
-    fetchRealProtectedPolygons(bounds),
-    fetchObisObservations(bounds),
-    fetchGbifObservations(bounds),
+    wantsChlorophyll ? enrichWithChlorophyll(points) : Promise.resolve(points),
+    wantsPorts ? fetchRealPorts(bounds) : Promise.resolve([]),
+    wantsMarinas ? Promise.resolve(getTurkeyMarinasInBounds(bounds)) : Promise.resolve([]),
+    wantsProtectedAreas ? fetchRealProtectedPolygons(bounds) : Promise.resolve([]),
+    wantsObservations ? fetchObisObservations(bounds) : Promise.resolve([]),
+    wantsObservations ? fetchGbifObservations(bounds) : Promise.resolve([]),
   ]);
   const observations = uniqueObservations([...obisObservations, ...gbifObservations]);
 
@@ -704,7 +711,8 @@ const buildResponse = async (points: MarinePoint[], bounds: NonNullable<ReturnTy
     isDynamic: true,
     densityPoints: observations.length ? toObservationPointCollection(observations) : emptyFeatureCollection,
     temperaturePoints: emptyFeatureCollection,
-    currents: toLineCollection(enrichedPoints),
+    weatherPoints: emptyFeatureCollection,
+    currents: emptyFeatureCollection,
     protectedPolygons: toPolygonCollection(protectedAreas),
     ports,
     marinas,
@@ -715,20 +723,21 @@ const buildResponse = async (points: MarinePoint[], bounds: NonNullable<ReturnTy
 export async function GET(request: NextRequest) {
   const bounds = parseBounds(request.nextUrl.searchParams.get("bbox"));
   const zoom = Number(request.nextUrl.searchParams.get("zoom") ?? 5);
+  const layers = new Set((request.nextUrl.searchParams.get("layers") ?? "fish-density,protected-areas,ports,marinas,weather").split(",").filter(Boolean));
 
   if (!bounds) {
     return NextResponse.json({ error: "Invalid bbox" }, { status: 400 });
   }
 
   if (!intersectsTurkeyMarineBounds(bounds)) {
-    return NextResponse.json(emptyResponse("out-of-region"));
+    return NextResponse.json(emptyResponse("unavailable"));
   }
 
   const candidatePoints = buildCandidateGrid(bounds, Number.isFinite(zoom) ? zoom : 5);
   const marineCandidatePoints = candidatePoints.filter(([longitude, latitude]) => isTurkeyMarinePoint(longitude, latitude));
 
   if (marineCandidatePoints.length === 0) {
-    return NextResponse.json(emptyResponse("out-of-region"));
+    return NextResponse.json(emptyResponse("unavailable"));
   }
 
   try {
@@ -739,7 +748,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(emptyResponse("unavailable"));
     }
 
-    return NextResponse.json(await buildResponse(realPoints, bounds));
+    return NextResponse.json(await buildResponse(realPoints, bounds, layers));
   } catch {
     return NextResponse.json(emptyResponse("unavailable"));
   }

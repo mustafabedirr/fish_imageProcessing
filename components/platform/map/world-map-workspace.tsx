@@ -42,7 +42,7 @@ const layerItems = [
   { id: "protected-areas", icon: Shield, title: "Koruma Alanlari", low: "Resmi Bolgeler", high: "", active: true, tone: "green" },
   { id: "ports", icon: Anchor, title: "Limanlar", low: "Ticari Liman", high: "", active: true, tone: "blue" },
   { id: "marinas", icon: ShipWheel, title: "Marinalar", low: "Yat Limani", high: "", active: true, tone: "green" },
-  { id: "weather", icon: CloudRain, title: "Hava Durumu", low: "Ruzgar & Yagis", high: "Anlik", active: true, tone: "muted" },
+  { id: "weather", icon: CloudRain, title: "Hava Durumu", low: "Haritaya tikla", high: "Anlik", active: true, tone: "muted" },
 ];
 const mapStyle = {
   version: 8,
@@ -133,7 +133,7 @@ type SelectedMapFacility =
   | ({ kind: "marina" } & MarineMapMarina);
 
 type MarineMapData = {
-  source?: "open-meteo" | "static" | "out-of-region" | "unavailable";
+  source?: "open-meteo" | "static" | "unavailable";
   densityPoints: unknown;
   temperaturePoints: unknown;
   weatherPoints: unknown;
@@ -157,19 +157,6 @@ const staticMarineMapData: MarineMapData = {
   isDynamic: false,
 };
 const MIN_DYNAMIC_MAP_ZOOM = 0;
-const TURKEY_PREMIUM_VIEW_BOUNDS = {
-  west: 23.1,
-  south: 34.0,
-  east: 45.2,
-  north: 43.8,
-};
-
-type PremiumClearArea = {
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-};
 
 const formatMapCoordinates = ([longitude, latitude]: [number, number]) =>
   `${Math.abs(latitude).toFixed(4)} ${latitude >= 0 ? "N" : "S"}, ${Math.abs(longitude).toFixed(4)} ${longitude >= 0 ? "E" : "W"}`;
@@ -209,26 +196,29 @@ export default function WorldMapWorkspace() {
   const [marineMapData, setMarineMapData] = useState<MarineMapData>(staticMarineMapData);
   const [viewportRegion, setViewportRegion] = useState<MarineMapRegion | null>(null);
   const [selectedFacility, setSelectedFacility] = useState<SelectedMapFacility | null>(null);
+  const [hasSelectedWeatherRegion, setHasSelectedWeatherRegion] = useState(false);
   const [viewportZoom, setViewportZoom] = useState(6.15);
-  const [premiumClearArea, setPremiumClearArea] = useState<PremiumClearArea | null>(null);
 
   const selectedRegion = viewportRegion ?? (mapRegions[activeRegionIndex] as MarineMapRegion);
   const selectedPanelCoordinates = selectedFacility?.coordinates ?? selectedRegion.center;
   const selectedPanelCoordinatesText = formatMapCoordinates(selectedPanelCoordinates);
-  const isPremiumRegion = marineMapData.source === "out-of-region";
   const selectedDayIndex = Math.max(days.indexOf(selectedDay), 0);
   const liveSourceLabel =
     marineStatus === "loading"
       ? "Veri aliniyor"
       : marineConditions?.source === "open-meteo"
       ? "Open-Meteo Marine"
-      : marineMapData.source === "out-of-region"
-      ? "Turkiye disi veri kapali"
       : marineMapData.source === "unavailable" || marineStatus === "unavailable"
       ? "Gercek veri alinamadi"
       : marineMapData.isDynamic
       ? "Open-Meteo + NOAA + OBIS/GBIF"
       : "Veri bekleniyor";
+  const selectedWeatherTitle =
+    marineConditions && marineConditions.source === "open-meteo"
+      ? [`Hava: ${marineConditions.airTemperature}`, `Ruzgar: ${marineConditions.windSpeed}`, selectedRegion.name].join(" | ")
+      : "Hava durumu verisi bekleniyor";
+  const selectedAirTemperatureLabel = marineConditions?.source === "open-meteo" ? marineConditions.airTemperature : "...";
+
   const floatingMetrics = [
     { icon: Thermometer, label: "Su Sicakligi", value: marineConditions?.waterTemperature ?? "Gercek veri yok" },
     { icon: CloudRain, label: "Hava", value: marineConditions?.airTemperature ?? "Gercek veri yok" },
@@ -266,6 +256,7 @@ export default function WorldMapWorkspace() {
     setActiveRegionIndex(index);
     setViewportRegion(null);
     setSelectedFacility(null);
+    setHasSelectedWeatherRegion(true);
     setIsRegionPanelOpen(true);
     mapRef.current?.flyTo({ center: region.center as [number, number], zoom: 7.25, duration: 850 });
   };
@@ -273,6 +264,7 @@ export default function WorldMapWorkspace() {
   const focusMarineRegion = (region: MarineMapRegion) => {
     setViewportRegion(region);
     setSelectedFacility(null);
+    setHasSelectedWeatherRegion(true);
     setIsRegionPanelOpen(true);
     mapRef.current?.flyTo({ center: region.center, zoom: Math.max(viewportZoom, 6.2), duration: 750 });
   };
@@ -284,29 +276,26 @@ export default function WorldMapWorkspace() {
     mapRef.current?.flyTo({ center: facility.coordinates, zoom: Math.max(viewportZoom, 8.2), duration: 650 });
   };
 
-  const updatePremiumClearArea = () => {
-    const map = mapRef.current;
-    if (!map) return;
+  const focusMapPoint = (coordinates: [number, number]) => {
+    const region: MarineMapRegion = {
+      id: `clicked-${coordinates[0].toFixed(4)}-${coordinates[1].toFixed(4)}`,
+      name: "Secili Harita Noktasi",
+      coordinatesText: formatMapCoordinates(coordinates),
+      center: coordinates,
+      density: "Gercek gozlem yok",
+      densityScore: "-",
+      temperature: "Gercek veri yok",
+      chlorophyll: "Gercek veri yok",
+      current: "Gercek veri yok",
+      wave: "Gercek veri yok",
+      wind: "Gercek veri yok",
+    };
 
-    const mapInstance = map.getMap();
-    const canvas = mapInstance.getCanvas();
-    const northWest = mapInstance.project([TURKEY_PREMIUM_VIEW_BOUNDS.west, TURKEY_PREMIUM_VIEW_BOUNDS.north]);
-    const southEast = mapInstance.project([TURKEY_PREMIUM_VIEW_BOUNDS.east, TURKEY_PREMIUM_VIEW_BOUNDS.south]);
-    const rawLeft = Math.min(northWest.x, southEast.x);
-    const rawRight = Math.max(northWest.x, southEast.x);
-    const rawTop = Math.min(northWest.y, southEast.y);
-    const rawBottom = Math.max(northWest.y, southEast.y);
-    const left = Math.max(0, rawLeft);
-    const top = Math.max(0, rawTop);
-    const right = Math.min(canvas.clientWidth, rawRight);
-    const bottom = Math.min(canvas.clientHeight, rawBottom);
-
-    if (right <= 0 || bottom <= 0 || left >= canvas.clientWidth || top >= canvas.clientHeight || right <= left || bottom <= top) {
-      setPremiumClearArea(null);
-      return;
-    }
-
-    setPremiumClearArea({ left, top, width: right - left, height: bottom - top });
+    setViewportRegion(region);
+    setSelectedFacility(null);
+    setHasSelectedWeatherRegion(true);
+    setActiveRegionTab("Canli Veriler");
+    setIsRegionPanelOpen(true);
   };
   const refreshViewportMarineData = () => {
     const map = mapRef.current;
@@ -314,7 +303,6 @@ export default function WorldMapWorkspace() {
 
     const mapInstance = map.getMap();
     const zoom = mapInstance.getZoom();
-    updatePremiumClearArea();
     setViewportZoom(zoom);
     mapDataControllerRef.current?.abort();
 
@@ -335,8 +323,13 @@ export default function WorldMapWorkspace() {
     const controller = new AbortController();
     mapDataControllerRef.current = controller;
     const bbox = [viewportBounds.west, viewportBounds.south, viewportBounds.east, viewportBounds.north].map((value) => value.toFixed(4)).join(",");
+    const visibleLayers = Object.entries(activeLayers)
+      .filter(([, isActive]) => isActive)
+      .map(([id]) => id)
+      .filter((id) => id !== "weather")
+      .join(",");
 
-    fetch(`/api/marine-map-data?bbox=${bbox}&zoom=${zoom.toFixed(2)}`, { signal: controller.signal })
+    fetch(`/api/marine-map-data?bbox=${bbox}&zoom=${zoom.toFixed(2)}&layers=${encodeURIComponent(visibleLayers)}`, { signal: controller.signal })
       .then((response) => {
         if (!response.ok) throw new Error("Marine map data request failed");
         return response.json();
@@ -383,6 +376,11 @@ export default function WorldMapWorkspace() {
         if (error instanceof DOMException && error.name === "AbortError") return;
       });
   };
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => refreshViewportMarineData(), 120);
+    return () => window.clearTimeout(timer);
+  }, [activeLayers]);
 
   const runSearch = () => {
     const query = searchQuery.trim().toLocaleLowerCase("tr-TR");
@@ -609,7 +607,7 @@ export default function WorldMapWorkspace() {
                 ) : null}
               </div>
 
-              <div className={isPremiumRegion ? "aqua-map-canvas-v2 is-premium-locked" : "aqua-map-canvas-v2"} aria-label="Ege Denizi veri haritasi">
+              <div className="aqua-map-canvas-v2" aria-label="Deniz veri haritasi">
                 <Map
                   ref={mapRef}
                   initialViewState={{ longitude: 26.35, latitude: 38.1, zoom: 6.15, pitch: 12 }}
@@ -620,35 +618,8 @@ export default function WorldMapWorkspace() {
                   maxZoom={10}
                   onLoad={refreshViewportMarineData}
                   onMoveEnd={refreshViewportMarineData}
+                  onClick={(event) => focusMapPoint([event.lngLat.lng, event.lngLat.lat])}
                 >
-
-
-                  {activeLayers.weather ? (
-                    <Source id="aqua-weather-points" type="geojson" data={marineMapData.weatherPoints as any}>
-                      <Layer
-                        id="aqua-weather-temperature-circles"
-                        type="circle"
-                        paint={{
-                          "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 12, 8, 34],
-                          "circle-color": [
-                            "interpolate",
-                            ["linear"],
-                            ["get", "temperature"],
-                            5,
-                            "rgba(56,189,248,0.16)",
-                            18,
-                            "rgba(34,211,238,0.22)",
-                            28,
-                            "rgba(255,161,62,0.32)",
-                            36,
-                            "rgba(255,72,60,0.42)",
-                          ],
-                          "circle-opacity": 0.62,
-                          "circle-blur": 0.64,
-                        }}
-                      />
-                    </Source>
-                  ) : null}
                   {activeLayers["fish-density"] ? (
                     <Source id="aqua-fish-density" type="geojson" data={marineMapData.densityPoints as any}>
                       <Layer
@@ -693,35 +664,18 @@ export default function WorldMapWorkspace() {
                       />
                     </Source>
                   ) : null}
-
-
-                  {activeLayers.weather
-                    ? ((marineMapData.weatherPoints as any)?.features ?? []).map((feature: any, index: number) => {
-                        const [longitude, latitude] = feature.geometry?.coordinates ?? [];
-                        const properties = feature.properties ?? {};
-                        if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return null;
-
-                        const weatherTitle = [
-                          `Hava: ${Number(properties.temperature).toFixed(1)} C`,
-                          `Ruzgar: ${Number(properties.windSpeed).toFixed(0)} kn`,
-                          `Nem: %${Number(properties.humidity).toFixed(0)}`,
-                          `Yagis: ${Number(properties.precipitation).toFixed(1)} mm`,
-                          properties.isDay === 1 ? "Gunduz" : "Gece",
-                        ].join(" | ");
-
-                        return (
-                          <Marker longitude={longitude} latitude={latitude} anchor="center" key={`weather-${longitude}-${latitude}-${index}`}>
-                            <span className="aqua-map-weather-marker" title={weatherTitle}>
-                              <CloudRain size={13} />
-                            </span>
-                          </Marker>
-                        );
-                      })
-                    : null}
+                  {activeLayers.weather && hasSelectedWeatherRegion ? (
+                    <Marker longitude={selectedRegion.center[0]} latitude={selectedRegion.center[1]} anchor="center">
+                      <span className="aqua-map-weather-marker" title={selectedWeatherTitle}>
+                        <CloudRain size={13} />
+                        <small>{selectedAirTemperatureLabel}</small>
+                      </span>
+                    </Marker>
+                  ) : null}
                   {activeLayers.ports
                     ? marineMapData.ports.map((port) => (
                         <Marker longitude={port.coordinates[0]} latitude={port.coordinates[1]} anchor="center" key={`${port.name}-${port.coordinates[0]}-${port.coordinates[1]}`}>
-                          <button type="button" className="aqua-map-port-marker" title={port.locode ? `${port.name} (${port.locode})` : port.name} onClick={() => focusMapFacility({ ...port, kind: "port" })}>
+                          <button type="button" className="aqua-map-port-marker" title={port.locode ? `${port.name} (${port.locode})` : port.name} onClick={(event) => { event.stopPropagation(); focusMapFacility({ ...port, kind: "port" }); }}>
                             <Anchor size={13} />
                           </button>
                         </Marker>
@@ -742,7 +696,7 @@ export default function WorldMapWorkspace() {
 
                         return (
                           <Marker longitude={marina.coordinates[0]} latitude={marina.coordinates[1]} anchor="center" key={`${marina.name}-${marina.coordinates[0]}-${marina.coordinates[1]}`}>
-                            <button type="button" className="aqua-map-marina-marker" title={marinaTitle} onClick={() => focusMapFacility({ ...marina, kind: "marina" })}>
+                            <button type="button" className="aqua-map-marina-marker" title={marinaTitle} onClick={(event) => { event.stopPropagation(); focusMapFacility({ ...marina, kind: "marina" }); }}>
                               <ShipWheel size={14} />
                             </button>
                           </Marker>
@@ -755,7 +709,7 @@ export default function WorldMapWorkspace() {
                       <button
                         type="button"
                         className={selectedRegion.id === marker.region.id ? "aqua-map-region-marker is-selected" : "aqua-map-region-marker"}
-                        onClick={() => focusMarineRegion(marker.region)}
+                        onClick={(event) => { event.stopPropagation(); focusMarineRegion(marker.region); }}
                       >
                         <span />
                         <strong>{marker.name}</strong>
@@ -766,29 +720,6 @@ export default function WorldMapWorkspace() {
                 </Map>
 
                 <div className="aqua-map-data-overlay" aria-hidden />
-                {isPremiumRegion ? (
-                  <div className="aqua-map-premium-mask" aria-hidden>
-                    {premiumClearArea ? (
-                      <>
-                        <span className="aqua-map-premium-blur-segment" style={{ left: 0, top: 0, right: 0, height: premiumClearArea.top }} />
-                        <span className="aqua-map-premium-blur-segment" style={{ left: 0, top: premiumClearArea.top + premiumClearArea.height, right: 0, bottom: 0 }} />
-                        <span className="aqua-map-premium-blur-segment" style={{ left: 0, top: premiumClearArea.top, width: premiumClearArea.left, height: premiumClearArea.height }} />
-                        <span className="aqua-map-premium-blur-segment" style={{ left: premiumClearArea.left + premiumClearArea.width, top: premiumClearArea.top, right: 0, height: premiumClearArea.height }} />
-                      </>
-                    ) : (
-                      <span className="aqua-map-premium-blur-segment" style={{ inset: 0 }} />
-                    )}
-                  </div>
-                ) : null}
-                {isPremiumRegion ? (
-                  <div className="aqua-map-premium-overlay" role="status" aria-live="polite">
-                    <div>
-                      <Shield size={22} />
-                      <strong>Premium harita alani</strong>
-                      <span>Gercek zamanli veri katmanlari su anda Turkiye ve cevresi icin acik. Diger bolgeler premium uyelik ile kullanilabilir.</span>
-                    </div>
-                  </div>
-                ) : null}
               </div>
 
               <div className="aqua-map-layer-dock aqua-glass-panel">
