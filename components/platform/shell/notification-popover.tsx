@@ -91,12 +91,13 @@ export default function NotificationPopover({
 
       <AnimatePresence>
         {isOpen ? (
-          <motion.section
+          <motion.div
             className={cn(styles.panel, panelClassName)}
             initial={{ opacity: 0, y: 10, scale: 0.96, filter: "blur(8px)" }}
             animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: 8, scale: 0.96, filter: "blur(8px)" }}
             transition={{ duration: 0.2, ease: "easeOut" }}
+            role="region"
             aria-label="Bildirim listesi"
           >
             <header className={styles.header}>
@@ -132,7 +133,7 @@ export default function NotificationPopover({
                 <div className={styles.empty}>Yeni bildirim yok.</div>
               )}
             </div>
-          </motion.section>
+          </motion.div>
         ) : null}
       </AnimatePresence>
     </div>

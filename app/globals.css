@@ -2491,7 +2491,7 @@ body:has(.auth-stage) {
   padding-top: 54px;
 }
 
-.social-area-page .social-interactions-panel section {
+.social-area-page .social-interactions-panel > section {
   padding: 17px 18px;
   border-radius: 12px;
   background:
@@ -6055,7 +6055,7 @@ body.sidebar-collapsed .sidebar.aqua-sidebar {
   font-size: 15px;
 }
 
-.social-interactions-panel section {
+.social-interactions-panel > section {
   padding-top: 18px;
 }
 
@@ -7990,7 +7990,7 @@ body.profile-dark-theme .profile-following img {
 .social-bell,
 .social-create,
 .social-post-card,
-.social-interactions-panel section {
+.social-interactions-panel > section {
   border: 1px solid rgba(77, 132, 190, 0.26);
   border-radius: 10px;
   background:
@@ -8544,7 +8544,7 @@ body.profile-dark-theme .profile-following img {
   display: none;
 }
 
-.social-interactions-panel section {
+.social-interactions-panel > section {
   position: relative;
   overflow: hidden;
   padding: clamp(14px, 1.25vw, 18px);
@@ -8559,7 +8559,7 @@ body.profile-dark-theme .profile-following img {
   transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
 
-.social-interactions-panel section::before {
+.social-interactions-panel > section::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -8567,7 +8567,7 @@ body.profile-dark-theme .profile-following img {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.045), transparent 34%);
 }
 
-.social-interactions-panel section:hover {
+.social-interactions-panel > section:hover {
   border-color: rgba(70, 180, 255, 0.48);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.09),
@@ -23775,7 +23775,7 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
   padding-top: 54px;
 }
 
-.social-area-page .social-interactions-panel section {
+.social-area-page .social-interactions-panel > section {
   padding: 17px 18px;
   border-radius: 12px;
 }
@@ -23995,7 +23995,7 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
   display: none;
 }
 
-.social-area-page .social-interactions-panel section {
+.social-area-page .social-interactions-panel > section {
   min-width: 0;
 }
 
