@@ -41,9 +41,10 @@ import {
 } from "lucide-react";
 import AnimatedTabBar from "../../ui/animated-tab-bar";
 import { useCurrentUser } from "../../../hooks/use-current-user";
+import { defaultProfileAvatarUrl } from "../../../lib/constants";
 import NotificationPopover from "../shell/notification-popover";
 
-const avatar = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80";
+const avatar = defaultProfileAvatarUrl;
 
 type SocialPostKind = "text" | "photo" | "video" | "location" | "poll";
 type SocialPost = {

@@ -2,8 +2,9 @@
 
 import { useRef, useState } from "react";
 import { ChevronDown, Mail, MapPin, Pencil, User } from "lucide-react";
+import { defaultProfileAvatarUrl } from "../../../lib/constants";
 
-const profileImage = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=85";
+const profileImage = defaultProfileAvatarUrl;
 
 export default function AccountSettings({ activeTab }: { activeTab?: string }) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);

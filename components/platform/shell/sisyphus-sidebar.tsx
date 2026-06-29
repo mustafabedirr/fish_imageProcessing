@@ -6,6 +6,7 @@ import type { ElementType } from "react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useCurrentUser } from "../../../hooks/use-current-user";
+import { defaultProfileAvatarUrl } from "../../../lib/constants";
 import {
   BarChart3,
   ChevronDown,
@@ -67,7 +68,7 @@ export default function SisyphusSidebar() {
 
   const displayName = user?.name ?? "AquaScope User";
   const displayEmail = user?.email ?? `${user?.handle ?? "@aquascope"}`;
-  const avatarUrl = user?.avatarUrl ?? "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&q=80";
+  const avatarUrl = user?.avatarUrl ?? defaultProfileAvatarUrl;
 
   function confirmLogout() {
     logout();

@@ -1,5 +1,5 @@
 import type { AquaScopeUser } from "../types/user";
-import { demoUser } from "./constants";
+import { defaultProfileAvatarUrl, demoUser } from "./constants";
 
 export const demoCredentials = {
   email: "demo@aquascope.app",
@@ -28,7 +28,7 @@ export function createRegisteredUser({ name, email }: RegisterUserInput): AquaSc
     region: "Bolge secilmedi",
     level: "Yeni uye",
     bio: "AquaScope topluluguna yeni katildi.",
-    avatarUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=160&q=85",
+    avatarUrl: defaultProfileAvatarUrl,
     coverUrl: "https://images.unsplash.com/photo-1544551763-77ef2d0cfc6c?auto=format&fit=crop&w=1400&q=80",
     interests: [],
     experience: "Baslangic",
@@ -45,7 +45,7 @@ export function getDemoSession() {
     user: {
       ...demoUser,
       email: demoCredentials.email,
-      avatarUrl: demoUser.avatarUrl ?? "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=85",
+      avatarUrl: demoUser.avatarUrl ?? defaultProfileAvatarUrl,
       coverUrl: demoUser.coverUrl ?? "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80",
       onboardingCompleted: true,
     },

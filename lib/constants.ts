@@ -6,12 +6,15 @@ import type { AquaScopeUser } from "../types/user";
 
 export const appName = "AquaScope";
 
+export const defaultProfileAvatarUrl = "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=160&q=85";
+
 export const demoUser: AquaScopeUser = {
   id: "u_001",
   name: "Deniz Arslan",
   handle: "@denizde",
   region: "İzmir Körfezi",
   level: "Kıyı avcısı",
+  avatarUrl: defaultProfileAvatarUrl,
   catches: 48,
   analyses: 126,
 };

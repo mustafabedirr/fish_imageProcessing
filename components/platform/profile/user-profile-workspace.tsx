@@ -29,10 +29,11 @@ import {
 } from "lucide-react";
 import { cn } from "../../../lib/utils";
 import { useCurrentUser } from "../../../hooks/use-current-user";
+import { defaultProfileAvatarUrl } from "../../../lib/constants";
 import AnimatedTabBar from "../../ui/animated-tab-bar";
 import { AvatarProfilePhoto } from "@/components/base/avatar/avatar";
 
-const avatar = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=180&q=80";
+const avatar = defaultProfileAvatarUrl;
 type ProfileFeedPost = {
   id: string;
   userId?: string;
@@ -259,7 +260,7 @@ export default function UserProfileWorkspace() {
     };
     setProfile(nextProfile);
     setDraftProfile(nextProfile);
-    if (user.avatarUrl) setAvatarSrc(user.avatarUrl);
+    setAvatarSrc(user.avatarUrl ?? defaultProfileAvatarUrl);
   }, [user]);
 
   useEffect(() => {
