@@ -35193,3 +35193,66 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
   box-shadow: none !important;
   transform: translateY(-50%) scale(1.08) !important;
 }
+
+/* Stable icon buttons in the social post detail header */
+.social-post-detail-modal .social-post-detail-author {
+  grid-template-columns: 46px minmax(0, 1fr) 40px 40px !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.social-post-detail-modal .social-detail-follow,
+.social-post-detail-modal .social-detail-more {
+  display: inline-grid !important;
+  place-items: center !important;
+  flex: 0 0 40px !important;
+  width: 40px !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 !important;
+  border: 1px solid rgba(103, 164, 226, 0.28) !important;
+  border-radius: 12px !important;
+  color: #dcecff !important;
+  background: rgba(7, 27, 50, 0.72) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  line-height: 1 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+}
+
+.social-post-detail-modal .social-detail-follow.is-active {
+  border-color: rgba(21, 129, 251, 0.58) !important;
+  color: #1581FB !important;
+  background: rgba(21, 129, 251, 0.16) !important;
+}
+
+.social-post-detail-modal .social-detail-follow:hover,
+.social-post-detail-modal .social-detail-more:hover {
+  border-color: rgba(0, 212, 255, 0.54) !important;
+  color: #ffffff !important;
+  background: rgba(14, 48, 82, 0.82) !important;
+  transform: translateY(-1px) !important;
+}
+
+.social-post-detail-modal .social-detail-follow.is-active:hover {
+  color: #ffffff !important;
+  background: rgba(21, 129, 251, 0.32) !important;
+}
+
+@media (max-width: 640px) {
+  .social-post-detail-modal .social-post-detail-author {
+    grid-template-columns: 42px minmax(0, 1fr) 38px 38px !important;
+  }
+
+  .social-post-detail-modal .social-detail-follow,
+  .social-post-detail-modal .social-detail-more {
+    display: inline-grid !important;
+    width: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+  }
+}

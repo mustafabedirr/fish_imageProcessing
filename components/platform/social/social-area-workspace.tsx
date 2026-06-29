@@ -2205,11 +2205,17 @@ function PostInteractionModal({
               <strong>{post.author}</strong>
               <span>{post.time}</span>
             </div>
-            <button type="button" className={isFollowing ? "social-detail-follow is-active" : "social-detail-follow"} onClick={onToggleFollow}>
-              <Users size={15} />
-              {isFollowing ? "Following" : "Follow"}
+            <button
+              type="button"
+              className={isFollowing ? "social-detail-follow is-active" : "social-detail-follow"}
+              aria-label={isFollowing ? "Following" : "Follow"}
+              aria-pressed={isFollowing}
+              title={isFollowing ? "Following" : "Follow"}
+              onClick={onToggleFollow}
+            >
+              <Users size={18} />
             </button>
-            <button type="button" className="social-detail-more" aria-label="Post options">
+            <button type="button" className="social-detail-more" aria-label="Post options" title="Post options">
               <MoreVertical size={19} />
             </button>
           </header>
