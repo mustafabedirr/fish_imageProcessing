@@ -35256,3 +35256,28 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     min-height: 38px !important;
   }
 }
+
+/* Keep the social right-panel profile avatar perfectly circular. */
+.social-area-page .social-side-actions .social-profile-menu-wrap {
+  flex: 0 0 auto;
+}
+
+.social-area-page .social-side-actions .social-profile-chip {
+  flex: 0 0 auto !important;
+  min-width: 38px !important;
+  overflow: visible !important;
+}
+
+.social-area-page .social-side-actions .social-profile-chip img {
+  display: block !important;
+  flex: 0 0 34px !important;
+  width: 34px !important;
+  min-width: 34px !important;
+  max-width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  aspect-ratio: 1 / 1 !important;
+  border-radius: 999px !important;
+  object-fit: cover !important;
+}
