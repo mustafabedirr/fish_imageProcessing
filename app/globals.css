@@ -28670,15 +28670,16 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 .social-story-progress {
   position: absolute;
   z-index: 2;
-  left: 40px;
-  right: 40px;
+  left: 24px;
+  right: 24px;
   top: 26px;
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  display: flex;
   gap: 5px;
 }
 
 .social-story-progress span {
+  flex: 1 1 0;
+  min-width: 0;
   height: 4px;
   border-radius: 999px;
   background: rgba(211, 226, 242, 0.42);
@@ -28912,7 +28913,7 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 
   .social-story-progress {
     left: 20px;
-    right: 76px;
+    right: 20px;
     top: 20px;
   }
 
@@ -29543,10 +29544,12 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 /* Social story fluid content behavior */
 .social-story-stage .social-story-progress {
   z-index: 7;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  display: flex;
 }
 
 .social-story-stage .social-story-progress span {
+  flex: 1 1 0;
+  min-width: 0;
   position: relative;
   overflow: hidden;
   height: 4px;
