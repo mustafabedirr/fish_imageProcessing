@@ -34881,3 +34881,19 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     grid-template-columns: 1fr;
   }
 }
+
+/* Social modals should cover the full app shell, including the sidebar. */
+.social-story-viewer-backdrop,
+.social-post-detail-backdrop,
+.social-flow-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  z-index: 2400 !important;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(0, 212, 255, 0.14), transparent 36%),
+    rgba(1, 7, 15, 0.82) !important;
+  backdrop-filter: blur(22px) saturate(1.08) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.08) !important;
+}

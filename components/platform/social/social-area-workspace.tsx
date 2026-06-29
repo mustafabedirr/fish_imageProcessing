@@ -2,6 +2,7 @@
 
 import type { ChangeEvent, CSSProperties, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Award,
   BarChart3,
@@ -1483,104 +1484,121 @@ export default function SocialAreaWorkspace() {
           </SocialPanel>
         </aside>
       </div>
-
       {activeStoryIndex !== null ? (
-        <StoryViewer
-          activeIndex={activeStoryIndex}
-          stories={storyItems}
-          onClose={closeStoryViewer}
-          onNext={goToNextStory}
-          onPrevious={goToPreviousStory}
-          onSelect={setActiveStoryIndex}
-        />
+        <SocialModalPortal>
+          <StoryViewer
+            activeIndex={activeStoryIndex}
+            stories={storyItems}
+            onClose={closeStoryViewer}
+            onNext={goToNextStory}
+            onPrevious={goToPreviousStory}
+            onSelect={setActiveStoryIndex}
+          />
+        </SocialModalPortal>
       ) : null}
 
       {activeModal === "comments" ? (
-        <PostInteractionModal
-          post={visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]}
-          isBookmarked={Boolean(activeFlowPostId && bookmarkedPosts[activeFlowPostId])}
-          isLiked={Boolean(activeFlowPostId && likedPosts[activeFlowPostId])}
-          likeCount={(visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).likes}
-          commentCount={activeFlowPostId ? (commentCounts[activeFlowPostId] ?? (visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).comments) : 0}
-          comments={activeFlowPostId ? (postComments[activeFlowPostId] ?? []) : []}
-          isFollowing={Boolean((visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).profile?.userId && followedUsers[(visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).profile!.userId])}
-          currentUserName={currentUserName}
-          currentUserAvatar={currentUserAvatar}
-          onClose={closeModal}
-          onToggleBookmark={() => {
-            const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? posts[0]?.id;
-            if (!targetPostId) return;
-            togglePostSave(targetPostId);
-          }}
-          onToggleLike={() => {
-            const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? posts[0]?.id;
-            if (!targetPostId) return;
-            togglePostLike(targetPostId);
-          }}
-          onToggleFollow={() => toggleAuthorFollow((visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).profile?.userId)}
-          onSubmitComment={(comment) => {
-            const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? posts[0]?.id;
-            if (!targetPostId) return;
-            submitPostComment(targetPostId, comment);
-          }}
-        />
+        <SocialModalPortal>
+          <PostInteractionModal
+            post={visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]}
+            isBookmarked={Boolean(activeFlowPostId && bookmarkedPosts[activeFlowPostId])}
+            isLiked={Boolean(activeFlowPostId && likedPosts[activeFlowPostId])}
+            likeCount={(visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).likes}
+            commentCount={activeFlowPostId ? (commentCounts[activeFlowPostId] ?? (visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).comments) : 0}
+            comments={activeFlowPostId ? (postComments[activeFlowPostId] ?? []) : []}
+            isFollowing={Boolean((visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).profile?.userId && followedUsers[(visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).profile!.userId])}
+            currentUserName={currentUserName}
+            currentUserAvatar={currentUserAvatar}
+            onClose={closeModal}
+            onToggleBookmark={() => {
+              const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? posts[0]?.id;
+              if (!targetPostId) return;
+              togglePostSave(targetPostId);
+            }}
+            onToggleLike={() => {
+              const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? posts[0]?.id;
+              if (!targetPostId) return;
+              togglePostLike(targetPostId);
+            }}
+            onToggleFollow={() => toggleAuthorFollow((visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).profile?.userId)}
+            onSubmitComment={(comment) => {
+              const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? posts[0]?.id;
+              if (!targetPostId) return;
+              submitPostComment(targetPostId, comment);
+            }}
+          />
+        </SocialModalPortal>
       ) : activeModal ? (
-        <SocialFlowModal
-          modal={activeModal}
-          audience={audience}
-          composerText={composerText}
-          onClose={closeModal}
-          onCreate={() => {
-            if (!composerText.trim()) {
+        <SocialModalPortal>
+          <SocialFlowModal
+            modal={activeModal}
+            audience={audience}
+            composerText={composerText}
+            onClose={closeModal}
+            onCreate={() => {
+              if (!composerText.trim()) {
+                createPost();
+                return;
+              }
               createPost();
-              return;
-            }
-            createPost();
-            closeModal();
-          }}
-          onApply={(modal) => {
-            const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? "local";
-            if (modal === "media" || modal === "video") {
-              const current: SocialPost = {
-                id: `${modal}-${Date.now()}`,
-                author: currentUserName,
-                handle: currentUserHandle,
-                time: "Az once",
-                avatar: currentUserAvatar,
-                kind: modal === "video" ? "video" : "photo",
-                text: composerText.trim() || (modal === "video" ? "Yeni bir av videosu paylaştı." : "Yeni bir av görseli paylaştı."),
-                tags: modal === "video" ? ["#FishingVideo", "#AegeanSea"] : ["#Catch", "#Fishing"],
-                likes: 0,
-                comments: 0,
-                photos: [
-                  modal === "video"
-                    ? "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=85"
-                    : "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=1200&q=85",
-                ],
-              };
-              setPosts((currentPosts) => [current, ...currentPosts]);
-              setComposerText("");
-              setActiveTab("For You");
-            }
-            if (modal === "location") setComposerText((current) => `${current}${current ? " " : ""}Lake Washington`);
-            if (modal === "achievement") setComposerText((current) => `${current}${current ? " " : ""}#Achievement`);
-            if (modal === "poll") setComposerText((current) => `${current}${current ? " " : ""}#CommunityPoll`);
-            if (modal === "comments") {
-              const targetPost = visiblePosts.find((post) => post.id === targetPostId);
-              setCommentCounts((current) => ({ ...current, [targetPostId]: (current[targetPostId] ?? targetPost?.comments ?? 0) + 1 }));
-            }
-            if (modal === "share") setSharedPosts((current) => ({ ...current, [targetPostId]: true }));
-            setNotice(`${modalCopy[modal].eyebrow} akışı uygulandı.`);
-            closeModal();
-          }}
-          onSaveDraft={() => {
-            setNotice("Taslak kaydedildi.");
-            closeModal();
-          }}
-        />
+              closeModal();
+            }}
+            onApply={(modal) => {
+              const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? "local";
+              if (modal === "media" || modal === "video") {
+                const current: SocialPost = {
+                  id: `${modal}-${Date.now()}`,
+                  author: currentUserName,
+                  handle: currentUserHandle,
+                  time: "Az once",
+                  avatar: currentUserAvatar,
+                  kind: modal === "video" ? "video" : "photo",
+                  text: composerText.trim() || (modal === "video" ? "Yeni bir av videosu paylaştı." : "Yeni bir av görseli paylaştı."),
+                  tags: modal === "video" ? ["#FishingVideo", "#AegeanSea"] : ["#Catch", "#Fishing"],
+                  likes: 0,
+                  comments: 0,
+                  photos: [
+                    modal === "video"
+                      ? "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=85"
+                      : "https://images.unsplash.com/photo-1510130387422-82bed34b37e9?auto=format&fit=crop&w=1200&q=85",
+                  ],
+                };
+                setPosts((currentPosts) => [current, ...currentPosts]);
+                setComposerText("");
+                setActiveTab("For You");
+              }
+              if (modal === "location") setComposerText((current) => `${current}${current ? " " : ""}Lake Washington`);
+              if (modal === "achievement") setComposerText((current) => `${current}${current ? " " : ""}#Achievement`);
+              if (modal === "poll") setComposerText((current) => `${current}${current ? " " : ""}#CommunityPoll`);
+              if (modal === "comments") {
+                const targetPost = visiblePosts.find((post) => post.id === targetPostId);
+                setCommentCounts((current) => ({ ...current, [targetPostId]: (current[targetPostId] ?? targetPost?.comments ?? 0) + 1 }));
+              }
+              if (modal === "share") setSharedPosts((current) => ({ ...current, [targetPostId]: true }));
+              setNotice(`${modalCopy[modal].eyebrow} akışı uygulandı.`);
+              closeModal();
+            }}
+            onSaveDraft={() => {
+              setNotice("Taslak kaydedildi.");
+              closeModal();
+            }}
+          />
+        </SocialModalPortal>
       ) : null}
     </section>
   );
+}
+
+function SocialModalPortal({ children }: { children: ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  return createPortal(children, document.body);
 }
 
 function PostKindBadge({ kind }: { kind: SocialPostKind }) {
