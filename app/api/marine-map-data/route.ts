@@ -228,14 +228,6 @@ const getViewportName = ([longitude, latitude]: [number, number]) => {
   return "Turkiye Deniz Alani";
 };
 
-const toTemperaturePointCollection = (items: MarinePoint[]) => ({
-  type: "FeatureCollection",
-  features: items.map((item) => ({
-    type: "Feature",
-    properties: { value: item.temperature, chlorophyll: item.chlorophyllMgM3 ?? null },
-    geometry: { type: "Point", coordinates: item.position },
-  })),
-});
 
 const toWeatherPointCollection = (items: MarinePoint[]) => ({
   type: "FeatureCollection",
@@ -711,7 +703,7 @@ const buildResponse = async (points: MarinePoint[], bounds: NonNullable<ReturnTy
     source: "open-meteo",
     isDynamic: true,
     densityPoints: observations.length ? toObservationPointCollection(observations) : emptyFeatureCollection,
-    temperaturePoints: toTemperaturePointCollection(enrichedPoints),
+    temperaturePoints: emptyFeatureCollection,
     currents: toLineCollection(enrichedPoints),
     protectedPolygons: toPolygonCollection(protectedAreas),
     ports,

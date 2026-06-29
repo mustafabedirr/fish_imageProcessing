@@ -38,7 +38,6 @@ import NotificationPopover from "../shell/notification-popover";
 
 const layerItems = [
   { id: "fish-density", icon: Fish, title: "Gozlem Kayitlari", low: "Yok", high: "Kayit", active: true, tone: "blue" },
-  { id: "water-temperature", icon: Thermometer, title: "Su Sicakligi", low: "Soguk", high: "Sicak", active: true, tone: "heat" },
   { id: "chlorophyll", icon: Leaf, title: "Klorofil Seviyesi", low: "Dusuk", high: "Yuksek", active: false, tone: "green" },
   { id: "protected-areas", icon: Shield, title: "Koruma Alanlari", low: "Resmi Bolgeler", high: "", active: true, tone: "green" },
   { id: "ports", icon: Anchor, title: "Limanlar", low: "Ticari Liman", high: "", active: true, tone: "blue" },
@@ -403,7 +402,6 @@ export default function WorldMapWorkspace() {
     setActiveLayers((current) => ({
       ...current,
       "fish-density": preset !== "navigation",
-      "water-temperature": preset !== "navigation",
       chlorophyll: preset === "environment",
       "protected-areas": preset !== "density",
       ports: preset === "navigation",
@@ -623,30 +621,6 @@ export default function WorldMapWorkspace() {
                   onLoad={refreshViewportMarineData}
                   onMoveEnd={refreshViewportMarineData}
                 >
-                  {activeLayers["water-temperature"] ? (
-                    <Source id="aqua-temperature-points" type="geojson" data={marineMapData.temperaturePoints as any}>
-                      <Layer
-                        id="aqua-temperature-circles"
-                        type="circle"
-                        paint={{
-                          "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 22, 8, 70],
-                          "circle-color": [
-                            "interpolate",
-                            ["linear"],
-                            ["get", "value"],
-                            52,
-                            "rgba(34,211,238,0.22)",
-                            72,
-                            "rgba(0,201,150,0.28)",
-                            88,
-                            "rgba(255,161,62,0.34)",
-                          ],
-                          "circle-opacity": 0.58,
-                          "circle-blur": 0.82,
-                        }}
-                      />
-                    </Source>
-                  ) : null}
 
 
                   {activeLayers.weather ? (
