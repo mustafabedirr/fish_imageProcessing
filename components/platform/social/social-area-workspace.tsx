@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   Award,
+  Ban,
   BarChart3,
   Bell,
   Bookmark,
@@ -17,9 +18,11 @@ import {
   Globe2,
   GripVertical,
   Heart,
+  EyeOff,
   Info,
   Image as ImageIcon,
   Lock,
+  ListPlus,
   MapPin,
   Maximize2,
   MessageCircle,
@@ -38,6 +41,7 @@ import {
   UserPlus,
   Users,
   Video,
+  VolumeX,
   X,
 } from "lucide-react";
 import AnimatedTabBar from "../../ui/animated-tab-bar";
@@ -752,6 +756,12 @@ export default function SocialAreaWorkspace() {
   const [addedFriends, setAddedFriends] = useState<Record<string, boolean>>({});
   const [followedUsers, setFollowedUsers] = useState<Record<string, boolean>>({});
   const [hiddenFriends, setHiddenFriends] = useState<Record<string, boolean>>({});
+  const [openPostMenuId, setOpenPostMenuId] = useState<string | null>(null);
+  const postMenuRef = useRef<HTMLDivElement | null>(null);
+  const [dismissedPostIds, setDismissedPostIds] = useState<Record<string, boolean>>({});
+  const [mutedHandles, setMutedHandles] = useState<Record<string, boolean>>({});
+  const [blockedHandles, setBlockedHandles] = useState<Record<string, boolean>>({});
+  const [listedPostIds, setListedPostIds] = useState<Record<string, boolean>>({});
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
   const [joinedEvent, setJoinedEvent] = useState(false);
@@ -775,6 +785,17 @@ export default function SocialAreaWorkspace() {
     document.addEventListener("pointerdown", handlePointerDown);
     return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, [profileMenuOpen]);
+  useEffect(() => {
+    if (!openPostMenuId) return undefined;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (postMenuRef.current?.contains(event.target as Node)) return;
+      setOpenPostMenuId(null);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [openPostMenuId]);
 
   useEffect(() => {
     fetch("/api/users")
@@ -844,6 +865,7 @@ export default function SocialAreaWorkspace() {
   const visiblePosts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     const searched = posts.filter((post) => {
+      if (dismissedPostIds[post.id] || mutedHandles[post.handle] || blockedHandles[post.handle]) return false;
       if (!query) return true;
       return [post.author, post.handle, post.text, ...post.tags].some((value) => value.toLowerCase().includes(query));
     });
@@ -857,7 +879,7 @@ export default function SocialAreaWorkspace() {
     }
 
     return [...searched].sort((a, b) => Number(featuredDemoPostIds.has(b.id)) - Number(featuredDemoPostIds.has(a.id)));
-  }, [activeTab, bookmarkedPosts, posts, searchQuery]);
+  }, [activeTab, blockedHandles, bookmarkedPosts, dismissedPostIds, mutedHandles, posts, searchQuery]);
 
 
   const updatePostCount = (postId: string, patch: Partial<Pick<SocialPost, "likes" | "comments">>) => {
@@ -938,6 +960,42 @@ export default function SocialAreaWorkspace() {
       setFollowedUsers((current) => ({ ...current, [userId]: !nextActive }));
       setNotice("Takip islemi tamamlanamadi. Oturumunuzu kontrol edin.");
     });
+  };
+
+  const handlePostMenuAction = (action: "dismiss" | "follow" | "list" | "mute" | "block", post: SocialPost) => {
+    setOpenPostMenuId(null);
+
+    if (action === "dismiss") {
+      setDismissedPostIds((current) => ({ ...current, [post.id]: true }));
+      setNotice("Post akistan kaldirildi.");
+      return;
+    }
+
+    if (action === "follow") {
+      if (!post.profile?.userId) {
+        setNotice("Bu kullanici icin takip bilgisi bulunamadi.");
+        return;
+      }
+      toggleAuthorFollow(post.profile.userId);
+      setNotice(`${post.handle} takip durumu guncellendi.`);
+      return;
+    }
+
+    if (action === "list") {
+      const nextListed = !listedPostIds[post.id];
+      setListedPostIds((current) => ({ ...current, [post.id]: nextListed }));
+      setNotice(nextListed ? "Post listeye eklendi." : "Post listeden kaldirildi.");
+      return;
+    }
+
+    if (action === "mute") {
+      setMutedHandles((current) => ({ ...current, [post.handle]: true }));
+      setNotice(`${post.handle} sessize alindi.`);
+      return;
+    }
+
+    setBlockedHandles((current) => ({ ...current, [post.handle]: true }));
+    setNotice(`${post.handle} engellendi.`);
   };
   const openPhotoPicker = () => {
     photoInputRef.current?.click();
@@ -1278,9 +1336,44 @@ export default function SocialAreaWorkspace() {
                     <strong>{post.author}</strong>
                     <span>{post.time}</span>
                   </div>
-                  <button type="button" className="social-post-more" aria-label="Post options" onClick={(event) => event.stopPropagation()}>
-                    <MoreVertical size={18} />
-                  </button>
+                  <div className="social-post-more-wrap" ref={openPostMenuId === post.id ? postMenuRef : null} data-social-post-menu>
+                    <button
+                      type="button"
+                      className={openPostMenuId === post.id ? "social-post-more is-open" : "social-post-more"}
+                      aria-label="Post options"
+                      aria-expanded={openPostMenuId === post.id}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setOpenPostMenuId((current) => (current === post.id ? null : post.id));
+                      }}
+                    >
+                      <MoreVertical size={18} />
+                    </button>
+                    {openPostMenuId === post.id ? (
+                      <div className="social-post-options-menu" role="menu" onClick={(event) => event.stopPropagation()}>
+                        <button type="button" role="menuitem" onClick={() => handlePostMenuAction("dismiss", post)}>
+                          <EyeOff size={17} />
+                          <span>Not interested in this post</span>
+                        </button>
+                        <button type="button" role="menuitem" onClick={() => handlePostMenuAction("follow", post)}>
+                          <UserPlus size={17} />
+                          <span>{followedUsers[post.profile?.userId ?? ""] ? "Unfollow" : "Follow"} {post.handle}</span>
+                        </button>
+                        <button type="button" role="menuitem" onClick={() => handlePostMenuAction("list", post)}>
+                          <ListPlus size={17} />
+                          <span>{listedPostIds[post.id] ? "Remove from Lists" : "Add/remove from Lists"}</span>
+                        </button>
+                        <button type="button" role="menuitem" onClick={() => handlePostMenuAction("mute", post)}>
+                          <VolumeX size={17} />
+                          <span>Mute</span>
+                        </button>
+                        <button type="button" role="menuitem" className="is-danger" onClick={() => handlePostMenuAction("block", post)}>
+                          <Ban size={17} />
+                          <span>Block {post.handle}</span>
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
                   <button
                     className={bookmarkedPosts[post.id] ? "social-bookmark is-active" : "social-bookmark"}
                     type="button"
