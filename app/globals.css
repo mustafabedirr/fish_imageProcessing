@@ -37060,3 +37060,29 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     border-right: 0;
   }
 }
+
+/* Smaller profile header action buttons. */
+.user-profile-content--reference .profile-hero-actions.profile-hero-actions--reference {
+  gap: 8px;
+}
+
+.user-profile-content--reference .profile-hero-actions.profile-hero-actions--reference button {
+  height: 38px;
+  border-radius: 8px;
+}
+
+.user-profile-content--reference .profile-hero-actions.profile-hero-actions--reference button:first-child {
+  min-width: 138px;
+  padding: 0 14px;
+  font-size: 0.82rem;
+}
+
+.user-profile-content--reference .profile-hero-actions.profile-hero-actions--reference button:not(:first-child) {
+  width: 38px;
+  min-width: 38px;
+}
+
+.user-profile-content--reference .profile-hero-actions.profile-hero-actions--reference button svg {
+  width: 16px;
+  height: 16px;
+}
