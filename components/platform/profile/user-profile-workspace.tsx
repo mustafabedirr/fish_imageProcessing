@@ -4,14 +4,20 @@ import type { CSSProperties, ChangeEvent, UIEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useInView } from "framer-motion";
 import {
+  Activity,
+  Briefcase,
+  CalendarDays,
   Camera,
   Check,
+  ChevronUp,
   Compass,
   Edit3,
   Fish,
+  Eye,
   Heart,
   Image,
   Images,
+  Mail,
   MapPin,
   MessageCircle,
   MoreHorizontal,
@@ -21,6 +27,7 @@ import {
   Share2,
   ShieldCheck,
   Star,
+  Tag,
   Trophy,
   UploadCloud,
   Video,
@@ -368,13 +375,16 @@ export default function UserProfileWorkspace() {
                 Kapak görselini değiştir
               </span>
             </button>
-            <div className="profile-hero-actions">
+            <div className="profile-hero-actions profile-hero-actions--reference">
               <button type="button" onClick={openEditProfile}>
-                <Edit3 size={17} />
-                Profilini Düzenle
+                <Edit3 size={19} />
+                Profili Duzenle
               </button>
               <button type="button" aria-label="More profile actions">
-                <MoreHorizontal size={20} />
+                <MoreHorizontal size={21} />
+              </button>
+              <button type="button" aria-label="Header alanini daralt" onClick={() => setIsProfileCollapsed((current) => !current)}>
+                <ChevronUp size={21} />
               </button>
             </div>
             <div className="profile-identity">
@@ -392,40 +402,68 @@ export default function UserProfileWorkspace() {
                   </span>
                 </h1>
                 <p>{profile.handle}</p>
-                <span>{profile.bio}</span>
+                <span className="profile-role-line"><Briefcase size={17} /> Deniz Biyologu <b /> Arastirmaci</span>
                 <div className="profile-meta-row">
                   <small>
                     <MapPin size={16} />
-                    Seattle, Washington
+                    {user?.region ?? "Istanbul, Turkiye"}
                   </small>
                 </div>
               </div>
             </div>
-
-            <div className="profile-stats-row">
-              <strong>
-                452 <span>Followers</span>
-              </strong>
-              <strong>
-                178 <span>Following</span>
-              </strong>
-              <strong>
-                178 <span>Catches</span>
-              </strong>
-              <strong>
-                24 <span>Trips</span>
-              </strong>
-              <div className="profile-hero-actions">
-                <button type="button" onClick={openEditProfile}>
-                  <Edit3 size={17} />
-                  Profilini Düzenle
-                </button>
-                <button type="button" aria-label="More profile actions">
-                  <MoreHorizontal size={20} />
-                </button>
-              </div>
+            <div className="profile-stats-row profile-stats-row--reference">
+              <article>
+                <span><Eye size={24} /></span>
+                <strong>{user?.analyses ?? 432}</strong>
+                <small>Toplam Gozlem</small>
+              </article>
+              <article>
+                <span><Image size={24} /></span>
+                <strong>{Math.max(profilePosts.length, 176)}</strong>
+                <small>Yuklenen Gorsel</small>
+              </article>
+              <article>
+                <span><Fish size={25} /></span>
+                <strong>{user?.catches ?? 179}</strong>
+                <small>Dogrulanan Tur</small>
+              </article>
+              <article>
+                <span><Trophy size={25} /></span>
+                <strong>24</strong>
+                <small>Rozet</small>
+              </article>
             </div>
 
+            <div className="profile-info-row profile-info-row--reference">
+              <article>
+                <span><CalendarDays size={23} /></span>
+                <div>
+                  <small>Uyelik Tarihi</small>
+                  <strong>12 Mar 2024</strong>
+                </div>
+              </article>
+              <article>
+                <span><Activity size={23} /></span>
+                <div>
+                  <small>Son Aktivite <i /></small>
+                  <strong>Cevrimici</strong>
+                </div>
+              </article>
+              <article>
+                <span><Tag size={23} /></span>
+                <div>
+                  <small>Kullanici Rolu</small>
+                  <strong>{user?.level ?? "Arastirmaci"}</strong>
+                </div>
+              </article>
+              <article>
+                <span><Mail size={23} /></span>
+                <div>
+                  <small>E-posta</small>
+                  <strong>{user?.email ?? "deniz.arslan@aqualens.com"}</strong>
+                </div>
+              </article>
+            </div>
           </section>
 
           <div className="profile-tabs-shell">
