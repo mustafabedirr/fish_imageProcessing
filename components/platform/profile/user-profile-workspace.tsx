@@ -379,7 +379,12 @@ export default function UserProfileWorkspace() {
               <button type="button" aria-label="More profile actions">
                 <MoreHorizontal size={21} />
               </button>
-              <button type="button" aria-label="Header alanini daralt" onClick={() => setIsProfileCollapsed((current) => !current)}>
+              <button
+                type="button"
+                aria-label={isProfileCollapsed ? "Header alanini genislet" : "Header alanini daralt"}
+                className={cn("profile-collapse-toggle", isProfileCollapsed && "profile-collapse-toggle--collapsed")}
+                onClick={() => setIsProfileCollapsed((current) => !current)}
+              >
                 <ChevronUp size={21} />
               </button>
             </div>
