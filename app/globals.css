@@ -37834,3 +37834,27 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     height: 21px;
   }
 }
+
+/* Compact profile hero typography. */
+.user-profile-content--reference .profile-copy h1 {
+  font-size: clamp(1.72rem, 2.05vw, 2.42rem);
+}
+
+.user-profile-content--reference .profile-stats-row.profile-stats-row--reference article {
+  grid-template-columns: 58px minmax(0, 1fr);
+  column-gap: 16px;
+}
+
+.user-profile-content--reference .profile-stats-row.profile-stats-row--reference article > span {
+  width: 46px;
+  height: 46px;
+}
+
+.user-profile-content--reference .profile-stats-row.profile-stats-row--reference article > span svg {
+  width: 22px;
+  height: 22px;
+}
+
+.user-profile-content--reference .profile-stats-row.profile-stats-row--reference strong {
+  font-size: clamp(1.22rem, 1.45vw, 1.62rem);
+}
