@@ -389,10 +389,10 @@ export default function UserProfileWorkspace() {
             </div>
             <div className="profile-identity">
               <button type="button" className="profile-avatar-wrap" aria-label="Profil fotografini degistir" onClick={openAvatarEditor}>
-                <AvatarProfilePhoto verified size="md" alt={profile.name} src={avatarSrc} />
+                <AvatarProfilePhoto size="md" alt={profile.name} src={avatarSrc} />
                 <span className="profile-avatar-edit">
                   <Camera size={15} />
-                  Degistir</span>
+                </span>
               </button>
               <div className="profile-copy">
                 <h1>
