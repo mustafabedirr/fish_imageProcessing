@@ -35418,3 +35418,251 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     height: 34px;
   }
 }
+/* Responsive stability for the settings workspace. */
+.settings-workspace {
+  width: 100%;
+  min-width: 0;
+  min-height: 100dvh;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable both-edges;
+}
+
+.settings-workspace .settings-header,
+.settings-workspace .settings-header-actions,
+.settings-workspace .settings-feedback,
+.settings-workspace .settings-stack,
+.settings-workspace .settings-card,
+.settings-workspace .settings-danger-zone {
+  min-width: 0;
+}
+
+.settings-workspace .settings-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: clamp(12px, 1.6vw, 22px);
+  flex-wrap: wrap;
+}
+
+.settings-workspace .settings-header > div:first-child {
+  min-width: min(100%, 260px);
+  flex: 1 1 320px;
+}
+
+.settings-workspace .settings-header-actions {
+  flex: 1 1 420px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: 0;
+}
+
+.settings-workspace .settings-search {
+  flex: 1 1 280px;
+  width: auto;
+  min-width: 0;
+  max-width: 560px;
+}
+
+.settings-workspace .settings-save-button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.settings-workspace .settings-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  align-items: end;
+  gap: 8px;
+  width: 100%;
+  overflow: visible;
+}
+
+.settings-workspace .settings-tabs .settings-tab-button {
+  min-width: 0;
+  width: 100%;
+  padding-inline: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-feedback {
+  flex-wrap: wrap;
+}
+
+.settings-feedback span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.settings-feedback strong {
+  margin-left: 0;
+  overflow-wrap: anywhere;
+}
+
+.settings-stack,
+.settings-stack[data-active-tab="Genel"] {
+  width: 100%;
+  max-width: none;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: none;
+  grid-auto-rows: auto;
+  align-items: start;
+  overflow: visible;
+}
+
+.settings-stack[data-active-tab="Genel"] .settings-card--sync,
+.settings-stack[data-active-tab="Genel"] .settings-card--backend {
+  grid-column: auto;
+  grid-row: auto;
+}
+
+.settings-stack[data-active-tab="Genel"] .settings-card--social,
+.settings-stack[data-active-tab="Sosyal"] .settings-card--social,
+.settings-stack[data-active-tab="Bildirimler"] .settings-card--social,
+.settings-stack[data-active-tab="Veri & Gizlilik"] .settings-card--social,
+.settings-stack[data-active-tab="Entegrasyonlar"] .settings-card--backend,
+.settings-stack[data-active-tab="Gorunum"] .settings-card--account,
+.settings-stack[data-active-tab="Guvenlik"] .settings-card--account {
+  grid-column: 1 / -1;
+  grid-row: auto;
+}
+
+.settings-workspace .settings-card {
+  height: auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.settings-workspace .settings-card-head,
+.settings-workspace .settings-preference-item,
+.settings-workspace .settings-sync-list article,
+.settings-workspace .settings-endpoint-row,
+.settings-workspace .settings-danger-zone {
+  min-width: 0;
+}
+
+.settings-workspace .settings-card-head > div,
+.settings-workspace .settings-preference-item > span:nth-child(2),
+.settings-workspace .settings-sync-list article > div,
+.settings-workspace .settings-endpoint-row > div,
+.settings-workspace .settings-danger-zone > div {
+  min-width: 0;
+}
+
+.settings-workspace .settings-card-head h2,
+.settings-workspace .settings-card-head p,
+.settings-workspace .settings-preference-item strong,
+.settings-workspace .settings-preference-item small,
+.settings-workspace .settings-sync-list strong,
+.settings-workspace .settings-sync-list small,
+.settings-workspace .settings-danger-zone h2,
+.settings-workspace .settings-danger-zone p {
+  overflow-wrap: anywhere;
+}
+
+.settings-workspace .settings-social-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.settings-workspace .settings-social-option,
+.settings-workspace .settings-segmented-control {
+  min-width: 0;
+}
+
+.settings-workspace .settings-segmented-control button {
+  min-width: 0;
+}
+
+@media (max-width: 1180px) {
+  .settings-workspace {
+    height: auto;
+    min-height: 100dvh;
+    overflow-y: auto;
+  }
+
+  .settings-workspace .settings-header,
+  .settings-workspace .settings-header-actions,
+  .settings-workspace .settings-danger-zone {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .settings-workspace .settings-header-actions,
+  .settings-workspace .settings-search,
+  .settings-workspace .settings-save-button {
+    width: 100%;
+    max-width: none;
+  }
+
+  .settings-stack,
+  .settings-stack[data-active-tab="Genel"] {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-workspace .settings-social-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .settings-workspace {
+    padding: 14px;
+  }
+
+  .settings-workspace .settings-header h1 {
+    font-size: 1.34rem;
+  }
+
+  .settings-workspace .settings-header p {
+    font-size: 0.8rem;
+  }
+
+  .settings-workspace .settings-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .settings-workspace .settings-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .settings-workspace .settings-tabs .settings-tab-button {
+    flex: 0 0 auto;
+    min-width: 118px;
+    width: auto;
+  }
+
+  .settings-workspace .settings-card {
+    padding: 14px;
+  }
+
+  .settings-workspace .settings-card-head {
+    align-items: flex-start;
+  }
+
+  .settings-workspace .settings-preference-item,
+  .settings-workspace .settings-sync-list article,
+  .settings-workspace .settings-endpoint-row {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  .settings-workspace .settings-preference-item input,
+  .settings-workspace .settings-preference-item i,
+  .settings-workspace .settings-sync-list article button,
+  .settings-workspace .settings-endpoint-row button {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    width: 100%;
+  }
+
+  .settings-workspace .settings-segmented-control {
+    grid-template-columns: 1fr;
+  }
+}

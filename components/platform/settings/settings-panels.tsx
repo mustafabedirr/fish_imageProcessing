@@ -19,8 +19,6 @@ import {
 } from "lucide-react";
 
 
-
-
 export type PlatformSettings = {
   addResultsToLibrary: boolean;
   densityAlerts: boolean;
