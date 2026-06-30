@@ -419,12 +419,12 @@ export default function UserProfileWorkspace() {
               </article>
               <article>
                 <span><Image size={24} /></span>
-                <strong>{Math.max(profilePosts.length, 176)}</strong>
+                <strong>{profilePosts.length || 176}</strong>
                 <small>Yuklenen Gorsel</small>
               </article>
               <article>
                 <span><Fish size={25} /></span>
-                <strong>{user?.catches ?? 179}</strong>
+                <strong>{user?.catches ?? 48}</strong>
                 <small>Dogrulanan Tur</small>
               </article>
               <article>

@@ -36490,3 +36490,123 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     border-right: 0 !important;
   }
 }
+
+/* Stabilize compact profile header proportions. */
+.user-profile-content--reference .profile-hero {
+  grid-template-rows: minmax(150px, 1fr) auto auto;
+  min-height: clamp(390px, 48vh, 470px);
+  padding: clamp(18px, 1.8vw, 28px) clamp(22px, 2.2vw, 36px) clamp(18px, 1.9vw, 26px);
+}
+
+.user-profile-content--reference .profile-cover span {
+  display: none !important;
+}
+
+.user-profile-content--reference .profile-hero-actions.profile-hero-actions--reference {
+  top: clamp(16px, 1.5vw, 24px);
+  right: clamp(18px, 1.8vw, 28px);
+  gap: 10px;
+}
+
+.user-profile-content--reference .profile-hero-actions.profile-hero-actions--reference button {
+  height: 48px;
+  border-radius: 10px;
+}
+
+.user-profile-content--reference .profile-hero-actions.profile-hero-actions--reference button:first-child {
+  min-width: 172px;
+  padding: 0 18px;
+  font-size: 0.96rem;
+}
+
+.user-profile-content--reference .profile-hero-actions.profile-hero-actions--reference button:not(:first-child) {
+  width: 48px;
+  min-width: 48px;
+}
+
+.user-profile-content--reference .profile-identity {
+  grid-template-columns: clamp(104px, 8.5vw, 132px) minmax(0, 1fr);
+  gap: clamp(18px, 1.8vw, 28px);
+  padding: 0 0 clamp(16px, 1.6vw, 22px);
+}
+
+.user-profile-content--reference .profile-avatar-wrap,
+.user-profile-content--reference .profile-avatar-wrap img {
+  width: clamp(104px, 8.5vw, 132px);
+  height: clamp(104px, 8.5vw, 132px);
+}
+
+.user-profile-content--reference .profile-copy h1 {
+  font-size: clamp(1.85rem, 2.2vw, 2.55rem);
+}
+
+.user-profile-content--reference .profile-copy p {
+  margin-top: 9px;
+  font-size: clamp(0.92rem, 0.98vw, 1.08rem);
+}
+
+.user-profile-content--reference .profile-role-line,
+.user-profile-content--reference .profile-meta-row small {
+  gap: 9px;
+  font-size: clamp(0.9rem, 0.96vw, 1.03rem);
+}
+
+.user-profile-content--reference .profile-meta-row {
+  margin-top: 10px;
+}
+
+.user-profile-content--reference .profile-stats-row.profile-stats-row--reference,
+.user-profile-content--reference .profile-info-row.profile-info-row--reference {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.user-profile-content--reference .profile-stats-row.profile-stats-row--reference {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 16px clamp(16px, 2vw, 28px);
+}
+
+.user-profile-content--reference .profile-stats-row.profile-stats-row--reference article,
+.user-profile-content--reference .profile-info-row.profile-info-row--reference article {
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 12px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.user-profile-content--reference .profile-stats-row.profile-stats-row--reference article > span,
+.user-profile-content--reference .profile-info-row.profile-info-row--reference article > span {
+  width: 46px;
+  height: 46px;
+}
+
+.user-profile-content--reference .profile-stats-row.profile-stats-row--reference strong {
+  font-size: clamp(1.32rem, 1.65vw, 1.78rem);
+}
+
+.user-profile-content--reference .profile-stats-row.profile-stats-row--reference small,
+.user-profile-content--reference .profile-info-row.profile-info-row--reference small {
+  margin-top: 5px;
+  font-size: clamp(0.78rem, 0.86vw, 0.92rem);
+  white-space: nowrap;
+}
+
+.user-profile-content--reference .profile-info-row.profile-info-row--reference {
+  margin-top: 16px;
+  padding: 15px clamp(16px, 2vw, 28px);
+}
+
+.user-profile-content--reference .profile-info-row.profile-info-row--reference strong {
+  margin-top: 5px;
+  font-size: clamp(0.83rem, 0.92vw, 0.98rem);
+}
+
+@media (max-width: 1180px) {
+  .user-profile-content--reference .profile-hero {
+    grid-template-rows: auto auto auto auto;
+  }
+
+  .user-profile-content--reference .profile-identity {
+    padding-top: 58px;
+  }
+}
