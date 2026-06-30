@@ -5,7 +5,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useInView } from "framer-motion";
 import {
   Activity,
-  Briefcase,
   CalendarDays,
   Camera,
   Check,
@@ -14,7 +13,6 @@ import {
   Edit3,
   Fish,
   ExternalLink,
-  Eye,
   Globe2,
   Heart,
   Image,
@@ -30,7 +28,9 @@ import {
   ShieldCheck,
   Star,
   Trophy,
+  Tag,
   UserRound,
+  UsersRound,
   UploadCloud,
   Video,
   Waves,
@@ -404,7 +404,7 @@ export default function UserProfileWorkspace() {
                   </span>
                 </h1>
                 <p>{profile.handle}</p>
-                <span className="profile-role-line"><Briefcase size={17} /> Deniz Biyologu <b /> Arastirmaci</span>
+                <span className="profile-bio-line">AquaScope demo profili.</span>
                 <div className="profile-meta-row">
                   <small>
                     <MapPin size={16} />
@@ -415,73 +415,62 @@ export default function UserProfileWorkspace() {
             </div>
             <div className="profile-stats-row profile-stats-row--reference">
               <article>
-                <span><Eye size={24} /></span>
-                <strong>{user?.analyses ?? 432}</strong>
-                <small>Toplam Gozlem</small>
+                <span><UsersRound size={24} /></span>
+                <strong>{user?.analyses ?? 452}</strong>
+                <small>Followers</small>
               </article>
               <article>
-                <span><Image size={24} /></span>
-                <strong>{profilePosts.length || 176}</strong>
-                <small>Yuklenen Gorsel</small>
+                <span><UserRound size={24} /></span>
+                <strong>{Math.max(profilePosts.length || 178, 178)}</strong>
+                <small>Following</small>
               </article>
               <article>
                 <span><Fish size={25} /></span>
-                <strong>{user?.catches ?? 48}</strong>
-                <small>Dogrulanan Tur</small>
+                <strong>{user?.catches ?? 178}</strong>
+                <small>Catches</small>
               </article>
               <article>
-                <span><Trophy size={25} /></span>
+                <span><MapPin size={25} /></span>
                 <strong>24</strong>
-                <small>Rozet</small>
+                <small>Trips</small>
               </article>
             </div>
-
-            <div className="profile-detail-grid profile-detail-grid--reference">
-              <div className="profile-info-row profile-info-row--reference">
-                <article>
-                  <span><CalendarDays size={23} /></span>
-                  <div>
-                    <small>Uyelik Tarihi</small>
-                    <strong>12 Mar 2024</strong>
-                  </div>
-                </article>
-                <article>
-                  <span><Activity size={23} /></span>
-                  <div>
-                    <small>Son Aktivite <i /></small>
-                    <strong>Cevrimici</strong>
-                  </div>
-                </article>
-                <article>
-                  <span><Mail size={23} /></span>
-                  <div>
-                    <small>E-posta</small>
-                    <strong>{user?.email ?? "deniz.arslan@aqualens.com"}</strong>
-                  </div>
-                </article>
-                <article>
-                  <span><Globe2 size={23} /></span>
-                  <div>
-                    <small>Website</small>
-                    <strong>aqualens.com/denizde <ExternalLink size={14} /></strong>
-                  </div>
-                </article>
-              </div>
-
-              <aside className="profile-about-summary profile-about-summary--reference">
-                <header>
-                  <UserRound size={23} />
-                  <h2>Hakkimda</h2>
-                </header>
-                <p>
-                  Denizel biyocesitlilik ve su alti ekosistemleri uzerine calisan bir arastirmaciyim. Tur teshisi,
-                  fotograf analizi ve veri toplama konularinda aktif olarak calisiyorum.
-                </p>
-                <div className="profile-about-tags" aria-label="Uzmanlik alanlari">
-                  <span><Waves size={15} /> Deniz Biyolojisi</span>
-                  <span><Camera size={15} /> Sualti Fotografciligi</span>
+            <div className="profile-info-row profile-info-row--reference profile-info-row--simple">
+              <article>
+                <span><CalendarDays size={23} /></span>
+                <div>
+                  <small>Uyelik Tarihi</small>
+                  <strong>12 Mar 2024</strong>
                 </div>
-              </aside>
+              </article>
+              <article>
+                <span><Activity size={23} /></span>
+                <div>
+                  <small>Son Aktivite <i /></small>
+                  <strong>Cevrimici</strong>
+                </div>
+              </article>
+              <article>
+                <span><Tag size={23} /></span>
+                <div>
+                  <small>Kullanici Rolu</small>
+                  <strong>{user?.level ?? "Arastirmaci"}</strong>
+                </div>
+              </article>
+              <article>
+                <span><Mail size={23} /></span>
+                <div>
+                  <small>E-posta</small>
+                  <strong>{user?.email ?? "deniz.arslan@aqualens.com"}</strong>
+                </div>
+              </article>
+              <article>
+                <span><Globe2 size={23} /></span>
+                <div>
+                  <small>Website</small>
+                  <strong>aqualens.com/denizde <ExternalLink size={14} /></strong>
+                </div>
+              </article>
             </div>
           </section>
 
