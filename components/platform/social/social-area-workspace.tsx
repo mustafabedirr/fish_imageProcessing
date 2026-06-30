@@ -666,6 +666,24 @@ const feedTabLabels: Record<FeedTab, string> = {
 };
 type SocialModal = "create" | "media" | "video" | "location" | "poll" | "achievement" | "notifications" | "comments" | "share" | "friends" | "topics" | "members" | "events" | null;
 
+type SocialRuntimeSettings = {
+  socialAllowComments: boolean;
+  socialStoryReplies: boolean;
+  socialDirectMessages: "everyone" | "followers" | "none";
+  socialShareActivity: boolean;
+  socialShowOnlineStatus: boolean;
+  socialContentLanguage: "tr" | "en" | "both";
+};
+
+const defaultSocialRuntimeSettings: SocialRuntimeSettings = {
+  socialAllowComments: true,
+  socialStoryReplies: true,
+  socialDirectMessages: "everyone",
+  socialShareActivity: true,
+  socialShowOnlineStatus: true,
+  socialContentLanguage: "tr",
+};
+
 const modalCopy: Record<Exclude<SocialModal, null>, { title: string; eyebrow: string; description: string }> = {
   create: {
     eyebrow: "Yeni Paylaşım",
@@ -774,6 +792,9 @@ export default function SocialAreaWorkspace() {
   );
   const storyRailRef = useRef<HTMLElement | null>(null);
   const storyInputRef = useRef<HTMLInputElement | null>(null);
+  const [socialSettings, setSocialSettings] = useState<SocialRuntimeSettings>(defaultSocialRuntimeSettings);
+  const commentsEnabled = socialSettings.socialAllowComments;
+  const storyRepliesEnabled = socialSettings.socialStoryReplies;
   useEffect(() => {
     if (!profileMenuOpen) return undefined;
 
@@ -796,6 +817,23 @@ export default function SocialAreaWorkspace() {
     document.addEventListener("pointerdown", handlePointerDown);
     return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, [openPostMenuId]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    fetch(`/api/users/${user.id}/settings`, { cache: "no-store" })
+      .then(async (response) => {
+        const data = await response.json().catch(() => null);
+        if (!response.ok) throw new Error("settings_load_failed");
+        if (!cancelled) setSocialSettings({ ...defaultSocialRuntimeSettings, ...data?.settings });
+      })
+      .catch(() => {
+        if (!cancelled) setNotice("Sosyal ayarlar yuklenemedi, varsayilan davranis kullaniliyor.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   useEffect(() => {
     fetch("/api/users")
@@ -1326,7 +1364,7 @@ export default function SocialAreaWorkspace() {
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
-                    openModal("comments", post.id);
+                    commentsEnabled ? openModal("comments", post.id) : setNotice("Yorumlar sosyal ayarlarinizda kapali.");
                   }
                 }}
               >
@@ -1471,7 +1509,7 @@ export default function SocialAreaWorkspace() {
                     type="button"
                     onClick={(event) => {
                       event.stopPropagation();
-                      openModal("comments", post.id);
+                      commentsEnabled ? openModal("comments", post.id) : setNotice("Yorumlar sosyal ayarlarinizda kapali.");
                     }}
                   >
                     <MessageCircle size={18} />
@@ -1664,6 +1702,8 @@ export default function SocialAreaWorkspace() {
             onNext={goToNextStory}
             onPrevious={goToPreviousStory}
             onSelect={setActiveStoryIndex}
+            repliesEnabled={storyRepliesEnabled}
+            onNotice={setNotice}
           />
         </SocialModalPortal>
       ) : null}
@@ -1692,6 +1732,7 @@ export default function SocialAreaWorkspace() {
               togglePostLike(targetPostId);
             }}
             onToggleFollow={() => toggleAuthorFollow((visiblePosts.find((post) => post.id === activeFlowPostId) ?? visiblePosts[0] ?? posts[0] ?? feedPosts[0]).profile?.userId)}
+            commentsEnabled={commentsEnabled}
             onSubmitComment={(comment) => {
               const targetPostId = activeFlowPostId ?? visiblePosts[0]?.id ?? posts[0]?.id;
               if (!targetPostId) return;
@@ -1881,6 +1922,8 @@ function StoryViewer({
   onNext,
   onPrevious,
   onSelect,
+  repliesEnabled,
+  onNotice,
 }: {
   activeIndex: number;
   stories: StoryItem[];
@@ -1888,6 +1931,8 @@ function StoryViewer({
   onNext: () => void;
   onPrevious: () => void;
   onSelect: (index: number) => void;
+  repliesEnabled: boolean;
+  onNotice: (message: string) => void;
 }) {
   const activeStory = stories[activeIndex];
   const activeStoryOwnerKey = activeStory.ownStory ? "__own_story__" : activeStory.handle;
@@ -1980,12 +2025,22 @@ function StoryViewer({
       return { ...current, liked, likes: Math.max(0, current.likes + (liked ? 1 : -1)) };
     });
   };
-  const focusStoryReply = () => replyInputRef.current?.focus();
+  const focusStoryReply = () => {
+    if (!repliesEnabled) {
+      onNotice("Story yanitlari sosyal ayarlarinizda kapali.");
+      return;
+    }
+    replyInputRef.current?.focus();
+  };
   const toggleStoryShare = () => {
     updateStoryActions((current) => ({ ...current, shared: !current.shared, shares: current.shared ? Math.max(0, current.shares - 1) : current.shares + 1 }));
   };
   const toggleStorySave = () => updateStoryActions((current) => ({ ...current, saved: !current.saved }));
   const submitStoryReply = () => {
+    if (!repliesEnabled) {
+      onNotice("Story yanitlari sosyal ayarlarinizda kapali.");
+      return;
+    }
     if (!storyReply.trim()) {
       focusStoryReply();
       return;
@@ -2080,7 +2135,7 @@ function StoryViewer({
           </div>
 
           <label className="social-story-reply" onPointerDown={(event) => event.stopPropagation()}>
-            <input ref={replyInputRef} type="text" placeholder="Reply..." value={storyReply} onChange={(event) => setStoryReply(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") submitStoryReply(); }} />
+            <input ref={replyInputRef} type="text" placeholder={repliesEnabled ? "Reply..." : "Story replies disabled"} value={storyReply} disabled={!repliesEnabled} onChange={(event) => setStoryReply(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") submitStoryReply(); }} />
             <button type="button" aria-label="Send reply" onClick={submitStoryReply}>
               <Send size={20} />
             </button>
@@ -2111,6 +2166,7 @@ function PostInteractionModal({
   isFollowing,
   currentUserName,
   currentUserAvatar,
+  commentsEnabled,
   onClose,
   onToggleBookmark,
   onToggleLike,
@@ -2126,6 +2182,7 @@ function PostInteractionModal({
   isFollowing: boolean;
   currentUserName: string;
   currentUserAvatar: string;
+  commentsEnabled: boolean;
   onClose: () => void;
   onToggleBookmark: () => void;
   onToggleLike: () => void;
@@ -2138,6 +2195,7 @@ function PostInteractionModal({
   const location = post.location ?? "Lake Washington";
 
   const handleSubmit = () => {
+    if (!commentsEnabled) return;
     if (!comment.trim()) return;
     onSubmitComment(comment.trim());
     setComment("");
@@ -2296,7 +2354,8 @@ function PostInteractionModal({
               <input
                 type="text"
                 value={comment}
-                placeholder="Write a comment..."
+                placeholder={commentsEnabled ? "Write a comment..." : "Comments disabled in settings"}
+                disabled={!commentsEnabled}
                 onChange={(event) => setComment(event.target.value)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter") handleSubmit();
@@ -2308,7 +2367,7 @@ function PostInteractionModal({
               <button type="button" aria-label="Attach image">
                 <ImageIcon size={17} />
               </button>
-              <button type="button" aria-label="Send comment" onClick={handleSubmit}>
+              <button type="button" aria-label="Send comment" disabled={!commentsEnabled} onClick={handleSubmit}>
                 <Send size={17} />
               </button>
             </label>

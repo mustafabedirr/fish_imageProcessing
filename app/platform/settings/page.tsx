@@ -134,7 +134,7 @@ export default function SettingsPage() {
         tabs={tabs.map((tab) => ({ title: tab, value: tab }))}
       />
       <div key={activeTab} className="settings-stack" data-active-tab={activeTab}>
-        {isGeneral || activeTab === "Gorunum" ? <AccountSettings activeTab={activeTab} /> : null}
+        {isGeneral || activeTab === "Gorunum" ? <AccountSettings activeTab={activeTab} setNotice={showNotice} /> : null}
         {isGeneral || activeTab === "Bildirimler" || activeTab === "Sosyal" || activeTab === "Veri & Gizlilik" ? (
           <SettingsPanels activeTab={activeTab} settings={settings} onSettingChange={updateSetting} setNotice={showNotice} />
         ) : null}

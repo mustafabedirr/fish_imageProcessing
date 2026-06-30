@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { updateProfile } from "../../../../../lib/server/aquascope-db";
 
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
@@ -15,7 +15,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       coverUrl: body?.coverUrl ? String(body.coverUrl) : undefined,
       interests: Array.isArray(body?.interests) ? body.interests.map(String) : undefined,
       experience: body?.experience ? String(body.experience) : undefined,
-      visibility: body?.visibility === "followers" || body?.visibility === "private" ? body.visibility : "public",
+      visibility: body?.visibility === "public" || body?.visibility === "followers" || body?.visibility === "private" ? body.visibility : undefined,
       onboardingCompleted: typeof body?.onboardingCompleted === "boolean" ? body.onboardingCompleted : undefined,
       catches: typeof body?.catches === "number" ? body.catches : undefined,
       analyses: typeof body?.analyses === "number" ? body.analyses : undefined,

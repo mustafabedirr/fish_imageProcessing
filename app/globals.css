@@ -36141,3 +36141,19 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     transform: translateX(42px);
   }
 }
+/* Align account and preferences cards in the general settings grid. */
+.settings-stack[data-active-tab="Genel"] {
+  align-items: stretch;
+}
+
+.settings-stack[data-active-tab="Genel"] .settings-card--account,
+.settings-stack[data-active-tab="Genel"] .settings-card--preferences {
+  height: 100%;
+}
+
+@media (max-width: 1180px) {
+  .settings-stack[data-active-tab="Genel"] .settings-card--account,
+  .settings-stack[data-active-tab="Genel"] .settings-card--preferences {
+    height: auto;
+  }
+}
