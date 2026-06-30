@@ -38463,3 +38463,38 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     min-height: var(--profile-collapsed-height);
   }
 }
+
+/* Hard-center collapsed avatar on the hero vertical axis. */
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-identity {
+  position: relative;
+  display: block;
+  height: var(--profile-collapsed-height);
+  min-height: var(--profile-collapsed-height);
+  padding-left: 70px;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-avatar-wrap {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: block;
+  margin: 0;
+  transform: translateY(-50%);
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-avatar-wrap .avatar-profile-photo,
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-avatar-wrap .avatar-profile-photo img {
+  display: block;
+  transform: none;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-copy {
+  height: var(--profile-collapsed-height);
+  justify-content: center;
+}
+
+@media (max-width: 760px) {
+  .user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-identity {
+    padding-left: 58px;
+  }
+}
