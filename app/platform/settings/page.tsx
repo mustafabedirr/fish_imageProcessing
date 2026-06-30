@@ -6,7 +6,7 @@ import BackendStatus from "../../../components/platform/settings/backend-status"
 import SettingsPanels, { defaultPlatformSettings, type PlatformSettings } from "../../../components/platform/settings/settings-panels";
 import AnimatedTabBar from "../../../components/ui/animated-tab-bar";
 import { useCurrentUser } from "../../../hooks/use-current-user";
-import { Check, Loader2, Search, Trash2 } from "lucide-react";
+import { AlertCircle, Check, Info, Loader2, Search, Trash2 } from "lucide-react";
 
 const tabs = ["Genel", "Bildirimler", "Sosyal", "Gorunum", "Guvenlik", "Entegrasyonlar", "Veri & Gizlilik"] as const;
 type SettingsTab = (typeof tabs)[number];
@@ -20,6 +20,8 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingSettings, setIsLoadingSettings] = useState(false);
   const isGeneral = activeTab === "Genel";
+  const noticeStatus = notice.includes("kaydedildi") || notice.includes("yuklendi") ? "success" : notice.includes("kaydedilemedi") || notice.includes("bulunamadi") || notice.includes("yuklenemedi") ? "error" : notice.includes("onayi") ? "warning" : "info";
+  const NoticeIcon = isLoadingSettings ? Loader2 : noticeStatus === "success" ? Check : noticeStatus === "error" ? AlertCircle : Info;
 
   useEffect(() => {
     if (!user?.id) return;
@@ -110,10 +112,15 @@ export default function SettingsPage() {
         tabs={tabs.map((tab) => ({ title: tab, value: tab }))}
       />
 
-      <div className="settings-feedback" role="status">
-        {isLoadingSettings ? <Loader2 size={16} className="settings-spin" /> : <Check size={16} />}
-        <span>{notice}</span>
-        {searchQuery ? <strong>Arama: {searchQuery}</strong> : null}
+      <div className="settings-alert" data-status={isLoadingSettings ? "info" : noticeStatus} role="status">
+        <span className="settings-alert-indicator">
+          <NoticeIcon size={18} className={isLoadingSettings ? "settings-spin" : undefined} />
+        </span>
+        <div className="settings-alert-content">
+          <strong>{noticeStatus === "success" ? "Islem Basarili" : noticeStatus === "error" ? "Dikkat Gerekiyor" : noticeStatus === "warning" ? "Onay Bekleniyor" : "Bilgilendirme"}</strong>
+          <p>{notice}</p>
+        </div>
+        {searchQuery ? <span className="settings-alert-meta">Arama: {searchQuery}</span> : null}
       </div>
 
       <div className="settings-stack" data-active-tab={activeTab}>
