@@ -13,7 +13,9 @@ import {
   Compass,
   Edit3,
   Fish,
+  ExternalLink,
   Eye,
+  Globe2,
   Heart,
   Image,
   Images,
@@ -26,9 +28,11 @@ import {
   Save,
   Share2,
   ShieldCheck,
+  Sparkles,
   Star,
   Tag,
   Trophy,
+  UserRound,
   UploadCloud,
   Video,
   Waves,
@@ -434,35 +438,61 @@ export default function UserProfileWorkspace() {
               </article>
             </div>
 
-            <div className="profile-info-row profile-info-row--reference">
-              <article>
-                <span><CalendarDays size={23} /></span>
-                <div>
-                  <small>Uyelik Tarihi</small>
-                  <strong>12 Mar 2024</strong>
+            <div className="profile-detail-grid profile-detail-grid--reference">
+              <div className="profile-info-row profile-info-row--reference">
+                <article>
+                  <span><CalendarDays size={23} /></span>
+                  <div>
+                    <small>Uyelik Tarihi</small>
+                    <strong>12 Mar 2024</strong>
+                  </div>
+                </article>
+                <article>
+                  <span><Activity size={23} /></span>
+                  <div>
+                    <small>Son Aktivite <i /></small>
+                    <strong>Cevrimici</strong>
+                  </div>
+                </article>
+                <article>
+                  <span><Tag size={23} /></span>
+                  <div>
+                    <small>Kullanici Rolu</small>
+                    <strong>{user?.level ?? "Arastirmaci"}</strong>
+                  </div>
+                </article>
+                <article>
+                  <span><Mail size={23} /></span>
+                  <div>
+                    <small>E-posta</small>
+                    <strong>{user?.email ?? "deniz.arslan@aqualens.com"}</strong>
+                  </div>
+                </article>
+                <article>
+                  <span><Globe2 size={23} /></span>
+                  <div>
+                    <small>Website</small>
+                    <strong>aqualens.com/denizde <ExternalLink size={14} /></strong>
+                  </div>
+                </article>
+              </div>
+
+              <aside className="profile-about-summary profile-about-summary--reference">
+                <header>
+                  <UserRound size={23} />
+                  <h2>Hakkimda</h2>
+                </header>
+                <p>
+                  Denizel biyocesitlilik ve su alti ekosistemleri uzerine calisan bir arastirmaciyim. Tur teshisi,
+                  fotograf analizi ve veri toplama konularinda aktif olarak calisiyorum.
+                </p>
+                <div className="profile-about-tags" aria-label="Uzmanlik alanlari">
+                  <span><Waves size={15} /> Deniz Biyolojisi</span>
+                  <span><Sparkles size={15} /> Tur Tanimlama</span>
+                  <span><Camera size={15} /> Sualti Fotografciligi</span>
+                  <span><Activity size={15} /> Veri Analizi</span>
                 </div>
-              </article>
-              <article>
-                <span><Activity size={23} /></span>
-                <div>
-                  <small>Son Aktivite <i /></small>
-                  <strong>Cevrimici</strong>
-                </div>
-              </article>
-              <article>
-                <span><Tag size={23} /></span>
-                <div>
-                  <small>Kullanici Rolu</small>
-                  <strong>{user?.level ?? "Arastirmaci"}</strong>
-                </div>
-              </article>
-              <article>
-                <span><Mail size={23} /></span>
-                <div>
-                  <small>E-posta</small>
-                  <strong>{user?.email ?? "deniz.arslan@aqualens.com"}</strong>
-                </div>
-              </article>
+              </aside>
             </div>
           </section>
 
