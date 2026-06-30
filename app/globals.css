@@ -37858,3 +37858,29 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 .user-profile-content--reference .profile-stats-row.profile-stats-row--reference strong {
   font-size: clamp(1.22rem, 1.45vw, 1.62rem);
 }
+
+/* Align and soften profile hero metric text. */
+.user-profile-content--reference .profile-copy h1 {
+  font-weight: 720;
+}
+
+.user-profile-content--reference .profile-stats-row.profile-stats-row--reference article {
+  align-items: center;
+}
+
+.user-profile-content--reference .profile-stats-row.profile-stats-row--reference strong,
+.user-profile-content--reference .profile-stats-row.profile-stats-row--reference small {
+  justify-self: start;
+  width: 100%;
+  text-align: left;
+}
+
+.user-profile-content--reference .profile-stats-row.profile-stats-row--reference strong {
+  align-self: end;
+  font-weight: 640;
+}
+
+.user-profile-content--reference .profile-stats-row.profile-stats-row--reference small {
+  align-self: start;
+  padding-left: 0;
+}
