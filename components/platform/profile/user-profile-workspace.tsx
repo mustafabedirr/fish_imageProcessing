@@ -28,7 +28,6 @@ import {
   Save,
   Share2,
   ShieldCheck,
-  Sparkles,
   Star,
   Tag,
   Trophy,
@@ -488,9 +487,7 @@ export default function UserProfileWorkspace() {
                 </p>
                 <div className="profile-about-tags" aria-label="Uzmanlik alanlari">
                   <span><Waves size={15} /> Deniz Biyolojisi</span>
-                  <span><Sparkles size={15} /> Tur Tanimlama</span>
                   <span><Camera size={15} /> Sualti Fotografciligi</span>
-                  <span><Activity size={15} /> Veri Analizi</span>
                 </div>
               </aside>
             </div>
