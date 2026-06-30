@@ -38439,3 +38439,27 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     height: 48px;
   }
 }
+
+/* Center collapsed profile avatar inside the hero bar. */
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-identity {
+  height: 100%;
+  min-height: var(--profile-collapsed-height);
+  align-content: center;
+  align-items: center;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-avatar-wrap {
+  align-self: center;
+  margin-block: auto;
+  top: auto;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-avatar-wrap .avatar-profile-photo {
+  align-self: center;
+}
+
+@media (max-width: 760px) {
+  .user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-identity {
+    min-height: var(--profile-collapsed-height);
+  }
+}
