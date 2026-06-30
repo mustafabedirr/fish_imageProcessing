@@ -8,7 +8,7 @@ import AnimatedTabBar from "../../../components/ui/animated-tab-bar";
 import { useCurrentUser } from "../../../hooks/use-current-user";
 import { AlertCircle, Check, Info, Loader2, Search, Trash2 } from "lucide-react";
 
-const tabs = ["Genel", "Bildirimler", "Sosyal", "Gorunum", "Entegrasyonlar", "Veri & Gizlilik"] as const;
+const tabs = ["Genel", "Bildirimler", "Sosyal", "Entegrasyonlar", "Veri & Gizlilik"] as const;
 type SettingsTab = (typeof tabs)[number];
 type NoticeStatus = "success" | "warning" | "error" | "info";
 type SettingsToast = {
@@ -134,7 +134,7 @@ export default function SettingsPage() {
         tabs={tabs.map((tab) => ({ title: tab, value: tab }))}
       />
       <div key={activeTab} className="settings-stack" data-active-tab={activeTab}>
-        {isGeneral || activeTab === "Gorunum" ? <AccountSettings activeTab={activeTab} setNotice={showNotice} /> : null}
+        {isGeneral ? <AccountSettings activeTab={activeTab} setNotice={showNotice} /> : null}
         {isGeneral || activeTab === "Bildirimler" || activeTab === "Sosyal" || activeTab === "Veri & Gizlilik" ? (
           <SettingsPanels activeTab={activeTab} settings={settings} onSettingChange={updateSetting} setNotice={showNotice} />
         ) : null}

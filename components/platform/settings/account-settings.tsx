@@ -118,7 +118,7 @@ export default function AccountSettings({ activeTab, setNotice }: AccountSetting
             hidden
             onChange={(event) => handleAvatarUpload(event.target.files?.[0] ?? null)}
           />
-          <small>{activeTab === "Gorunum" ? "Profil gorseli gorunum ayarlarinda da kullanilir." : "JPG, PNG veya WEBP yukleyin."}</small>
+          <small>JPG, PNG veya WEBP yukleyin.</small>
         </div>
 
         <div className="settings-form-grid">

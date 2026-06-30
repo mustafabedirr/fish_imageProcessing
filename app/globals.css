@@ -27101,8 +27101,7 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 
 .settings-stack[data-active-tab="Entegrasyonlar"] .settings-card--backend,
 .settings-stack[data-active-tab="Veri & Gizlilik"] .settings-card--sync,
-.settings-stack[data-active-tab="Bildirimler"] .settings-card--preferences,
-.settings-stack[data-active-tab="Gorunum"] .settings-card--account {
+.settings-stack[data-active-tab="Bildirimler"] .settings-card--preferences {
   grid-column: 1 / -1;
 }
 
@@ -27281,13 +27280,7 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.settings-stack[data-active-tab="Gorunum"] .settings-form-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
 
-.settings-stack[data-active-tab="Gorunum"] .settings-field--wide {
-  grid-column: auto;
-}
 
 @media (max-width: 1180px) {
   .settings-stack,
@@ -27306,8 +27299,7 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
   .settings-stack[data-active-tab="Genel"] .settings-card--backend,
   .settings-stack[data-active-tab="Entegrasyonlar"] .settings-card--backend,
   .settings-stack[data-active-tab="Veri & Gizlilik"] .settings-card--sync,
-  .settings-stack[data-active-tab="Bildirimler"] .settings-card--preferences,
-  .settings-stack[data-active-tab="Gorunum"] .settings-card--account {
+  .settings-stack[data-active-tab="Bildirimler"] .settings-card--preferences {
     grid-column: 1;
     grid-row: auto;
   }
@@ -32945,8 +32937,7 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
   .settings-stack[data-active-tab="Genel"] .settings-card--backend,
   .settings-stack[data-active-tab="Entegrasyonlar"] .settings-card--backend,
   .settings-stack[data-active-tab="Veri & Gizlilik"] .settings-card--sync,
-  .settings-stack[data-active-tab="Bildirimler"] .settings-card--preferences,
-  .settings-stack[data-active-tab="Gorunum"] .settings-card--account {
+  .settings-stack[data-active-tab="Bildirimler"] .settings-card--preferences {
     grid-column: 1;
     grid-row: auto;
   }
@@ -35519,8 +35510,7 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 .settings-stack[data-active-tab="Sosyal"] .settings-card--social,
 .settings-stack[data-active-tab="Bildirimler"] .settings-card--social,
 .settings-stack[data-active-tab="Veri & Gizlilik"] .settings-card--social,
-.settings-stack[data-active-tab="Entegrasyonlar"] .settings-card--backend,
-.settings-stack[data-active-tab="Gorunum"] .settings-card--account {
+.settings-stack[data-active-tab="Entegrasyonlar"] .settings-card--backend {
   grid-column: 1 / -1;
   grid-row: auto;
 }
@@ -36155,5 +36145,15 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
   .settings-stack[data-active-tab="Genel"] .settings-card--account,
   .settings-stack[data-active-tab="Genel"] .settings-card--preferences {
     height: auto;
+  }
+}
+/* Settings tabs typography. */
+.settings-workspace .settings-tabs .settings-tab-button {
+  font-size: 0.98rem;
+}
+
+@media (max-width: 640px) {
+  .settings-workspace .settings-tabs .settings-tab-button {
+    font-size: 0.92rem;
   }
 }
