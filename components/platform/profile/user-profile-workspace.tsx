@@ -29,7 +29,6 @@ import {
   Share2,
   ShieldCheck,
   Star,
-  Tag,
   Trophy,
   UserRound,
   UploadCloud,
@@ -451,13 +450,6 @@ export default function UserProfileWorkspace() {
                   <div>
                     <small>Son Aktivite <i /></small>
                     <strong>Cevrimici</strong>
-                  </div>
-                </article>
-                <article>
-                  <span><Tag size={23} /></span>
-                  <div>
-                    <small>Kullanici Rolu</small>
-                    <strong>{user?.level ?? "Arastirmaci"}</strong>
                   </div>
                 </article>
                 <article>
