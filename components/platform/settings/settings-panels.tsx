@@ -164,9 +164,9 @@ function SegmentedControl<K extends SettingsKey>({
 export default function SettingsPanels({ activeTab, settings, onSettingChange, setNotice }: SettingsPanelsProps) {
   const [cacheCleared, setCacheCleared] = useState(false);
   const [backupReady, setBackupReady] = useState(false);
-  const showPreferences = activeTab !== "Veri & Gizlilik" && activeTab !== "Sosyal";
-  const showSync = activeTab !== "Bildirimler" && activeTab !== "Sosyal";
-  const showSocial = activeTab === "Genel" || activeTab === "Sosyal" || activeTab === "Bildirimler" || activeTab === "Veri & Gizlilik";
+  const showPreferences = activeTab === "Genel" || activeTab === "Bildirimler";
+  const showSync = activeTab === "Genel" || activeTab === "Veri & Gizlilik";
+  const showSocial = activeTab === "Sosyal";
 
   const updateBoolean = (key: BooleanSettingsKey, checked: boolean, title: string) => {
     onSettingChange(key, checked as PlatformSettings[typeof key]);
