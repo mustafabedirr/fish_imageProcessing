@@ -10,19 +10,33 @@ import { AlertCircle, Check, Info, Loader2, Search, Trash2 } from "lucide-react"
 
 const tabs = ["Genel", "Bildirimler", "Sosyal", "Gorunum", "Guvenlik", "Entegrasyonlar", "Veri & Gizlilik"] as const;
 type SettingsTab = (typeof tabs)[number];
+type NoticeStatus = "success" | "warning" | "error" | "info";
+type SettingsToast = {
+  id: number;
+  message: string;
+  status: NoticeStatus;
+};
+
+function getNoticeStatus(message: string): NoticeStatus {
+  if (message.includes("kaydedildi") || message.includes("yuklendi") || message.includes("guncellendi") || message.includes("hazirlandi") || message.includes("temizlendi")) return "success";
+  if (message.includes("kaydedilemedi") || message.includes("bulunamadi") || message.includes("yuklenemedi") || message.includes("vermedi")) return "error";
+  if (message.includes("onayi")) return "warning";
+  return "info";
+}
 
 export default function SettingsPage() {
   const { user } = useCurrentUser();
   const [activeTab, setActiveTab] = useState<SettingsTab>("Genel");
   const [searchQuery, setSearchQuery] = useState("");
-  const [notice, setNotice] = useState("Ayarlariniz guncellenmeye hazir.");
+  const [toast, setToast] = useState<SettingsToast | null>(null);
   const [settings, setSettings] = useState<PlatformSettings>(defaultPlatformSettings);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingSettings, setIsLoadingSettings] = useState(false);
   const isGeneral = activeTab === "Genel";
-  const noticeStatus = notice.includes("kaydedildi") || notice.includes("yuklendi") ? "success" : notice.includes("kaydedilemedi") || notice.includes("bulunamadi") || notice.includes("yuklenemedi") ? "error" : notice.includes("onayi") ? "warning" : "info";
-  const NoticeIcon = isLoadingSettings ? Loader2 : noticeStatus === "success" ? Check : noticeStatus === "error" ? AlertCircle : Info;
-
+  const ToastIcon = toast?.status === "success" ? Check : toast?.status === "error" ? AlertCircle : Info;
+  const showNotice = (message: string) => {
+    setToast({ id: Date.now(), message, status: getNoticeStatus(message) });
+  };
   useEffect(() => {
     if (!user?.id) return;
     let isMounted = true;
@@ -35,11 +49,11 @@ export default function SettingsPage() {
       .then((payload) => {
         if (!isMounted) return;
         setSettings({ ...defaultPlatformSettings, ...payload.settings });
-        setNotice("Ayarlariniz yuklendi.");
+
       })
       .catch(() => {
         if (!isMounted) return;
-        setNotice("Ayarlar yuklenemedi, varsayilan degerler kullaniliyor.");
+        showNotice("Ayarlar yuklenemedi, varsayilan degerler kullaniliyor.");
       })
       .finally(() => {
         if (isMounted) setIsLoadingSettings(false);
@@ -49,13 +63,21 @@ export default function SettingsPage() {
     };
   }, [user?.id]);
 
+  useEffect(() => {
+    if (!toast) return;
+    const timeout = window.setTimeout(() => {
+      setToast((current) => (current?.id === toast.id ? null : current));
+    }, 3000);
+    return () => window.clearTimeout(timeout);
+  }, [toast]);
+
   const updateSetting = <K extends keyof PlatformSettings>(key: K, value: PlatformSettings[K]) => {
     setSettings((current) => ({ ...current, [key]: value }));
   };
 
   const saveSettings = async () => {
     if (!user?.id) {
-      setNotice("Ayar kaydi icin oturum bilgisi bulunamadi.");
+      showNotice("Ayar kaydi icin oturum bilgisi bulunamadi.");
       return;
     }
     setIsSaving(true);
@@ -68,9 +90,9 @@ export default function SettingsPage() {
       if (!response.ok) throw new Error("settings_save_failed");
       const payload = await response.json();
       setSettings({ ...defaultPlatformSettings, ...payload.settings });
-      setNotice("Degisiklikler kaydedildi.");
+      showNotice("Degisiklikler kaydedildi.");
     } catch {
-      setNotice("Ayarlar kaydedilemedi. Lutfen tekrar deneyin.");
+      showNotice("Ayarlar kaydedilemedi. Lutfen tekrar deneyin.");
     } finally {
       setIsSaving(false);
     }
@@ -112,23 +134,13 @@ export default function SettingsPage() {
         tabs={tabs.map((tab) => ({ title: tab, value: tab }))}
       />
 
-      <div className="settings-alert" data-status={isLoadingSettings ? "info" : noticeStatus} role="status">
-        <span className="settings-alert-indicator">
-          <NoticeIcon size={18} className={isLoadingSettings ? "settings-spin" : undefined} />
-        </span>
-        <div className="settings-alert-content">
-          <strong>{noticeStatus === "success" ? "Islem Basarili" : noticeStatus === "error" ? "Dikkat Gerekiyor" : noticeStatus === "warning" ? "Onay Bekleniyor" : "Bilgilendirme"}</strong>
-          <p>{notice}</p>
-        </div>
-        {searchQuery ? <span className="settings-alert-meta">Arama: {searchQuery}</span> : null}
-      </div>
 
       <div className="settings-stack" data-active-tab={activeTab}>
         {isGeneral || activeTab === "Gorunum" || activeTab === "Guvenlik" ? <AccountSettings activeTab={activeTab} /> : null}
         {isGeneral || activeTab === "Bildirimler" || activeTab === "Sosyal" || activeTab === "Veri & Gizlilik" ? (
-          <SettingsPanels activeTab={activeTab} settings={settings} onSettingChange={updateSetting} setNotice={setNotice} />
+          <SettingsPanels activeTab={activeTab} settings={settings} onSettingChange={updateSetting} setNotice={showNotice} />
         ) : null}
-        {isGeneral || activeTab === "Entegrasyonlar" ? <BackendStatus setNotice={setNotice} /> : null}
+        {isGeneral || activeTab === "Entegrasyonlar" ? <BackendStatus setNotice={showNotice} /> : null}
       </div>
 
       {isGeneral || activeTab === "Veri & Gizlilik" || activeTab === "Guvenlik" ? (
@@ -137,11 +149,22 @@ export default function SettingsPage() {
             <h2>Hesabinizi silmek mi istiyorsunuz?</h2>
             <p>Bu islem geri alinamaz. Tum verileriniz kalici olarak silinecektir.</p>
           </div>
-          <button type="button" onClick={() => setNotice("Hesap silme icin guvenlik onayi gerekir.")}>
+          <button type="button" onClick={() => showNotice("Hesap silme icin guvenlik onayi gerekir.")}>
             <Trash2 size={18} />
             Hesabi Sil
           </button>
         </section>
+      ) : null}
+      {toast ? (
+        <div key={toast.id} className="settings-alert settings-alert--toast" data-status={toast.status} role="status" aria-live="polite">
+          <span className="settings-alert-indicator">
+            <ToastIcon size={18} />
+          </span>
+          <div className="settings-alert-content">
+            <strong>{toast.status === "success" ? "Islem Basarili" : toast.status === "error" ? "Dikkat Gerekiyor" : toast.status === "warning" ? "Onay Bekleniyor" : "Bilgilendirme"}</strong>
+            <p>{toast.message}</p>
+          </div>
+        </div>
       ) : null}
     </section>
   );
