@@ -35666,3 +35666,173 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     grid-template-columns: 1fr;
   }
 }
+/* Keep settings content contained inside every device viewport. */
+.settings-workspace,
+.settings-workspace * {
+  box-sizing: border-box;
+}
+
+.settings-workspace {
+  max-width: 100vw;
+  overflow-x: clip;
+}
+
+.settings-workspace .settings-header,
+.settings-workspace .settings-header-actions,
+.settings-workspace .settings-tabs,
+.settings-workspace .settings-feedback,
+.settings-workspace .settings-stack,
+.settings-workspace .settings-card,
+.settings-workspace .settings-account-layout,
+.settings-workspace .settings-form-grid,
+.settings-workspace .settings-preference-grid,
+.settings-workspace .settings-backend-grid,
+.settings-workspace .settings-sync-list,
+.settings-workspace .settings-social-grid,
+.settings-workspace .settings-danger-zone {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.settings-workspace .settings-card {
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+.settings-workspace .settings-header-actions {
+  flex-wrap: wrap;
+}
+
+.settings-workspace .settings-search,
+.settings-workspace .settings-save-button,
+.settings-workspace .settings-env-button,
+.settings-workspace .settings-sync-list button,
+.settings-workspace .settings-endpoint-row button,
+.settings-workspace .settings-danger-zone button {
+  max-width: 100%;
+}
+
+.settings-workspace .settings-search input,
+.settings-workspace .settings-input-shell input,
+.settings-workspace .settings-input-shell select,
+.settings-workspace .settings-endpoint-row code {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.settings-workspace .settings-tabs {
+  overflow: hidden;
+}
+
+.settings-workspace .settings-tabs .settings-tab-button,
+.settings-workspace .settings-save-button,
+.settings-workspace .settings-env-button,
+.settings-workspace .settings-sync-list button,
+.settings-workspace .settings-endpoint-row button,
+.settings-workspace .settings-danger-zone button,
+.settings-workspace .settings-segmented-control button {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.settings-workspace .settings-preference-item,
+.settings-workspace .settings-sync-list article,
+.settings-workspace .settings-endpoint-row {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.settings-workspace .settings-preference-item > span,
+.settings-workspace .settings-sync-list article > div,
+.settings-workspace .settings-backend-grid article > div,
+.settings-workspace .settings-card-head > div,
+.settings-workspace .settings-social-option,
+.settings-workspace .settings-danger-zone > div {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.settings-workspace .settings-backend-grid article {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.settings-workspace .settings-segmented-control {
+  width: 100%;
+  max-width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+  .settings-workspace .settings-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow: visible;
+  }
+
+  .settings-workspace .settings-tabs .settings-tab-button {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .settings-workspace {
+    max-width: 100vw;
+    padding-inline: 12px;
+  }
+
+  .settings-workspace .settings-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+
+  .settings-workspace .settings-tabs .settings-tab-button {
+    flex: initial;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .settings-workspace .settings-card-head {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  .settings-workspace .settings-account-layout,
+  .settings-workspace .settings-form-grid,
+  .settings-workspace .settings-preference-grid,
+  .settings-workspace .settings-backend-grid,
+  .settings-workspace .settings-social-grid,
+  .settings-workspace .settings-sync-list article,
+  .settings-workspace .settings-endpoint-row {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-workspace .settings-preference-item {
+    grid-template-columns: 38px minmax(0, 1fr);
+  }
+
+  .settings-workspace .settings-preference-item i {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+  }
+
+  .settings-workspace .settings-segmented-control {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .settings-workspace .settings-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-workspace .settings-save-button {
+    white-space: normal;
+  }
+}
