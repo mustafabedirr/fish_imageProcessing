@@ -36157,3 +36157,27 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     font-size: 0.92rem;
   }
 }
+
+/* Keep the profile header avatar circular when wrapped by AvatarProfilePhoto. */
+.user-profile-content--reference .profile-avatar-wrap {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 0;
+  line-height: 0;
+}
+
+.user-profile-content--reference .profile-avatar-wrap .avatar-profile-photo {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1;
+  border-radius: 999px;
+}
+
+.user-profile-content--reference .profile-avatar-wrap .avatar-profile-photo img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  object-fit: cover;
+}
