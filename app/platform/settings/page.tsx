@@ -8,7 +8,7 @@ import AnimatedTabBar from "../../../components/ui/animated-tab-bar";
 import { useCurrentUser } from "../../../hooks/use-current-user";
 import { AlertCircle, Check, Info, Loader2, Search, Trash2 } from "lucide-react";
 
-const tabs = ["Genel", "Bildirimler", "Sosyal", "Gorunum", "Guvenlik", "Entegrasyonlar", "Veri & Gizlilik"] as const;
+const tabs = ["Genel", "Bildirimler", "Sosyal", "Gorunum", "Entegrasyonlar", "Veri & Gizlilik"] as const;
 type SettingsTab = (typeof tabs)[number];
 type NoticeStatus = "success" | "warning" | "error" | "info";
 type SettingsToast = {
@@ -133,17 +133,15 @@ export default function SettingsPage() {
         onChange={(value) => setActiveTab(value as SettingsTab)}
         tabs={tabs.map((tab) => ({ title: tab, value: tab }))}
       />
-
-
-      <div className="settings-stack" data-active-tab={activeTab}>
-        {isGeneral || activeTab === "Gorunum" || activeTab === "Guvenlik" ? <AccountSettings activeTab={activeTab} /> : null}
+      <div key={activeTab} className="settings-stack" data-active-tab={activeTab}>
+        {isGeneral || activeTab === "Gorunum" ? <AccountSettings activeTab={activeTab} /> : null}
         {isGeneral || activeTab === "Bildirimler" || activeTab === "Sosyal" || activeTab === "Veri & Gizlilik" ? (
           <SettingsPanels activeTab={activeTab} settings={settings} onSettingChange={updateSetting} setNotice={showNotice} />
         ) : null}
         {isGeneral || activeTab === "Entegrasyonlar" ? <BackendStatus setNotice={showNotice} /> : null}
       </div>
 
-      {isGeneral || activeTab === "Veri & Gizlilik" || activeTab === "Guvenlik" ? (
+      {isGeneral || activeTab === "Veri & Gizlilik" ? (
         <section className="settings-danger-zone">
           <div>
             <h2>Hesabinizi silmek mi istiyorsunuz?</h2>
