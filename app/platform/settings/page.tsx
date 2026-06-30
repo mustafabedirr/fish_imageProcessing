@@ -1,20 +1,78 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AccountSettings from "../../../components/platform/settings/account-settings";
 import BackendStatus from "../../../components/platform/settings/backend-status";
-import SettingsPanels from "../../../components/platform/settings/settings-panels";
+import SettingsPanels, { defaultPlatformSettings, type PlatformSettings } from "../../../components/platform/settings/settings-panels";
 import AnimatedTabBar from "../../../components/ui/animated-tab-bar";
-import { Check, Search, Trash2 } from "lucide-react";
+import { useCurrentUser } from "../../../hooks/use-current-user";
+import { Check, Loader2, Search, Trash2 } from "lucide-react";
 
-const tabs = ["Genel", "Bildirimler", "Gorunum", "Guvenlik", "Entegrasyonlar", "Veri & Gizlilik"] as const;
+const tabs = ["Genel", "Bildirimler", "Sosyal", "Gorunum", "Guvenlik", "Entegrasyonlar", "Veri & Gizlilik"] as const;
 type SettingsTab = (typeof tabs)[number];
 
 export default function SettingsPage() {
+  const { user } = useCurrentUser();
   const [activeTab, setActiveTab] = useState<SettingsTab>("Genel");
   const [searchQuery, setSearchQuery] = useState("");
   const [notice, setNotice] = useState("Ayarlariniz guncellenmeye hazir.");
+  const [settings, setSettings] = useState<PlatformSettings>(defaultPlatformSettings);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingSettings, setIsLoadingSettings] = useState(false);
   const isGeneral = activeTab === "Genel";
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let isMounted = true;
+    setIsLoadingSettings(true);
+    fetch(`/api/users/${user.id}/settings`, { cache: "no-store" })
+      .then((response) => {
+        if (!response.ok) throw new Error("settings_load_failed");
+        return response.json();
+      })
+      .then((payload) => {
+        if (!isMounted) return;
+        setSettings({ ...defaultPlatformSettings, ...payload.settings });
+        setNotice("Ayarlariniz yuklendi.");
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setNotice("Ayarlar yuklenemedi, varsayilan degerler kullaniliyor.");
+      })
+      .finally(() => {
+        if (isMounted) setIsLoadingSettings(false);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id]);
+
+  const updateSetting = <K extends keyof PlatformSettings>(key: K, value: PlatformSettings[K]) => {
+    setSettings((current) => ({ ...current, [key]: value }));
+  };
+
+  const saveSettings = async () => {
+    if (!user?.id) {
+      setNotice("Ayar kaydi icin oturum bilgisi bulunamadi.");
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/users/${user.id}/settings`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settings),
+      });
+      if (!response.ok) throw new Error("settings_save_failed");
+      const payload = await response.json();
+      setSettings({ ...defaultPlatformSettings, ...payload.settings });
+      setNotice("Degisiklikler kaydedildi.");
+    } catch {
+      setNotice("Ayarlar kaydedilemedi. Lutfen tekrar deneyin.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <section className="settings-workspace">
@@ -34,9 +92,9 @@ export default function SettingsPage() {
             />
             <span>Ctrl K</span>
           </label>
-          <button type="button" className="settings-save-button" onClick={() => setNotice("Degisiklikler kaydedildi.")}>
-            <Check size={19} />
-            Degisiklikleri Kaydet
+          <button type="button" className="settings-save-button" onClick={saveSettings} disabled={isSaving || isLoadingSettings}>
+            {isSaving ? <Loader2 size={19} className="settings-spin" /> : <Check size={19} />}
+            {isSaving ? "Kaydediliyor" : "Degisiklikleri Kaydet"}
           </button>
         </div>
       </header>
@@ -53,28 +111,30 @@ export default function SettingsPage() {
       />
 
       <div className="settings-feedback" role="status">
-        <Check size={16} />
+        {isLoadingSettings ? <Loader2 size={16} className="settings-spin" /> : <Check size={16} />}
         <span>{notice}</span>
         {searchQuery ? <strong>Arama: {searchQuery}</strong> : null}
       </div>
 
       <div className="settings-stack" data-active-tab={activeTab}>
-        {(isGeneral || activeTab === "Gorunum" || activeTab === "Guvenlik") ? <AccountSettings activeTab={activeTab} /> : null}
-        {(isGeneral || activeTab === "Bildirimler" || activeTab === "Veri & Gizlilik") ? <SettingsPanels activeTab={activeTab} setNotice={setNotice} /> : null}
-        {(isGeneral || activeTab === "Entegrasyonlar") ? <BackendStatus setNotice={setNotice} /> : null}
+        {isGeneral || activeTab === "Gorunum" || activeTab === "Guvenlik" ? <AccountSettings activeTab={activeTab} /> : null}
+        {isGeneral || activeTab === "Bildirimler" || activeTab === "Sosyal" || activeTab === "Veri & Gizlilik" ? (
+          <SettingsPanels activeTab={activeTab} settings={settings} onSettingChange={updateSetting} setNotice={setNotice} />
+        ) : null}
+        {isGeneral || activeTab === "Entegrasyonlar" ? <BackendStatus setNotice={setNotice} /> : null}
       </div>
 
-      {(isGeneral || activeTab === "Veri & Gizlilik" || activeTab === "Guvenlik") ? (
-      <section className="settings-danger-zone">
-        <div>
-          <h2>Hesabinizi silmek mi istiyorsunuz?</h2>
-          <p>Bu islem geri alinamaz. Tum verileriniz kalici olarak silinecektir.</p>
-        </div>
-        <button type="button" onClick={() => setNotice("Hesap silme icin guvenlik onayi gerekir.")}>
-          <Trash2 size={18} />
-          Hesabi Sil
-        </button>
-      </section>
+      {isGeneral || activeTab === "Veri & Gizlilik" || activeTab === "Guvenlik" ? (
+        <section className="settings-danger-zone">
+          <div>
+            <h2>Hesabinizi silmek mi istiyorsunuz?</h2>
+            <p>Bu islem geri alinamaz. Tum verileriniz kalici olarak silinecektir.</p>
+          </div>
+          <button type="button" onClick={() => setNotice("Hesap silme icin guvenlik onayi gerekir.")}>
+            <Trash2 size={18} />
+            Hesabi Sil
+          </button>
+        </section>
       ) : null}
     </section>
   );

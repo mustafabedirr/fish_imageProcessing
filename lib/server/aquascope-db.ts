@@ -31,6 +31,14 @@ export type StoredSettings = {
   densityAlerts: boolean;
   syncInterval: string;
   emailNotifications: boolean;
+  socialProfileVisibility: "public" | "followers" | "private";
+  socialAllowComments: boolean;
+  socialAllowMentions: boolean;
+  socialStoryReplies: boolean;
+  socialDirectMessages: "everyone" | "followers" | "none";
+  socialShareActivity: boolean;
+  socialShowOnlineStatus: boolean;
+  socialContentLanguage: "tr" | "en" | "both";
   createdAt: string;
   updatedAt: string;
 };
@@ -186,7 +194,68 @@ async function ensureLibraryArchiveTable() {
   )`);
   await prisma.$executeRawUnsafe(`CREATE UNIQUE INDEX IF NOT EXISTS "species_archive_userId_species_key" ON "species_archive"("userId", "species")`);
 }
-function mapSettings(settings: UserSettings): StoredSettings {
+type SettingsRow = UserSettings & {
+  socialProfileVisibility?: string | null;
+  socialAllowComments?: boolean | number | null;
+  socialAllowMentions?: boolean | number | null;
+  socialStoryReplies?: boolean | number | null;
+  socialDirectMessages?: string | null;
+  socialShareActivity?: boolean | number | null;
+  socialShowOnlineStatus?: boolean | number | null;
+  socialContentLanguage?: string | null;
+};
+
+const defaultSocialSettings = {
+  socialProfileVisibility: "public" as const,
+  socialAllowComments: true,
+  socialAllowMentions: true,
+  socialStoryReplies: true,
+  socialDirectMessages: "followers" as const,
+  socialShareActivity: true,
+  socialShowOnlineStatus: true,
+  socialContentLanguage: "tr" as const,
+};
+
+function normalizeBoolean(value: boolean | number | null | undefined, fallback: boolean) {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value === 1;
+  return fallback;
+}
+
+function normalizeProfileVisibility(value: string | null | undefined): StoredSettings["socialProfileVisibility"] {
+  return value === "followers" || value === "private" ? value : "public";
+}
+
+function normalizeDirectMessages(value: string | null | undefined): StoredSettings["socialDirectMessages"] {
+  return value === "everyone" || value === "none" ? value : "followers";
+}
+
+function normalizeContentLanguage(value: string | null | undefined): StoredSettings["socialContentLanguage"] {
+  return value === "en" || value === "both" ? value : "tr";
+}
+
+function ignoreDuplicateColumn(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  if (!message.toLowerCase().includes("duplicate column")) throw error;
+}
+
+async function ensureSettingsColumns() {
+  await prisma.$executeRawUnsafe(`ALTER TABLE \"UserSettings\" ADD COLUMN \"socialProfileVisibility\" TEXT NOT NULL DEFAULT 'public'`).catch(ignoreDuplicateColumn);
+  await prisma.$executeRawUnsafe('ALTER TABLE "UserSettings" ADD COLUMN "socialAllowComments" BOOLEAN NOT NULL DEFAULT 1').catch(ignoreDuplicateColumn);
+  await prisma.$executeRawUnsafe('ALTER TABLE "UserSettings" ADD COLUMN "socialAllowMentions" BOOLEAN NOT NULL DEFAULT 1').catch(ignoreDuplicateColumn);
+  await prisma.$executeRawUnsafe('ALTER TABLE "UserSettings" ADD COLUMN "socialStoryReplies" BOOLEAN NOT NULL DEFAULT 1').catch(ignoreDuplicateColumn);
+  await prisma.$executeRawUnsafe(`ALTER TABLE \"UserSettings\" ADD COLUMN \"socialDirectMessages\" TEXT NOT NULL DEFAULT 'followers'`).catch(ignoreDuplicateColumn);
+  await prisma.$executeRawUnsafe('ALTER TABLE "UserSettings" ADD COLUMN "socialShareActivity" BOOLEAN NOT NULL DEFAULT 1').catch(ignoreDuplicateColumn);
+  await prisma.$executeRawUnsafe('ALTER TABLE "UserSettings" ADD COLUMN "socialShowOnlineStatus" BOOLEAN NOT NULL DEFAULT 1').catch(ignoreDuplicateColumn);
+  await prisma.$executeRawUnsafe(`ALTER TABLE \"UserSettings\" ADD COLUMN \"socialContentLanguage\" TEXT NOT NULL DEFAULT 'tr'`).catch(ignoreDuplicateColumn);
+}
+
+async function readSettingsRow(userId: string, fallback: UserSettings) {
+  const rows = await prisma.$queryRawUnsafe<SettingsRow[]>('SELECT * FROM "UserSettings" WHERE "userId" = ? LIMIT 1', userId);
+  return rows[0] ?? fallback;
+}
+
+function mapSettings(settings: SettingsRow): StoredSettings {
   return {
     id: settings.id,
     userId: settings.userId,
@@ -194,6 +263,14 @@ function mapSettings(settings: UserSettings): StoredSettings {
     densityAlerts: settings.densityAlerts,
     syncInterval: settings.syncInterval,
     emailNotifications: settings.emailNotifications,
+    socialProfileVisibility: normalizeProfileVisibility(settings.socialProfileVisibility),
+    socialAllowComments: normalizeBoolean(settings.socialAllowComments, defaultSocialSettings.socialAllowComments),
+    socialAllowMentions: normalizeBoolean(settings.socialAllowMentions, defaultSocialSettings.socialAllowMentions),
+    socialStoryReplies: normalizeBoolean(settings.socialStoryReplies, defaultSocialSettings.socialStoryReplies),
+    socialDirectMessages: normalizeDirectMessages(settings.socialDirectMessages),
+    socialShareActivity: normalizeBoolean(settings.socialShareActivity, defaultSocialSettings.socialShareActivity),
+    socialShowOnlineStatus: normalizeBoolean(settings.socialShowOnlineStatus, defaultSocialSettings.socialShowOnlineStatus),
+    socialContentLanguage: normalizeContentLanguage(settings.socialContentLanguage),
     createdAt: settings.createdAt.toISOString(),
     updatedAt: settings.updatedAt.toISOString(),
   };
@@ -358,35 +435,62 @@ export async function updateProfile(userId: string, patch: Partial<StoredProfile
 
 export async function getSettings(userId: string) {
   await ensureSeedData();
+  await ensureSettingsColumns();
   const settings = await prisma.userSettings.upsert({
     where: { userId },
     create: { id: id("settings"), userId },
     update: {},
   });
-  return mapSettings(settings);
+  return mapSettings(await readSettingsRow(userId, settings));
 }
 
 export async function updateSettings(userId: string, patch: Partial<StoredSettings>) {
   await ensureSeedData();
+  await ensureSettingsColumns();
+  const current = await getSettings(userId);
   const settingsPatch = compactPatch(patch);
+  const next = {
+    ...current,
+    ...settingsPatch,
+    socialProfileVisibility: normalizeProfileVisibility(settingsPatch.socialProfileVisibility ? String(settingsPatch.socialProfileVisibility) : current.socialProfileVisibility),
+    socialDirectMessages: normalizeDirectMessages(settingsPatch.socialDirectMessages ? String(settingsPatch.socialDirectMessages) : current.socialDirectMessages),
+    socialContentLanguage: normalizeContentLanguage(settingsPatch.socialContentLanguage ? String(settingsPatch.socialContentLanguage) : current.socialContentLanguage),
+    socialAllowComments: typeof settingsPatch.socialAllowComments === "boolean" ? settingsPatch.socialAllowComments : current.socialAllowComments,
+    socialAllowMentions: typeof settingsPatch.socialAllowMentions === "boolean" ? settingsPatch.socialAllowMentions : current.socialAllowMentions,
+    socialStoryReplies: typeof settingsPatch.socialStoryReplies === "boolean" ? settingsPatch.socialStoryReplies : current.socialStoryReplies,
+    socialShareActivity: typeof settingsPatch.socialShareActivity === "boolean" ? settingsPatch.socialShareActivity : current.socialShareActivity,
+    socialShowOnlineStatus: typeof settingsPatch.socialShowOnlineStatus === "boolean" ? settingsPatch.socialShowOnlineStatus : current.socialShowOnlineStatus,
+  } satisfies StoredSettings;
   const settings = await prisma.userSettings.upsert({
     where: { userId },
     create: {
       id: id("settings"),
       userId,
-      addResultsToLibrary: settingsPatch.addResultsToLibrary as boolean | undefined,
-      densityAlerts: settingsPatch.densityAlerts as boolean | undefined,
-      syncInterval: settingsPatch.syncInterval ? String(settingsPatch.syncInterval) : undefined,
-      emailNotifications: settingsPatch.emailNotifications as boolean | undefined,
+      addResultsToLibrary: next.addResultsToLibrary,
+      densityAlerts: next.densityAlerts,
+      syncInterval: next.syncInterval,
+      emailNotifications: next.emailNotifications,
     },
     update: {
-      addResultsToLibrary: settingsPatch.addResultsToLibrary as boolean | undefined,
-      densityAlerts: settingsPatch.densityAlerts as boolean | undefined,
-      syncInterval: settingsPatch.syncInterval ? String(settingsPatch.syncInterval) : undefined,
-      emailNotifications: settingsPatch.emailNotifications as boolean | undefined,
+      addResultsToLibrary: next.addResultsToLibrary,
+      densityAlerts: next.densityAlerts,
+      syncInterval: next.syncInterval,
+      emailNotifications: next.emailNotifications,
     },
   });
-  return mapSettings(settings);
+  await prisma.$executeRawUnsafe(
+    'UPDATE "UserSettings" SET "socialProfileVisibility" = ?, "socialAllowComments" = ?, "socialAllowMentions" = ?, "socialStoryReplies" = ?, "socialDirectMessages" = ?, "socialShareActivity" = ?, "socialShowOnlineStatus" = ?, "socialContentLanguage" = ? WHERE "userId" = ?',
+    next.socialProfileVisibility,
+    next.socialAllowComments,
+    next.socialAllowMentions,
+    next.socialStoryReplies,
+    next.socialDirectMessages,
+    next.socialShareActivity,
+    next.socialShowOnlineStatus,
+    next.socialContentLanguage,
+    userId,
+  );
+  return mapSettings(await readSettingsRow(userId, settings));
 }
 
 export async function listPosts(options: { viewerId?: string | null; followingOnly?: boolean } = {}) {
