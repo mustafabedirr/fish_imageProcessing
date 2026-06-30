@@ -5,6 +5,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   AtSign,
   Bell,
+  Check,
   BookOpen,
   BriefcaseBusiness,
   CloudCog,
@@ -12,6 +13,7 @@ import {
   Eye,
   Globe2,
   MessageCircle,
+  Power,
   Radio,
   ShieldCheck,
   SlidersHorizontal,
@@ -78,6 +80,7 @@ const preferences: Array<{
     title: "Bolge yogunlugu uyarilarini goster",
     description: "Secilen bolgelerde yogunluk degisimlerinde bildirim alin.",
     icon: Bell,
+  Check,
   },
   {
     key: "emailNotifications",
@@ -98,6 +101,7 @@ const socialToggles: Array<{
     title: "Yorumlara izin ver",
     description: "Paylasimlarinizda yorum aksiyonu aktif kalsin.",
     icon: MessageCircle,
+  Power,
   },
   {
     key: "socialAllowMentions",
@@ -198,7 +202,11 @@ export default function SettingsPanels({ activeTab, settings, onSettingChange, s
                   <small>{description}</small>
                 </span>
                 <input type="checkbox" checked={settings[key]} onChange={(event) => updateBoolean(key, event.target.checked, title)} />
-                <i aria-hidden />
+                <span className="settings-switch-control" aria-hidden="true">
+                  <span className="settings-switch-thumb">
+                    {settings[key] ? <Check size={12} /> : <Power size={12} />}
+                  </span>
+                </span>
               </label>
             ))}
           </div>
@@ -270,7 +278,11 @@ export default function SettingsPanels({ activeTab, settings, onSettingChange, s
                   <small>{description}</small>
                 </span>
                 <input type="checkbox" checked={settings[key]} onChange={(event) => updateBoolean(key, event.target.checked, title)} />
-                <i aria-hidden />
+                <span className="settings-switch-control" aria-hidden="true">
+                  <span className="settings-switch-thumb">
+                    {settings[key] ? <Check size={12} /> : <Power size={12} />}
+                  </span>
+                </span>
               </label>
             ))}
           </div>
