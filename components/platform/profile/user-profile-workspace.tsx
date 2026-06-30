@@ -443,7 +443,8 @@ export default function UserProfileWorkspace() {
 
           <div className="profile-lower-grid">
             <div className="profile-primary-column">
-              {activeTab === "posts" ? (
+              <div key={activeTab} className="profile-tab-content-shell">
+                {activeTab === "posts" ? (
                 <div className="profile-feed" onScroll={handleProfileScroll}>
                   {profilePostsLoading ? (
                     <div className="profile-empty-state">
@@ -523,6 +524,7 @@ export default function UserProfileWorkspace() {
               ) : (
                 <ProfileTabPanel activeTab={activeTab} onScroll={handleProfileScroll} />
               )}
+              </div>
             </div>
           </div>
         </main>
