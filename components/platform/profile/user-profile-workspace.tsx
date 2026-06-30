@@ -4,20 +4,15 @@ import type { CSSProperties, ChangeEvent, UIEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useInView } from "framer-motion";
 import {
-  Activity,
-  CalendarDays,
   Camera,
   Check,
   ChevronUp,
   Compass,
   Edit3,
   Fish,
-  ExternalLink,
-  Globe2,
   Heart,
   Image,
   Images,
-  Mail,
   MapPin,
   MessageCircle,
   MoreHorizontal,
@@ -28,7 +23,6 @@ import {
   ShieldCheck,
   Star,
   Trophy,
-  Tag,
   UserRound,
   UsersRound,
   UploadCloud,
@@ -433,43 +427,6 @@ export default function UserProfileWorkspace() {
                 <span><MapPin size={25} /></span>
                 <strong>24</strong>
                 <small>Trips</small>
-              </article>
-            </div>
-            <div className="profile-info-row profile-info-row--reference profile-info-row--simple">
-              <article>
-                <span><CalendarDays size={23} /></span>
-                <div>
-                  <small>Uyelik Tarihi</small>
-                  <strong>12 Mar 2024</strong>
-                </div>
-              </article>
-              <article>
-                <span><Activity size={23} /></span>
-                <div>
-                  <small>Son Aktivite <i /></small>
-                  <strong>Cevrimici</strong>
-                </div>
-              </article>
-              <article>
-                <span><Tag size={23} /></span>
-                <div>
-                  <small>Kullanici Rolu</small>
-                  <strong>{user?.level ?? "Arastirmaci"}</strong>
-                </div>
-              </article>
-              <article>
-                <span><Mail size={23} /></span>
-                <div>
-                  <small>E-posta</small>
-                  <strong>{user?.email ?? "deniz.arslan@aqualens.com"}</strong>
-                </div>
-              </article>
-              <article>
-                <span><Globe2 size={23} /></span>
-                <div>
-                  <small>Website</small>
-                  <strong>aqualens.com/denizde <ExternalLink size={14} /></strong>
-                </div>
               </article>
             </div>
           </section>

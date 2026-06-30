@@ -37632,3 +37632,41 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
     grid-template-columns: 38px minmax(0, 1fr);
   }
 }
+
+/* Remove profile hero info strip and compact actions. */
+.user-profile-content--reference .profile-hero {
+  grid-template-rows: minmax(300px, 1fr) auto;
+  min-height: clamp(455px, 50vh, 540px);
+}
+
+.user-profile-content--reference .profile-info-row.profile-info-row--simple {
+  display: none !important;
+}
+
+.user-profile-content--reference .profile-hero-actions.profile-hero-actions--reference {
+  top: clamp(18px, 1.8vw, 28px);
+  right: clamp(18px, 2vw, 34px);
+  gap: 8px;
+}
+
+.user-profile-content--reference .profile-hero-actions.profile-hero-actions--reference button {
+  height: 45px;
+  border-radius: 11px;
+}
+
+.user-profile-content--reference .profile-hero-actions.profile-hero-actions--reference button:first-child {
+  min-width: 152px;
+  padding: 0 18px;
+  font-size: 0.84rem;
+}
+
+.user-profile-content--reference .profile-hero-actions.profile-hero-actions--reference button:not(:first-child) {
+  width: 45px;
+  min-width: 45px;
+  padding: 0;
+}
+
+.user-profile-content--reference .profile-hero-actions.profile-hero-actions--reference button svg {
+  width: 16px;
+  height: 16px;
+}
