@@ -4,6 +4,7 @@ import type { CSSProperties, ChangeEvent, UIEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useInView } from "framer-motion";
 import {
+  Bell,
   Camera,
   Check,
   ChevronUp,
@@ -13,6 +14,7 @@ import {
   Heart,
   Image,
   Images,
+  Layers3,
   MapPin,
   MessageCircle,
   MoreHorizontal,
@@ -372,6 +374,14 @@ export default function UserProfileWorkspace() {
               </span>
             </button>
             <div className="profile-hero-actions profile-hero-actions--reference">
+              <span className="profile-collapsed-score" aria-label="Toplam analiz kaydi">
+                <Layers3 size={18} />
+                <span>1.254</span>
+              </span>
+              <button type="button" className="profile-collapsed-notification" aria-label="Bildirimler">
+                <Bell size={21} />
+                <span aria-hidden="true" />
+              </button>
               <button type="button" onClick={openEditProfile}>
                 <Edit3 size={19} />
                 Profili Duzenle
@@ -403,6 +413,7 @@ export default function UserProfileWorkspace() {
                   </span>
                 </h1>
                 <p>{profile.handle}</p>
+                <span className="profile-collapsed-role">{user?.level ?? "Arastirmaci"}</span>
                 <span className="profile-bio-line">AquaScope demo profili.</span>
                 <div className="profile-meta-row">
                   <small>

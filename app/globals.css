@@ -37921,3 +37921,377 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 .user-profile-content--reference .profile-collapse-toggle.profile-collapse-toggle--collapsed svg {
   transform: rotate(180deg);
 }
+
+/* Reference collapsed profile header bar. */
+.user-profile-content--reference .profile-collapsed-score,
+.user-profile-content--reference .profile-collapsed-notification,
+.user-profile-content--reference .profile-collapsed-role {
+  display: none;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed {
+  --profile-collapsed-height: clamp(76px, 7.2vw, 92px);
+  display: grid;
+  grid-template-columns: minmax(250px, 0.9fr) minmax(260px, 1.35fr) auto;
+  grid-template-rows: 1fr;
+  align-items: center;
+  min-height: var(--profile-collapsed-height);
+  height: var(--profile-collapsed-height);
+  padding: 0 clamp(18px, 2vw, 28px);
+  overflow: hidden;
+  border-radius: 14px;
+  background-position: center 42%;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-cover {
+  inset: 0;
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-cover::after {
+  background:
+    linear-gradient(90deg, rgba(4, 15, 31, 0.84) 0%, rgba(4, 15, 31, 0.52) 34%, rgba(4, 15, 31, 0.24) 54%, rgba(5, 18, 35, 0.78) 100%),
+    linear-gradient(180deg, rgba(7, 22, 40, 0.5), rgba(5, 16, 31, 0.62));
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-identity {
+  position: relative;
+  z-index: 2;
+  grid-column: 1;
+  align-self: center;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 14px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 clamp(14px, 1.6vw, 24px) 0 0;
+  border-right: 1px solid rgba(126, 171, 214, 0.24);
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-avatar-wrap,
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-avatar-wrap img {
+  width: 58px;
+  height: 58px;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-avatar-wrap {
+  position: relative;
+  box-shadow: none;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-avatar-wrap::after {
+  content: "";
+  position: absolute;
+  right: 1px;
+  bottom: 4px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(5, 20, 38, 0.96);
+  border-radius: 999px;
+  background: #52ef86;
+  box-shadow: 0 0 12px rgba(82, 239, 134, 0.58);
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-avatar-edit,
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-cover span,
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-verified,
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-copy p,
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-bio-line,
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-meta-row,
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-stats-row.profile-stats-row--reference,
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-info-row {
+  display: none !important;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-copy {
+  align-self: center;
+  min-width: 0;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-copy h1 {
+  margin: 0;
+  overflow: hidden;
+  color: rgba(246, 250, 255, 0.96);
+  font-size: clamp(1rem, 1.05vw, 1.24rem);
+  font-weight: 620;
+  line-height: 1.1;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-collapsed-role {
+  display: block;
+  margin-top: 8px;
+  overflow: hidden;
+  color: rgba(217, 231, 248, 0.72);
+  font-size: clamp(0.82rem, 0.88vw, 0.98rem);
+  font-weight: 470;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-hero-actions.profile-hero-actions--reference {
+  position: relative;
+  top: auto;
+  right: auto;
+  z-index: 2;
+  grid-column: 3;
+  align-self: center;
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-hero-actions.profile-hero-actions--reference > button:not(.profile-collapsed-notification):not(.profile-collapse-toggle) {
+  display: none;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-collapsed-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid rgba(117, 162, 213, 0.22);
+  border-radius: 12px;
+  background: rgba(12, 33, 61, 0.48);
+  color: rgba(218, 231, 249, 0.86);
+  font-size: 0.94rem;
+  font-weight: 560;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(14px);
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-collapsed-score svg {
+  width: 17px;
+  height: 17px;
+  color: rgba(193, 219, 250, 0.86);
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-collapsed-notification {
+  position: relative;
+  display: grid;
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(232, 241, 252, 0.94);
+  box-shadow: none;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-collapsed-notification svg {
+  width: 21px;
+  height: 21px;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-collapsed-notification span {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid rgba(5, 20, 38, 0.96);
+  border-radius: 999px;
+  background: #52ef86;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-collapse-toggle {
+  width: 46px;
+  min-width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: rgba(13, 31, 55, 0.72);
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-collapse-toggle svg,
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-collapse-toggle.profile-collapse-toggle--collapsed svg {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 900px) {
+  .user-profile-content--reference .profile-hero.profile-hero--collapsed {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-inline: 14px;
+  }
+
+  .user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-collapsed-score {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .user-profile-content--reference .profile-hero.profile-hero--collapsed {
+    --profile-collapsed-height: 74px;
+  }
+
+  .user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-identity {
+    grid-template-columns: 50px minmax(0, 1fr);
+    gap: 10px;
+    border-right: 0;
+  }
+
+  .user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-avatar-wrap,
+  .user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-avatar-wrap img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-copy h1 {
+    font-size: 0.95rem;
+  }
+
+  .user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-collapsed-role {
+    font-size: 0.78rem;
+  }
+
+  .user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-collapsed-notification {
+    display: none;
+  }
+
+  .user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-collapse-toggle {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+  }
+}
+
+/* Smooth profile hero expand and collapse motion. */
+.user-profile-content--reference .profile-hero {
+  transition:
+    height 680ms cubic-bezier(0.16, 1, 0.3, 1),
+    min-height 680ms cubic-bezier(0.16, 1, 0.3, 1),
+    padding 680ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-radius 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 520ms ease,
+    background-position 820ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: height, min-height, padding, background-position;
+}
+
+.user-profile-content--reference .profile-cover,
+.user-profile-content--reference .profile-cover::after {
+  transition:
+    opacity 620ms ease,
+    filter 720ms ease,
+    transform 780ms cubic-bezier(0.16, 1, 0.3, 1),
+    background 720ms ease;
+}
+
+.user-profile-content--reference .profile-identity,
+.user-profile-content--reference .profile-avatar-wrap,
+.user-profile-content--reference .profile-copy,
+.user-profile-content--reference .profile-hero-actions.profile-hero-actions--reference,
+.user-profile-content--reference .profile-stats-row.profile-stats-row--reference {
+  transition:
+    opacity 520ms ease,
+    transform 680ms cubic-bezier(0.16, 1, 0.3, 1),
+    margin 680ms cubic-bezier(0.16, 1, 0.3, 1),
+    padding 680ms cubic-bezier(0.16, 1, 0.3, 1),
+    width 680ms cubic-bezier(0.16, 1, 0.3, 1),
+    height 680ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-identity {
+  animation: profileHeroIdentityExpand 720ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-copy p,
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-bio-line,
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-meta-row {
+  animation: profileHeroContentReveal 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-stats-row.profile-stats-row--reference {
+  animation: profileHeroStatsReveal 760ms cubic-bezier(0.16, 1, 0.3, 1) 90ms both;
+}
+
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-stats-row.profile-stats-row--reference article {
+  animation: profileHeroMetricReveal 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-stats-row.profile-stats-row--reference article:nth-child(2) {
+  animation-delay: 55ms;
+}
+
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-stats-row.profile-stats-row--reference article:nth-child(3) {
+  animation-delay: 100ms;
+}
+
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-stats-row.profile-stats-row--reference article:nth-child(4) {
+  animation-delay: 145ms;
+}
+
+@keyframes profileHeroIdentityExpand {
+  from {
+    opacity: 0.82;
+    transform: translate3d(0, -8px, 0) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes profileHeroContentReveal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes profileHeroStatsReveal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes profileHeroMetricReveal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .user-profile-content--reference .profile-hero,
+  .user-profile-content--reference .profile-cover,
+  .user-profile-content--reference .profile-cover::after,
+  .user-profile-content--reference .profile-identity,
+  .user-profile-content--reference .profile-avatar-wrap,
+  .user-profile-content--reference .profile-copy,
+  .user-profile-content--reference .profile-hero-actions.profile-hero-actions--reference,
+  .user-profile-content--reference .profile-stats-row.profile-stats-row--reference {
+    transition: none;
+  }
+
+  .user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-identity,
+  .user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-copy p,
+  .user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-bio-line,
+  .user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-meta-row,
+  .user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-stats-row.profile-stats-row--reference,
+  .user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-stats-row.profile-stats-row--reference article {
+    animation: none;
+  }
+}
