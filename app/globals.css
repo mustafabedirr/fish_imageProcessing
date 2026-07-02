@@ -39029,3 +39029,27 @@ textarea,
 [contenteditable="true"] {
   cursor: text;
 }
+/* Align analyze right rail bottom with the main analysis panel. */
+@media (min-width: 1221px) {
+  .fish-analyze-layout {
+    align-items: stretch;
+  }
+
+  .fish-analyze-main,
+  .fish-analyze-rail {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .fish-analyze-rail {
+    align-self: stretch;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .fish-analyze-rail .fish-species-card {
+    align-self: stretch;
+    height: 100%;
+    max-height: none;
+    min-height: 0;
+  }
+}
