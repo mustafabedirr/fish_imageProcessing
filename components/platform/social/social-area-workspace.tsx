@@ -1424,8 +1424,7 @@ export default function SocialAreaWorkspace() {
                       return isOwnPost ? (
                         <div className="social-post-options-menu social-post-options-menu--owner" role="menu" onClick={(event) => event.stopPropagation()}>
                           <div className="social-post-options-head">
-                            <strong>Gonderi yonetimi</strong>
-                            <span>Bu paylasim size ait</span>
+                            <strong>Size ait</strong>
                           </div>
                           <button type="button" role="menuitem" onClick={() => handlePostMenuAction("edit", post)}>
                             <Pencil size={17} />

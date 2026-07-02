@@ -39113,3 +39113,24 @@ textarea,
   border-color: rgba(45, 226, 255, 0.3);
   background: rgba(21, 129, 251, 0.16);
 }
+
+/* Keep owner post options visually quiet until interaction. */
+.social-area-page .social-post-options-menu--owner button {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.social-area-page .social-post-options-menu--owner button:hover,
+.social-area-page .social-post-options-menu--owner button:focus-visible,
+.social-area-page .social-post-options-menu--owner button:active {
+  border-color: rgba(45, 226, 255, 0.3);
+  background: rgba(21, 129, 251, 0.16);
+}
+
+.social-area-page .social-post-options-menu--owner button.is-danger:hover,
+.social-area-page .social-post-options-menu--owner button.is-danger:focus-visible,
+.social-area-page .social-post-options-menu--owner button.is-danger:active {
+  border-color: rgba(255, 105, 125, 0.28);
+  background: rgba(239, 68, 68, 0.14);
+}
