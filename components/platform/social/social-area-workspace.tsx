@@ -27,6 +27,8 @@ import {
   Maximize2,
   MessageCircle,
   MoreVertical,
+  Pencil,
+  Pin,
   Navigation,
   Plus,
   Search,
@@ -36,6 +38,7 @@ import {
   SlidersHorizontal,
   Smile,
   Tag,
+  Trash2,
   Trophy,
   Upload,
   UserPlus,
@@ -1000,9 +1003,37 @@ export default function SocialAreaWorkspace() {
     });
   };
 
-  const handlePostMenuAction = (action: "dismiss" | "follow" | "list" | "mute" | "block", post: SocialPost) => {
+  const handlePostMenuAction = (action: "dismiss" | "follow" | "list" | "mute" | "block" | "edit" | "pin" | "stats" | "share" | "delete", post: SocialPost) => {
     setOpenPostMenuId(null);
 
+    if (action === "edit") {
+      setComposerText(post.text);
+      setNotice("Gonderi metni duzenleme alanina tasindi.");
+      return;
+    }
+
+    if (action === "pin") {
+      setPosts((current) => [post, ...current.filter((item) => item.id !== post.id)]);
+      setNotice("Gonderi akisin en ustune sabitlendi.");
+      return;
+    }
+
+    if (action === "stats") {
+      setNotice(`${post.likes} begeni ve ${commentCounts[post.id] ?? post.comments} yorum goruntuleniyor.`);
+      return;
+    }
+
+    if (action === "share") {
+      setSharedPosts((current) => ({ ...current, [post.id]: true }));
+      setNotice("Gonderi paylasim baglantisi hazirlandi.");
+      return;
+    }
+
+    if (action === "delete") {
+      setPosts((current) => current.filter((item) => item.id !== post.id));
+      setNotice("Gonderi akistan kaldirildi.");
+      return;
+    }
     if (action === "dismiss") {
       setDismissedPostIds((current) => ({ ...current, [post.id]: true }));
       setNotice("Post akistan kaldirildi.");
@@ -1387,30 +1418,61 @@ export default function SocialAreaWorkspace() {
                     >
                       <MoreVertical size={18} />
                     </button>
-                    {openPostMenuId === post.id ? (
-                      <div className="social-post-options-menu" role="menu" onClick={(event) => event.stopPropagation()}>
-                        <button type="button" role="menuitem" onClick={() => handlePostMenuAction("dismiss", post)}>
-                          <EyeOff size={17} />
-                          <span>Not interested in this post</span>
-                        </button>
-                        <button type="button" role="menuitem" onClick={() => handlePostMenuAction("follow", post)}>
-                          <UserPlus size={17} />
-                          <span>{followedUsers[post.profile?.userId ?? ""] ? "Unfollow" : "Follow"} {post.handle}</span>
-                        </button>
-                        <button type="button" role="menuitem" onClick={() => handlePostMenuAction("list", post)}>
-                          <ListPlus size={17} />
-                          <span>{listedPostIds[post.id] ? "Remove from Lists" : "Add/remove from Lists"}</span>
-                        </button>
-                        <button type="button" role="menuitem" onClick={() => handlePostMenuAction("mute", post)}>
-                          <VolumeX size={17} />
-                          <span>Mute</span>
-                        </button>
-                        <button type="button" role="menuitem" className="is-danger" onClick={() => handlePostMenuAction("block", post)}>
-                          <Ban size={17} />
-                          <span>Block {post.handle}</span>
-                        </button>
-                      </div>
-                    ) : null}
+                    {openPostMenuId === post.id ? (() => {
+                      const isOwnPost = Boolean((user?.id && post.profile?.userId === user.id) || post.handle === currentUserHandle || post.author === currentUserName);
+
+                      return isOwnPost ? (
+                        <div className="social-post-options-menu social-post-options-menu--owner" role="menu" onClick={(event) => event.stopPropagation()}>
+                          <div className="social-post-options-head">
+                            <strong>Gonderi yonetimi</strong>
+                            <span>Bu paylasim size ait</span>
+                          </div>
+                          <button type="button" role="menuitem" onClick={() => handlePostMenuAction("edit", post)}>
+                            <Pencil size={17} />
+                            <span>Gonderiyi duzenle</span>
+                          </button>
+                          <button type="button" role="menuitem" onClick={() => handlePostMenuAction("pin", post)}>
+                            <Pin size={17} />
+                            <span>Akisin ustune sabitle</span>
+                          </button>
+                          <button type="button" role="menuitem" onClick={() => handlePostMenuAction("stats", post)}>
+                            <BarChart3 size={17} />
+                            <span>Etkilesim istatistikleri</span>
+                          </button>
+                          <button type="button" role="menuitem" onClick={() => handlePostMenuAction("share", post)}>
+                            <Share2 size={17} />
+                            <span>Paylasim baglantisi</span>
+                          </button>
+                          <button type="button" role="menuitem" className="is-danger" onClick={() => handlePostMenuAction("delete", post)}>
+                            <Trash2 size={17} />
+                            <span>Gonderiyi kaldir</span>
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="social-post-options-menu" role="menu" onClick={(event) => event.stopPropagation()}>
+                          <button type="button" role="menuitem" onClick={() => handlePostMenuAction("dismiss", post)}>
+                            <EyeOff size={17} />
+                            <span>Not interested in this post</span>
+                          </button>
+                          <button type="button" role="menuitem" onClick={() => handlePostMenuAction("follow", post)}>
+                            <UserPlus size={17} />
+                            <span>{followedUsers[post.profile?.userId ?? ""] ? "Unfollow" : "Follow"} {post.handle}</span>
+                          </button>
+                          <button type="button" role="menuitem" onClick={() => handlePostMenuAction("list", post)}>
+                            <ListPlus size={17} />
+                            <span>{listedPostIds[post.id] ? "Remove from Lists" : "Add/remove from Lists"}</span>
+                          </button>
+                          <button type="button" role="menuitem" onClick={() => handlePostMenuAction("mute", post)}>
+                            <VolumeX size={17} />
+                            <span>Mute</span>
+                          </button>
+                          <button type="button" role="menuitem" className="is-danger" onClick={() => handlePostMenuAction("block", post)}>
+                            <Ban size={17} />
+                            <span>Block {post.handle}</span>
+                          </button>
+                        </div>
+                      );
+                    })() : null}
                   </div>
                   <button
                     className={bookmarkedPosts[post.id] ? "social-bookmark is-active" : "social-bookmark"}
@@ -1427,7 +1489,6 @@ export default function SocialAreaWorkspace() {
 
                 {(post.kind ?? "photo") === "text" ? (
                   <div className="social-post-text-body">
-                    <PostKindBadge kind="text" />
                     <p>{post.text}</p>
                     <PostTags tags={post.tags} />
                     {post.photos[0] ? (
@@ -1442,7 +1503,6 @@ export default function SocialAreaWorkspace() {
 
                 {post.kind === "poll" ? (
                   <div className="social-post-poll-body">
-                    <PostKindBadge kind="poll" />
                     <p>{post.poll?.question ?? post.text}</p>
                     <div className="social-poll-options">
                       {post.poll?.options.map(([label, value]) => (
@@ -1458,7 +1518,6 @@ export default function SocialAreaWorkspace() {
 
                 {post.kind === "location" ? (
                   <div className="social-post-location-body">
-                    <PostKindBadge kind="location" />
                     <h3>{post.location}</h3>
                     <span>Turkiye</span>
                     <p>{post.text}</p>
@@ -1471,7 +1530,6 @@ export default function SocialAreaWorkspace() {
 
                 {(post.kind === "photo" || post.kind === "video" || !post.kind) ? (
                   <div className="social-post-media-body">
-                    <PostKindBadge kind={post.kind === "video" ? "video" : "photo"} />
                     <p className="social-post-caption">{post.text}</p>
                     <PostTags tags={post.tags} />
                     <div className={post.photos.length > 1 ? "social-post-photos social-post-photos--grid" : "social-post-photos"}>
@@ -1811,24 +1869,6 @@ function SocialModalPortal({ children }: { children: ReactNode }) {
   if (!mounted) return null;
 
   return createPortal(children, document.body);
-}
-
-function PostKindBadge({ kind }: { kind: SocialPostKind }) {
-  const badgeMap: Record<SocialPostKind, { label: string; Icon: typeof SlidersHorizontal }> = {
-    text: { label: "Text", Icon: SlidersHorizontal },
-    photo: { label: "Photo", Icon: ImageIcon },
-    video: { label: "Video", Icon: Video },
-    location: { label: "Location", Icon: MapPin },
-    poll: { label: "Poll", Icon: BarChart3 },
-  };
-  const { label, Icon } = badgeMap[kind];
-
-  return (
-    <span className={`social-post-kind social-post-kind--${kind}`}>
-      <Icon size={16} />
-      {label}
-    </span>
-  );
 }
 
 function PostTags({ tags }: { tags: string[] }) {
@@ -2220,7 +2260,6 @@ function PostInteractionModal({
               <img src={primaryPhoto} alt={`${post.author} shared catch`} />
             ) : (
               <div className={`social-post-detail-placeholder social-post-detail-placeholder--${post.kind}`}>
-                <PostKindBadge kind={post.kind} />
                 {post.kind === "poll" ? (
                   <>
                     <h2>{post.poll?.question ?? post.text}</h2>

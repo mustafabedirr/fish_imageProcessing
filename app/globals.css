@@ -39053,3 +39053,63 @@ textarea,
     min-height: 0;
   }
 }
+
+/* Social owner post options menu. */
+.social-area-page .social-post-options-menu--owner {
+  width: min(286px, calc(100vw - 32px));
+  gap: 6px;
+  padding: 12px;
+  border-color: rgba(45, 226, 255, 0.42);
+  background:
+    radial-gradient(circle at 84% 0%, rgba(45, 226, 255, 0.24), transparent 34%),
+    radial-gradient(circle at 6% 100%, rgba(21, 129, 251, 0.18), transparent 42%),
+    linear-gradient(180deg, rgba(6, 31, 58, 0.98), rgba(2, 12, 24, 0.99));
+  box-shadow:
+    0 30px 82px rgba(0, 0, 0, 0.52),
+    0 0 46px rgba(0, 207, 255, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.social-area-page .social-post-options-menu--owner::before {
+  border-color: rgba(45, 226, 255, 0.34);
+  background: rgba(6, 31, 58, 0.98);
+}
+
+.social-area-page .social-post-options-head {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 3px;
+  padding: 4px 6px 10px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid rgba(93, 184, 255, 0.16);
+}
+
+.social-area-page .social-post-options-head strong {
+  color: #f8fbff;
+  font-size: 0.82rem;
+  font-weight: 780;
+  line-height: 1.1;
+}
+
+.social-area-page .social-post-options-head span {
+  color: rgba(176, 205, 233, 0.78);
+  font-size: 0.72rem;
+  font-weight: 620;
+}
+
+.social-area-page .social-post-options-menu--owner button {
+  min-height: 40px;
+  border-color: rgba(75, 180, 255, 0.08);
+  background: rgba(6, 28, 52, 0.3);
+}
+
+.social-area-page .social-post-options-menu--owner button svg {
+  color: #4fdcff;
+}
+
+.social-area-page .social-post-options-menu--owner button:hover,
+.social-area-page .social-post-options-menu--owner button:focus-visible {
+  border-color: rgba(45, 226, 255, 0.3);
+  background: rgba(21, 129, 251, 0.16);
+}
