@@ -17140,6 +17140,7 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 .fish-analyze-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 0.27fr);
+  align-items: stretch;
   gap: var(--fish-gap);
   height: 100%;
   min-height: 0;
@@ -17162,6 +17163,7 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   gap: var(--fish-gap);
+  height: 100%;
 }
 
 .fish-rail-actions {
@@ -38845,4 +38847,111 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
   .fish-species-detail-meta {
     grid-template-columns: 1fr;
   }
+}
+
+/* Stabilize analyze side-panel full species list. */
+.fish-species-card .fish-all-species-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 252px;
+  max-height: 360px;
+  padding: 10px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-radius: 16px;
+  box-sizing: border-box;
+}
+
+.fish-species-card .fish-all-species-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: auto;
+  min-height: 64px;
+  flex: 0 0 auto;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  line-height: 1.2;
+}
+
+.fish-species-card .fish-all-species-row span {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.fish-species-card .fish-all-species-row strong {
+  display: block;
+  min-width: 0;
+  color: #f3fbff;
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.fish-species-card .fish-all-species-row small {
+  display: block;
+  min-width: 0;
+  color: rgba(177, 204, 229, 0.78);
+  font-size: 0.76rem;
+  line-height: 1.25;
+}
+
+.fish-species-card .fish-all-species-row b {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 54px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(45, 226, 255, 0.1);
+  line-height: 1;
+}
+
+/* Compact expanded profile header vertical scale by 15%. */
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) {
+  grid-template-rows: minmax(255px, 1fr) auto;
+  min-height: clamp(366px, 40vh, 434px);
+  padding-top: clamp(20px, 1.95vw, 32px);
+  padding-bottom: clamp(20px, 2.05vw, 34px);
+}
+
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-identity {
+  grid-template-columns: clamp(107px, 8.7vw, 139px) minmax(0, 1fr);
+  gap: clamp(24px, 2.55vw, 41px);
+  padding-bottom: clamp(29px, 3.75vh, 46px);
+}
+
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-avatar-wrap,
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-avatar-wrap img,
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-avatar-wrap .avatar-profile-photo {
+  width: clamp(107px, 8.7vw, 139px);
+  height: clamp(107px, 8.7vw, 139px);
+}
+
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-avatar-edit {
+  bottom: 9px;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  min-height: 32px;
+}
+
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-stats-row.profile-stats-row--reference,
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-stats-row.profile-stats-row--reference article {
+  min-height: 78px;
+}
+
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-stats-row.profile-stats-row--reference article > span {
+  width: 39px;
+  height: 39px;
+}
+
+.user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-stats-row.profile-stats-row--reference article > span svg {
+  width: 19px;
+  height: 19px;
 }
