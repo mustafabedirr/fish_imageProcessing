@@ -824,3 +824,56 @@ export async function archiveAnalyzedSpecies(input: {
   );
   return rows[0] ? mapArchiveRow(rows[0]) : null;
 }
+
+export async function getUserSocialSummary(userId: string) {
+  await ensureSeedData();
+
+  const user = await prisma.user.findUnique({ where: { id: userId }, include: { profile: true } });
+  if (!user) throw new Error("Kullanici bulunamadi.");
+
+  const [followersCount, followingCount, followingRows, posts] = await Promise.all([
+    prisma.follow.count({ where: { followingId: userId } }),
+    prisma.follow.count({ where: { followerId: userId } }),
+    prisma.follow.findMany({
+      where: { followerId: userId },
+      take: 6,
+      orderBy: { createdAt: "desc" },
+      include: { following: { include: { profile: true } } },
+    }),
+    prisma.socialPost.findMany({
+      where: { userId },
+      take: 24,
+      orderBy: { createdAt: "desc" },
+      include: { user: { include: { profile: true } } },
+    }),
+  ]);
+
+  const mediaUrls = posts.flatMap((post) => fromJsonArray(post.mediaUrls)).filter(Boolean).slice(0, 8);
+  const totalLikes = posts.reduce((sum, post) => sum + post.likes, 0);
+  const totalComments = posts.reduce((sum, post) => sum + post.comments, 0);
+  const levelScore = Math.max(1, Math.min(12, Math.ceil(((user.profile?.catches ?? 0) + posts.length + followingCount) / 15)));
+  const xp = Math.min(1800, 900 + (user.profile?.analyses ?? 0) * 3 + (user.profile?.catches ?? 0) * 4 + totalLikes * 2 + totalComments);
+
+  return {
+    user: mapUser(user, user.profile),
+    stats: {
+      followers: followersCount,
+      following: followingCount,
+      posts: posts.length,
+      likes: totalLikes,
+      comments: totalComments,
+      level: levelScore,
+      xp,
+      xpTarget: 1800,
+    },
+    following: followingRows.map((row) => ({
+      id: row.following.id,
+      name: row.following.name,
+      handle: row.following.profile?.handle ?? normalizeHandle(row.following.name),
+      avatarUrl: row.following.profile?.avatarUrl ?? undefined,
+      region: row.following.profile?.region ?? undefined,
+      level: row.following.profile?.level ?? undefined,
+    })),
+    recentPhotos: mediaUrls,
+  };
+}

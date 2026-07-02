@@ -16,6 +16,7 @@ import {
   MapPin,
   MessageCircle,
   MoreHorizontal,
+  Trash2,
   Mountain,
   RotateCcw,
   Save,
@@ -37,6 +38,37 @@ import AnimatedTabBar from "../../ui/animated-tab-bar";
 import { AvatarProfilePhoto } from "@/components/base/avatar/avatar";
 
 const avatar = defaultProfileAvatarUrl;
+type ProfileSocialSummary = {
+  stats: {
+    followers: number;
+    following: number;
+    posts: number;
+    likes: number;
+    comments: number;
+    level: number;
+    xp: number;
+    xpTarget: number;
+  };
+  following: Array<{
+    id: string;
+    name: string;
+    handle: string;
+    avatarUrl?: string;
+    region?: string;
+    level?: string;
+  }>;
+  recentPhotos: string[];
+};
+
+type ProfilePostComment = {
+  id: string;
+  body: string;
+  createdAt: string;
+  author: string;
+  handle: string;
+  avatar?: string;
+};
+
 type ProfileFeedPost = {
   id: string;
   userId?: string;
@@ -252,7 +284,13 @@ export default function UserProfileWorkspace() {
   const [draftProfile, setDraftProfile] = useState(profile);
   const [profilePosts, setProfilePosts] = useState<ProfileFeedPost[]>([]);
   const [profilePostsLoading, setProfilePostsLoading] = useState(true);
+  const [profileSummary, setProfileSummary] = useState<ProfileSocialSummary | null>(null);
   const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
+  const [postMenuId, setPostMenuId] = useState<string | null>(null);
+  const postMenuRef = useRef<HTMLDivElement | null>(null);
+  const [activePost, setActivePost] = useState<ProfileFeedPost | null>(null);
+  const [postComments, setPostComments] = useState<Record<string, ProfilePostComment[]>>({});
+  const [commentDraft, setCommentDraft] = useState("");
 
   useEffect(() => {
     if (!user) return;
@@ -266,6 +304,36 @@ export default function UserProfileWorkspace() {
     setAvatarSrc(user.avatarUrl ?? defaultProfileAvatarUrl);
   }, [user]);
 
+  useEffect(() => {
+    if (!user?.id) return undefined;
+    let cancelled = false;
+
+    fetch(`/api/users/${user.id}/social-summary`, { cache: "no-store" })
+      .then(async (response) => {
+        const data = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(String(data?.error ?? "Profil sosyal verisi yuklenemedi."));
+        if (!cancelled) setProfileSummary(data as ProfileSocialSummary);
+      })
+      .catch(() => {
+        if (!cancelled) setProfileSummary(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!postMenuId) return undefined;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (postMenuRef.current?.contains(event.target as Node)) return;
+      setPostMenuId(null);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [postMenuId]);
   useEffect(() => {
     let cancelled = false;
     setProfilePostsLoading(true);
@@ -310,6 +378,80 @@ export default function UserProfileWorkspace() {
     [likedPosts, profilePosts, sharedPosts]
   ) as Record<string, { likes: number; shared: boolean }>;
 
+  const followerCount = profileSummary?.stats.followers ?? 0;
+  const followingCount = profileSummary?.stats.following ?? 0;
+  const levelValue = profileSummary?.stats.level ?? 1;
+  const xpValue = profileSummary?.stats.xp ?? 0;
+  const xpTarget = profileSummary?.stats.xpTarget ?? 1800;
+  const followingList = profileSummary?.following ?? [];
+
+  const profileAboutItems = useMemo(
+    () => [
+      { icon: Compass, label: "Home", value: user?.region ?? "Bolge secilmedi" },
+      { icon: Trophy, label: "Seviye", value: user?.level ?? "Yeni uye" },
+      { icon: Fish, label: "Hedef Turler", value: user?.interests?.length ? user.interests.slice(0, 3).join(", ") : "Henuz eklenmedi" },
+      { icon: Camera, label: "Paylasim", value: `${profilePosts.length} gonderi` },
+    ],
+    [profilePosts.length, user?.interests, user?.level, user?.region]
+  );
+
+  const loadPostComments = (postId: string) => {
+    if (postComments[postId]) return;
+    fetch(`/api/posts/${postId}/comments`, { cache: "no-store" })
+      .then(async (response) => {
+        const data = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(String(data?.error ?? "Yorumlar yuklenemedi."));
+        setPostComments((current) => ({ ...current, [postId]: Array.isArray(data?.comments) ? data.comments : [] }));
+      })
+      .catch(() => setPostComments((current) => ({ ...current, [postId]: [] })));
+  };
+
+  const openPostModal = (post: ProfileFeedPost) => {
+    setActivePost(post);
+    setCommentDraft("");
+    loadPostComments(post.id);
+  };
+
+  const toggleProfilePostLike = (postId: string) => {
+    const nextActive = !likedPosts[postId];
+    setLikedPosts((current) => ({ ...current, [postId]: nextActive }));
+    fetch(`/api/posts/${postId}/like`, nextActive ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ active: true }) } : { method: "DELETE" }).catch(() => undefined);
+  };
+
+  const handleProfilePostMenuAction = (action: "edit" | "share" | "delete", post: ProfileFeedPost) => {
+    setPostMenuId(null);
+    if (action === "edit") {
+      setDraftProfile((current) => ({ ...current }));
+      setActivePost(post);
+      return;
+    }
+    if (action === "share") {
+      setSharedPosts((current) => ({ ...current, [post.id]: true }));
+      return;
+    }
+    setProfilePosts((current) => current.filter((item) => item.id !== post.id));
+    if (activePost?.id === post.id) setActivePost(null);
+  };
+
+  const submitProfilePostComment = () => {
+    const body = commentDraft.trim();
+    if (!activePost || !body) return;
+    const localComment: ProfilePostComment = {
+      id: `local-${Date.now()}`,
+      body,
+      createdAt: new Date().toISOString(),
+      author: profile.name,
+      handle: profile.handle,
+      avatar: avatarSrc,
+    };
+    setPostComments((current) => ({ ...current, [activePost.id]: [...(current[activePost.id] ?? []), localComment] }));
+    setCommentDraft("");
+    fetch(`/api/posts/${activePost.id}/comments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ body }),
+    }).catch(() => undefined);
+  };
   const openEditProfile = () => {
     setDraftProfile(profile);
     setIsEditing(true);
@@ -416,12 +558,12 @@ export default function UserProfileWorkspace() {
             <div className="profile-stats-row profile-stats-row--reference">
               <article>
                 <span><UsersRound size={24} /></span>
-                <strong>{user?.analyses ?? 452}</strong>
+                <strong>{followerCount}</strong>
                 <small>Followers</small>
               </article>
               <article>
                 <span><UserRound size={24} /></span>
-                <strong>{Math.max(profilePosts.length || 178, 178)}</strong>
+                <strong>{followingCount}</strong>
                 <small>Following</small>
               </article>
               <article>
@@ -431,8 +573,8 @@ export default function UserProfileWorkspace() {
               </article>
               <article>
                 <span><MapPin size={25} /></span>
-                <strong>24</strong>
-                <small>Trips</small>
+                <strong>{profileSummary?.stats.posts ?? profilePosts.length}</strong>
+                <small>Posts</small>
               </article>
             </div>
           </section>
@@ -466,7 +608,7 @@ export default function UserProfileWorkspace() {
                       const tags = post.tags ?? [];
 
                       return (
-                        <article className="profile-post-card" key={post.id}>
+                        <article className="profile-post-card" key={post.id} role="button" tabIndex={0} onClick={() => openPostModal(post)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openPostModal(post); } }}>
                           <header>
                             <img src={post.avatar ?? post.authorProfile?.avatarUrl ?? avatarSrc} alt={post.author} />
                             <div>
@@ -474,7 +616,28 @@ export default function UserProfileWorkspace() {
                               <span>{formatProfilePostTime(post.createdAt)}</span>
                               <small>Public</small>
                             </div>
-                            <MoreHorizontal size={19} />
+                            <div className="profile-post-more-wrap" ref={postMenuId === post.id ? postMenuRef : null}>
+                              <button
+                                type="button"
+                                className={postMenuId === post.id ? "profile-post-more is-open" : "profile-post-more"}
+                                aria-label="Gonderi secenekleri"
+                                aria-expanded={postMenuId === post.id}
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  setPostMenuId((current) => (current === post.id ? null : post.id));
+                                }}
+                              >
+                                <MoreHorizontal size={19} />
+                              </button>
+                              {postMenuId === post.id ? (
+                                <div className="profile-post-options-menu" role="menu" onClick={(event) => event.stopPropagation()}>
+                                  <strong>Size ait</strong>
+                                  <button type="button" role="menuitem" onClick={() => handleProfilePostMenuAction("edit", post)}><Edit3 size={16} />Duzenle</button>
+                                  <button type="button" role="menuitem" onClick={() => handleProfilePostMenuAction("share", post)}><Share2 size={16} />Paylas</button>
+                                  <button type="button" role="menuitem" className="is-danger" onClick={() => handleProfilePostMenuAction("delete", post)}><Trash2 size={16} />Kaldir</button>
+                                </div>
+                              ) : null}
+                            </div>
                           </header>
 
                           <p>{post.body}</p>
@@ -495,26 +658,26 @@ export default function UserProfileWorkspace() {
 
                           <footer>
                             <div className="profile-reaction-stack" aria-hidden="true">
-                              {following.slice(0, 3).map((image) => (
+                              {(followingList.length ? followingList.map((person) => person.avatarUrl ?? avatar) : following).slice(0, 3).map((image) => (
                                 <img key={image} src={image} alt="" />
                               ))}
                             </div>
                             <button
                               className={likedPosts[post.id] ? "profile-action profile-action--active" : "profile-action"}
                               type="button"
-                              onClick={() => setLikedPosts((current) => ({ ...current, [post.id]: !current[post.id] }))}
+                              onClick={(event) => { event.stopPropagation(); toggleProfilePostLike(post.id); }}
                             >
                               <Heart size={19} />
                               {postStats[post.id]?.likes ?? post.likes}
                             </button>
-                            <button className="profile-action" type="button">
+                            <button className="profile-action" type="button" onClick={(event) => { event.stopPropagation(); openPostModal(post); }}>
                               <MessageCircle size={19} />
                               {post.comments} Comments
                             </button>
                             <button
                               className={postStats[post.id]?.shared ? "profile-action profile-action--active" : "profile-action"}
                               type="button"
-                              onClick={() => setSharedPosts((current) => ({ ...current, [post.id]: !current[post.id] }))}
+                              onClick={(event) => { event.stopPropagation(); setSharedPosts((current) => ({ ...current, [post.id]: !current[post.id] })); }}
                             >
                               <Share2 size={18} />
                               {postStats[post.id]?.shared ? "Shared" : "Share"}
@@ -543,7 +706,7 @@ export default function UserProfileWorkspace() {
             <header>
               <h2>Hakkında</h2>
             </header>
-            {aboutItems.map(({ icon: Icon, label, value }) => (
+            {profileAboutItems.map(({ icon: Icon, label, value }) => (
               <article key={label}>
                 <span>
                   <Icon size={19} />
@@ -554,18 +717,18 @@ export default function UserProfileWorkspace() {
                 </div>
               </article>
             ))}
-            <button type="button">Tüm Profili Gör</button>
+            <button type="button" onClick={() => setActiveTab("posts")}>Tüm Profili Gör</button>
           </section>
 
           <section className="angler-level">
             <div>
               <h2>Angler Level</h2>
-              <strong>12</strong>
+              <strong>{levelValue}</strong>
               <ShieldCheck size={17} />
             </div>
             <div className="level-arc">
               <Waves size={28} />
-              <span>1540 / 1,800</span>
+              <span>{xpValue} / {xpTarget}</span>
               <small>XP</small>
             </div>
             <p>Keep going, you're making great progress!</p>
@@ -579,22 +742,74 @@ export default function UserProfileWorkspace() {
 
           <section className="profile-following">
             <header>
-              <h2>Takip Ettikleri <span>(178)</span></h2>
+              <h2>Takip Ettikleri <span>({followingCount})</span></h2>
               <a href="/platform/social">Tümünü Gör</a>
             </header>
             <div className="profile-following-list">
-              {followingPeople.map((person) => (
-                <article key={person.name}>
-                  <img src={person.image} alt={person.name} />
+              {followingList.length ? followingList.map((person) => (
+                <article key={person.id}>
+                  <img src={person.avatarUrl ?? avatar} alt={person.name} />
                   <strong>{person.name}</strong>
-                  <button type="button">Takip Ediyor</button>
+                  <button type="button" onClick={() => { window.location.href = "/platform/social"; }}>Takip Ediyor</button>
                 </article>
-              ))}
+              )) : (
+                <article className="profile-following-empty"><strong>Takip edilen yok</strong><button type="button" onClick={() => { window.location.href = "/platform/social"; }}>Sosyal Alana Git</button></article>
+              )}
             </div>
           </section>
         </aside>
       </div>
 
+      {activePost ? (
+        <div className="profile-modal-layer profile-post-modal-layer" role="dialog" aria-modal="true" aria-labelledby="profile-post-modal-title" onClick={() => setActivePost(null)}>
+          <section className="profile-post-modal" onClick={(event) => event.stopPropagation()}>
+            <button type="button" className="profile-post-modal-close" aria-label="Gonderi modalini kapat" onClick={() => setActivePost(null)}>
+              <X size={18} />
+            </button>
+            <div className="profile-post-modal-media">
+              <img src={activePost.mediaUrls?.[0] ?? defaultPostImage} alt="" />
+            </div>
+            <div className="profile-post-modal-content">
+              <header>
+                <img src={activePost.avatar ?? activePost.authorProfile?.avatarUrl ?? avatarSrc} alt={activePost.author} />
+                <div>
+                  <h2 id="profile-post-modal-title">{activePost.author}</h2>
+                  <span>{formatProfilePostTime(activePost.createdAt)} � Public</span>
+                </div>
+              </header>
+              <p>{activePost.body}</p>
+              {activePost.tags?.length ? (
+                <div className="profile-post-tags">
+                  {activePost.tags.map((tag) => <span key={tag}>{tag}</span>)}
+                </div>
+              ) : null}
+              <div className="profile-post-modal-actions">
+                <button type="button" className={likedPosts[activePost.id] ? "profile-action profile-action--active" : "profile-action"} onClick={() => toggleProfilePostLike(activePost.id)}>
+                  <Heart size={18} />{postStats[activePost.id]?.likes ?? activePost.likes}
+                </button>
+                <button type="button" className="profile-action">
+                  <MessageCircle size={18} />{postComments[activePost.id]?.length ?? activePost.comments}
+                </button>
+                <button type="button" className={postStats[activePost.id]?.shared ? "profile-action profile-action--active" : "profile-action"} onClick={() => setSharedPosts((current) => ({ ...current, [activePost.id]: !current[activePost.id] }))}>
+                  <Share2 size={18} />{postStats[activePost.id]?.shared ? "Shared" : "Share"}
+                </button>
+              </div>
+              <div className="profile-post-modal-comments">
+                {(postComments[activePost.id] ?? []).map((comment) => (
+                  <article key={comment.id}>
+                    <img src={comment.avatar ?? avatar} alt={comment.author} />
+                    <div><strong>{comment.author}</strong><p>{comment.body}</p></div>
+                  </article>
+                ))}
+              </div>
+              <label className="profile-post-modal-comment-box">
+                <input value={commentDraft} placeholder="Yorum yaz..." onChange={(event) => setCommentDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") submitProfilePostComment(); }} />
+                <button type="button" onClick={submitProfilePostComment}>Gonder</button>
+              </label>
+            </div>
+          </section>
+        </div>
+      ) : null}
       {isAvatarEditorOpen ? (
         <ProfileImagePickerModal
           currentImage={avatarSrc}
