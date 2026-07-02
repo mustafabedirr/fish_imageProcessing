@@ -1,6 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800&display=swap");
 
 :root {
+  --cursor-aqualens: url('/icons/aqualens-cursor.svg') 6 5, auto;
+  --cursor-aqualens-hover: url('/icons/aqualens-cursor-hover.svg') 6 5, pointer;
+  --cursor-aqualens-busy: url('/icons/aqualens-cursor-busy.svg') 6 5, wait;
+  --cursor-aqualens-disabled: url('/icons/aqualens-cursor-disabled.svg') 6 5, not-allowed;
   --bg: #eaf8ff;
   --bg-2: #d8f2ff;
   --text: #072338;
@@ -1550,6 +1554,10 @@ img {
 
 /* Underwater login palette */
 :root {
+  --cursor-aqualens: url('/icons/aqualens-cursor.svg') 6 5, auto;
+  --cursor-aqualens-hover: url('/icons/aqualens-cursor-hover.svg') 6 5, pointer;
+  --cursor-aqualens-busy: url('/icons/aqualens-cursor-busy.svg') 6 5, wait;
+  --cursor-aqualens-disabled: url('/icons/aqualens-cursor-disabled.svg') 6 5, not-allowed;
   --aqua-page: #edf6fa;
   --aqua-panel: #f8fbfd;
   --aqua-panel-soft: #eef7fb;
@@ -27410,6 +27418,10 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
    ============================================= */
 
 :root {
+  --cursor-aqualens: url('/icons/aqualens-cursor.svg') 6 5, auto;
+  --cursor-aqualens-hover: url('/icons/aqualens-cursor-hover.svg') 6 5, pointer;
+  --cursor-aqualens-busy: url('/icons/aqualens-cursor-busy.svg') 6 5, wait;
+  --cursor-aqualens-disabled: url('/icons/aqualens-cursor-disabled.svg') 6 5, not-allowed;
   --map-glass-bg: rgba(11, 32, 56, 0.65);
   --map-glass-border: rgba(34, 211, 238, 0.15);
   --map-accent-cyan: #00D4FF;
@@ -38954,4 +38966,66 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 .user-profile-content--reference .profile-hero:not(.profile-hero--collapsed) .profile-stats-row.profile-stats-row--reference article > span svg {
   width: 19px;
   height: 19px;
+}
+
+/* AquaLens blue cursor system. */
+html,
+body,
+#__next,
+.aqua-shell,
+.aqua-dashboard-page,
+.fish-analyze-page,
+.user-profile-page,
+.social-area-page,
+.species-library-page,
+.marine-map-page,
+.settings-page {
+  cursor: var(--cursor-aqualens);
+}
+
+a,
+button,
+[role="button"],
+summary,
+label,
+select,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="checkbox"],
+input[type="radio"],
+.cursor-pointer,
+[aria-haspopup="menu"],
+[aria-expanded] {
+  cursor: var(--cursor-aqualens-hover) !important;
+}
+
+button:active,
+a:active,
+[role="button"]:active,
+.cursor-pointer:active {
+  cursor: var(--cursor-aqualens-hover) !important;
+}
+
+button:disabled,
+[aria-disabled="true"],
+.disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: var(--cursor-aqualens-disabled) !important;
+}
+
+body.is-loading,
+body.is-loading *,
+[aria-busy="true"],
+[aria-busy="true"] *,
+.cursor-wait {
+  cursor: var(--cursor-aqualens-busy) !important;
+}
+
+input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]),
+textarea,
+[contenteditable="true"] {
+  cursor: text;
 }
