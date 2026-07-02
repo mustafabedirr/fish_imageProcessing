@@ -98,6 +98,21 @@ type SpeciesProfile = {
   colors: string[];
   distribution: number[];
 };
+type WikipediaSummary = {
+  title: string;
+  extract: string;
+  description?: string;
+  pageUrl?: string;
+  thumbnail?: string;
+  sourceLabel: string;
+};
+
+type SpeciesListRow = {
+  name: string;
+  latin: string;
+  score?: string;
+  isPrimary?: boolean;
+};
 
 const thumbnails = [
   "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=220&q=80",
@@ -179,6 +194,7 @@ const speciesProfiles: Record<string, SpeciesProfile> = {
 
 export default function AnalyzeWorkspace() {
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const speciesListRef = useRef<HTMLDivElement | null>(null);
   const acceptedTypes = useMemo(() => ["image/svg+xml", "image/jpeg", "image/jpg", "image/png", "image/gif"], []);
   const maxSizeMB = 2;
   const maxSize = maxSizeMB * 1024 * 1024;
@@ -196,6 +212,11 @@ export default function AnalyzeWorkspace() {
   const [isMoreActionsOpen, setIsMoreActionsOpen] = useState(false);
   const [selectedSizeIndex, setSelectedSizeIndex] = useState(4);
   const [observationRange, setObservationRange] = useState<"month" | "week">("month");
+  const [isSpeciesDetailOpen, setIsSpeciesDetailOpen] = useState(false);
+  const [speciesDetail, setSpeciesDetail] = useState<WikipediaSummary | null>(null);
+  const [speciesDetailLoading, setSpeciesDetailLoading] = useState(false);
+  const [speciesDetailError, setSpeciesDetailError] = useState<string | null>(null);
+  const [isAllSpeciesExpanded, setIsAllSpeciesExpanded] = useState(false);
 
   const detectedSpecies = result?.species ?? "Levrek";
   const confidence = result ? normalizeConfidence(result.confidence) : 95.4;
@@ -210,6 +231,7 @@ export default function AnalyzeWorkspace() {
   const scoreRows = getScoreRows(confidence, result, speciesProfile);
   const measurements = getMeasurementsFromResult(result);
   const topPredictionRows = result?.top_predictions.length ? getTopPredictionRows(result) : getFallbackPredictionRows(detectedSpecies, confidence);
+  const allSpeciesRows = useMemo(() => buildAllSpeciesRows(topPredictionRows), [topPredictionRows]);
   const analysisId = result && file ? `AAS-${file.name.replace(/\W+/g, "-").slice(0, 18).toUpperCase()}` : "AAS-2024-0518-1247";
   const modelName = result ? "EfficientNet + YOLO Fish_Data" : "AquaScope AI v2.4";
   const imageSet = result ? [previewUrl, ...thumbnails] : thumbnails;
@@ -426,6 +448,37 @@ export default function AnalyzeWorkspace() {
     } finally {
       setIsMoreActionsOpen(false);
     }
+  }
+  async function openSpeciesDetailModal(target?: SpeciesListRow) {
+    const targetName = target?.name ?? displaySpecies;
+    const targetProfile = target ? { ...getSpeciesProfile(target.name), latin: target.latin } : speciesProfile;
+
+    setIsSpeciesDetailOpen(true);
+    setSpeciesDetail(null);
+    setSpeciesDetailError(null);
+    setSpeciesDetailLoading(true);
+
+    try {
+      const summary = await fetchWikipediaSummary(targetName, targetProfile);
+      setSpeciesDetail(summary);
+    } catch (err) {
+      setSpeciesDetailError(err instanceof Error ? err.message : "Wikipedia tur bilgisi alinamadi.");
+      setSpeciesDetail({
+        title: targetName,
+        description: targetProfile.latin,
+        extract: targetProfile.description,
+        sourceLabel: "AquaScope tur profili",
+      });
+    } finally {
+      setSpeciesDetailLoading(false);
+    }
+  }
+
+  function showAllSpeciesInPanel() {
+    setIsAllSpeciesExpanded(true);
+    window.setTimeout(() => {
+      speciesListRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, 80);
   }
   return (
     <section className="fish-analyze-page">
@@ -841,7 +894,7 @@ export default function AnalyzeWorkspace() {
                   : "Sonuç geldiğinde model kararı burada görünür."}
               </small>
             </div>
-            <button type="button" onClick={() => setActionMessage(`${displaySpecies} tur detayi acildi.`)}>Tür Detayına Git <ChevronRight size={17} /></button>
+            <button type="button" onClick={() => void openSpeciesDetailModal()}>Tur Detayina Git <ChevronRight size={17} /></button>
 
             <h3>Top-5 Tahminler</h3>
             <div className="fish-alt-list">
@@ -853,7 +906,17 @@ export default function AnalyzeWorkspace() {
                 </div>
               ))}
             </div>
-            <button type="button" onClick={() => setActionMessage("Tür kütüphanesi bağlantısı hazır.")}>Tüm Türleri Gör <ChevronRight size={17} /></button>
+            <button type="button" onClick={showAllSpeciesInPanel}>Tum Turleri Gor <ChevronRight size={17} /></button>
+            {isAllSpeciesExpanded ? (
+              <div className="fish-all-species-list" ref={speciesListRef} aria-label="Tum analiz turleri">
+                {allSpeciesRows.map((item) => (
+                  <button type="button" className={item.isPrimary ? "fish-all-species-row fish-all-species-row--primary" : "fish-all-species-row"} key={`${item.name}-${item.latin}`} onClick={() => void openSpeciesDetailModal(item)}>
+                    <span><strong>{item.name}</strong><small>{item.latin}</small></span>
+                    <b>{item.score ?? "Profil"}</b>
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </article>
         </aside>
       </main>
@@ -889,11 +952,113 @@ export default function AnalyzeWorkspace() {
         </div>
       ) : null}
 
+      {isSpeciesDetailOpen ? (
+        <div className="fish-species-detail-backdrop" role="presentation" onClick={() => setIsSpeciesDetailOpen(false)}>
+          <section className="fish-species-detail-modal" role="dialog" aria-modal="true" aria-labelledby="fish-species-detail-title" onClick={(event) => event.stopPropagation()}>
+            <button type="button" className="fish-species-detail-close" aria-label="Tur detayini kapat" onClick={() => setIsSpeciesDetailOpen(false)}>
+              <X size={18} />
+            </button>
+            <div className="fish-species-detail-head">
+              <span>Wikipedia tur profili</span>
+              <h2 id="fish-species-detail-title">{speciesDetail?.title ?? displaySpecies}</h2>
+              <small>{speciesDetail?.description ?? speciesProfile.latin}</small>
+            </div>
+            {speciesDetailLoading ? (
+              <div className="fish-species-detail-loading">
+                <Loader2 className="fish-spinner" size={22} />
+                <span>Wikipedia bilgileri aliniyor...</span>
+              </div>
+            ) : (
+              <>
+                {speciesDetail?.thumbnail ? <img className="fish-species-detail-image" src={speciesDetail.thumbnail} alt="" /> : null}
+                {speciesDetailError ? <p className="fish-species-detail-warning">{speciesDetailError}</p> : null}
+                <p>{speciesDetail?.extract ?? speciesProfile.description}</p>
+                <div className="fish-species-detail-meta">
+                  <span><strong>Latince</strong><small>{speciesDetail?.description ?? speciesProfile.latin}</small></span>
+                  <span><strong>Bolge</strong><small>{speciesProfile.location}</small></span>
+                  <span><strong>Kaynak</strong><small>{speciesDetail?.sourceLabel ?? "Wikipedia"}</small></span>
+                </div>
+                {speciesDetail?.pageUrl ? (
+                  <a className="fish-species-detail-link" href={speciesDetail.pageUrl} target="_blank" rel="noreferrer">
+                    Wikipedia sayfasini ac <ChevronRight size={16} />
+                  </a>
+                ) : null}
+              </>
+            )}
+          </section>
+        </div>
+      ) : null}
       {actionMessage ? <div className="fish-action-toast" role="status">{actionMessage}</div> : null}
     </section>
   );
 }
 
+function buildAllSpeciesRows(predictionRows: PredictionDisplay[]): SpeciesListRow[] {
+  const rows: SpeciesListRow[] = [];
+  const seen = new Set<string>();
+
+  const addRow = (row: SpeciesListRow) => {
+    const key = normalizeSpeciesKey(`${row.name}-${row.latin}`);
+    if (seen.has(key)) return;
+    seen.add(key);
+    rows.push(row);
+  };
+
+  predictionRows.forEach((row) => addRow({ name: row.name, latin: row.latin, score: row.score, isPrimary: row.isPrimary }));
+  Object.values(speciesProfiles).forEach((profile) => addRow({ name: profile.commonName, latin: profile.latin }));
+
+  return rows;
+}
+
+type WikipediaApiSummary = {
+  title?: string;
+  extract?: string;
+  description?: string;
+  thumbnail?: { source?: string };
+  content_urls?: { desktop?: { page?: string } };
+};
+
+async function fetchWikipediaSummary(displayName: string, profile: SpeciesProfile): Promise<WikipediaSummary> {
+  const titles = uniqueWikipediaTitles([profile.latin, displayName, profile.commonName]);
+  const languages = ["tr", "en"];
+
+  for (const language of languages) {
+    for (const title of titles) {
+      const endpoint = `https://${language}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
+      try {
+        const response = await fetch(endpoint, { headers: { accept: "application/json" } });
+        if (!response.ok) continue;
+        const data = (await response.json()) as WikipediaApiSummary;
+        if (!data.extract) continue;
+        return {
+          title: data.title || displayName,
+          description: data.description || profile.latin,
+          extract: data.extract,
+          thumbnail: data.thumbnail?.source,
+          pageUrl: data.content_urls?.desktop?.page,
+          sourceLabel: `Wikipedia ${language.toUpperCase()}`,
+        };
+      } catch {
+        continue;
+      }
+    }
+  }
+
+  throw new Error("Wikipedia tur bilgisi bulunamadi.");
+}
+
+function uniqueWikipediaTitles(items: string[]) {
+  const seen = new Set<string>();
+  return items
+    .map((item) => item.trim())
+    .filter((item) => {
+      if (!item) return false;
+      const key = item.toLocaleLowerCase("tr-TR");
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
 function waitForMinimumDuration(startedAt: number, minimumMs: number) {
   const remaining = minimumMs - (performance.now() - startedAt);
   if (remaining <= 0) return Promise.resolve();

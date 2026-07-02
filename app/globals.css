@@ -38555,3 +38555,294 @@ body.sidebar-collapsed .aqua-sidebar__logout--icon,
 .user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-avatar-wrap .avatar-profile-photo {
   margin: 0;
 }
+
+/* Use the standard profile action buttons in collapsed mode. */
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-collapsed-score,
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-collapsed-notification {
+  display: none !important;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-hero-actions.profile-hero-actions--reference {
+  gap: 6px;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-hero-actions.profile-hero-actions--reference > button:not(.profile-collapsed-notification):not(.profile-collapse-toggle) {
+  display: inline-flex;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-hero-actions.profile-hero-actions--reference > button:first-of-type {
+  width: auto;
+  min-width: 136px;
+  height: 38px;
+  padding: 0 14px;
+  gap: 8px;
+  border-radius: 9px;
+  font-size: 0.8rem;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-hero-actions.profile-hero-actions--reference > button:not(:first-of-type) {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 9px;
+}
+
+.user-profile-content--reference .profile-hero.profile-hero--collapsed .profile-hero-actions.profile-hero-actions--reference > button.profile-collapse-toggle {
+  width: 43px;
+  min-width: 43px;
+  height: 43px;
+  border-radius: 999px;
+}
+
+/* Analyze species detail modal and full species list. */
+.fish-species-card {
+  max-height: min(760px, calc(100vh - 128px));
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(45, 226, 255, 0.38) rgba(8, 30, 52, 0.35);
+}
+
+.fish-all-species-list {
+  display: grid;
+  gap: 8px;
+  max-height: 320px;
+  margin-top: 12px;
+  padding: 8px;
+  overflow-y: auto;
+  border: 1px solid rgba(80, 160, 220, 0.18);
+  border-radius: 14px;
+  background: rgba(5, 19, 36, 0.52);
+  animation: fishSpeciesListReveal 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.fish-all-species-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 58px;
+  padding: 10px 12px;
+  border: 1px solid rgba(82, 158, 218, 0.16);
+  border-radius: 12px;
+  background: rgba(10, 34, 58, 0.58);
+  color: rgba(235, 246, 255, 0.92);
+  text-align: left;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.fish-all-species-row:hover {
+  transform: translateY(-1px);
+  border-color: rgba(45, 226, 255, 0.42);
+  background: rgba(13, 51, 82, 0.76);
+}
+
+.fish-all-species-row--primary {
+  border-color: rgba(35, 244, 230, 0.44);
+  background: rgba(17, 82, 102, 0.52);
+}
+
+.fish-all-species-row span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.fish-all-species-row strong,
+.fish-all-species-row small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fish-all-species-row strong {
+  font-size: 0.9rem;
+  font-weight: 720;
+}
+
+.fish-all-species-row small {
+  color: rgba(177, 204, 229, 0.72);
+  font-size: 0.76rem;
+}
+
+.fish-all-species-row b {
+  flex: 0 0 auto;
+  color: #52f0ff;
+  font-size: 0.78rem;
+  font-weight: 720;
+}
+
+.fish-species-detail-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: clamp(18px, 4vw, 48px);
+  background: rgba(2, 8, 18, 0.42);
+  backdrop-filter: blur(18px);
+  animation: fishModalBackdropIn 260ms ease both;
+}
+
+.fish-species-detail-modal {
+  position: relative;
+  width: min(720px, 100%);
+  max-height: min(760px, calc(100vh - 56px));
+  overflow-y: auto;
+  padding: clamp(22px, 3vw, 34px);
+  border: 1px solid rgba(74, 170, 226, 0.34);
+  border-radius: 22px;
+  background:
+    linear-gradient(145deg, rgba(8, 24, 45, 0.95), rgba(4, 14, 28, 0.94)),
+    radial-gradient(circle at top right, rgba(37, 244, 230, 0.16), transparent 44%);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  animation: fishSpeciesModalIn 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.fish-species-detail-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgba(110, 174, 226, 0.28);
+  border-radius: 12px;
+  background: rgba(7, 27, 49, 0.78);
+  color: rgba(235, 247, 255, 0.9);
+}
+
+.fish-species-detail-head {
+  display: grid;
+  gap: 8px;
+  padding-right: 42px;
+}
+
+.fish-species-detail-head span {
+  color: #31e6df;
+  font-size: 0.76rem;
+  font-weight: 820;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fish-species-detail-head h2 {
+  margin: 0;
+  color: #f4fbff;
+  font-size: clamp(1.6rem, 2.4vw, 2.35rem);
+  line-height: 1;
+}
+
+.fish-species-detail-head small {
+  color: rgba(188, 212, 235, 0.76);
+  font-size: 0.92rem;
+}
+
+.fish-species-detail-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 180px;
+  color: rgba(221, 239, 250, 0.8);
+}
+
+.fish-species-detail-image {
+  width: 100%;
+  max-height: 260px;
+  margin: 22px 0 4px;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 1px solid rgba(89, 162, 216, 0.2);
+}
+
+.fish-species-detail-modal p {
+  margin: 22px 0 0;
+  color: rgba(225, 239, 250, 0.86);
+  font-size: 0.98rem;
+  line-height: 1.72;
+}
+
+.fish-species-detail-warning {
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 191, 87, 0.28);
+  border-radius: 12px;
+  background: rgba(255, 191, 87, 0.08);
+  color: #ffd38a !important;
+}
+
+.fish-species-detail-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.fish-species-detail-meta span {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(80, 160, 220, 0.18);
+  border-radius: 14px;
+  background: rgba(9, 34, 60, 0.5);
+}
+
+.fish-species-detail-meta strong {
+  color: rgba(160, 190, 218, 0.72);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.fish-species-detail-meta small {
+  overflow: hidden;
+  color: rgba(241, 248, 255, 0.9);
+  font-size: 0.82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fish-species-detail-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 22px;
+  color: #4ff3ff;
+  font-size: 0.9rem;
+  font-weight: 760;
+  text-decoration: none;
+}
+
+@keyframes fishSpeciesModalIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes fishModalBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fishSpeciesListReveal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (max-width: 680px) {
+  .fish-species-detail-meta {
+    grid-template-columns: 1fr;
+  }
+}
